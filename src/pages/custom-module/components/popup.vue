@@ -2,11 +2,11 @@
   <div class="popup">
     <div class="popup-head">
       <h4 class="popup-head-title">普通表单设计</h4>
-      <i class="el-icon-close popup-head-close" @click="onClose"></i>
+      <i class="el-icon-close popup-head-close" @click="onClose" />
     </div>
     <div class="popup-body">
       <PopupLeft />
-      <PopupMiddle v-bind="$attrs" v-on="$listeners" @onClose="onClose"/>
+      <PopupMiddle v-bind="$attrs" v-on="$listeners" @onClose="onClose" @getData="getData" />
       <PopupRight v-bind="$attrs" v-on="$listeners" />
     </div>
   </div>
@@ -24,6 +24,9 @@ export default {
   methods: {
     onClose() {
       this.$emit('onClose')
+    },
+    getData(name) {
+      this.$emit('getData', name)
     }
   }
 }

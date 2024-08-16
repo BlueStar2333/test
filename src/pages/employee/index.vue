@@ -6,14 +6,18 @@
           <el-input v-model="userName" clearable placeholder="根据用户名查询" />
         </el-form-item>
         <el-form-item>
-          <el-button icon="el-icon-search" type="primary" @click="getUser"
-            >查询</el-button
-          >
+          <el-button
+            icon="el-icon-search"
+            type="primary"
+            @click="getUser"
+          >查询</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button icon="el-icon-plus" type="primary" @click="openAddUser"
-            >人员添加</el-button
-          >
+          <el-button
+            icon="el-icon-plus"
+            type="primary"
+            @click="openAddUser"
+          >人员添加</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -35,11 +39,11 @@
         <el-table-column prop="Iphone" label="联系电话" />
         <el-table-column label="是否管理员">
           <template slot-scope="scope">
-            <label v-if="scope.row.Power == 3">全院管理</label>
-            <label v-else-if="scope.row.Power == 2">科室管理</label>
-            <label v-else-if="scope.row.Power == 1">追踪处理</label>
-            <label v-else-if="scope.row.Power == 0">录入</label>
-            <label v-else-if="scope.row.Power == -1">个人</label>
+            <label v-if="scope.row.Power === 3">全院管理</label>
+            <label v-else-if="scope.row.Power === 2">科室管理</label>
+            <label v-else-if="scope.row.Power === 1">追踪处理</label>
+            <label v-else-if="scope.row.Power === 0">录入</label>
+            <label v-else-if="scope.row.Power === -1">个人</label>
           </template>
         </el-table-column>
         <el-table-column label="创建时间">
@@ -53,14 +57,13 @@
               v-if="user.power >= scope.row.Power"
               type="primary"
               @click="editPerson(scope.row)"
-              >编辑</el-link
-            >
+            >编辑</el-link>
             <el-link
+              v-if="user.power > scope.row.Power"
               type="danger"
               style="margin-left: 10px"
-              v-if="user.power > scope.row.Power"
               @click="deleteUser(scope.row)"
-              >删除
+            >删除
             </el-link>
           </template>
         </el-table-column>
@@ -97,7 +100,7 @@
         <el-form-item label="用户编号">
           <el-input
             v-model="addPerson.number"
-            :disabled="dialogType === 'edit' && addPerson.name != user.name"
+            :disabled="dialogType === 'edit' && addPerson.name !== user.name"
             clearable
             placeholder="请输入用户编号"
           />
@@ -106,7 +109,7 @@
           <el-input
             v-model="addPerson.password"
             type="password"
-            :disabled="dialogType == 'edit' && addPerson.name != user.name"
+            :disabled="dialogType === 'edit' && addPerson.name !== user.name"
             clearable
             placeholder="请输入用户密码"
           />
@@ -123,7 +126,7 @@
               :key="item.ID"
               :label="item.Name"
               :value="item.Name"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="联系电话">
@@ -153,9 +156,11 @@
       </el-form>
       <div style="text-align: right; margin: 10px 10px 0">
         <el-button @click="(drawer = false), getUser()">取消</el-button>
-        <el-button icon="el-icon-finished" type="primary" @click="confirm"
-          >提交</el-button
-        >
+        <el-button
+          icon="el-icon-finished"
+          type="primary"
+          @click="confirm"
+        >提交</el-button>
       </div>
     </el-dialog>
   </div>
@@ -166,71 +171,62 @@ import {
   addUserInfo,
   getUserinfoByName,
   updateUser,
-  deleteUser,
-} from "@/api/employee";
-import { getDept } from "@/api/dept";
+  deleteUser
+} from '@/api/employee'
 
 export default {
   data() {
     return {
-      userName: "",
+      userName: '',
       user: {
         name: this.$store.state.user.userInfo.Name,
-        power: this.$store.state.user.userInfo.Power,
+        power: this.$store.state.user.userInfo.Power
       },
       tableData: [],
-      deptName: "",
+      deptName: '',
       edit: false,
       drawer: false,
       isAdmin: false,
       addPerson: {
-        department: "",
-        phone: "",
-        name: "",
-        number: "",
-        power: "",
-        password: "",
+        department: '',
+        phone: '',
+        name: '',
+        number: '',
+        power: '',
+        password: '',
         hospitalCode: this.$store.state.user.userInfo.hospitalCode,
-        hospitalName: this.$store.state.user.userInfo.HospitalName,
+        hospitalName: this.$store.state.user.userInfo.HospitalName
       },
-      dialogType: "",
+      dialogType: '',
       dept: [],
       Confirmpage: 1,
-      ConfirmpageSize: 10,
-    };
+      ConfirmpageSize: 10
+    }
   },
   computed: {},
   mounted() {
-    this.getUser();
-    this.getDept();
+    this.getUser()
   },
   methods: {
     editPerson(row) {
-      this.dialogType = "edit";
-      this.drawer = true;
-      this.addPerson.power = row.Power;
-      this.addPerson.department = row.Department;
-      this.addPerson.phone = row.Iphone;
-      this.addPerson.name = row.Name;
-      this.addPerson.number = row.Number;
-      this.addPerson.password = row.Password;
-    },
-    getDept() {
-      getDept({
-        hospitalCode: this.$store.state.user.userInfo.hospitalCode,
-      }).then((res) => {
-        this.dept = JSON.parse(res.d);
-      });
+      this.dialogType = 'edit'
+      this.drawer = true
+      this.addPerson.power = row.Power
+      this.addPerson.department = row.Department
+      this.addPerson.phone = row.Iphone
+      this.addPerson.name = row.Name
+      this.addPerson.number = row.Number
+      this.addPerson.password = row.Password
     },
     getUser() {
       getUserinfoByName({
         Name: this.userName,
         hospitalCode: this.$store.state.user.userInfo.hospitalCode,
         power: this.$store.state.user.userInfo.Power,
-        dept: this.$store.state.user.userInfo.Department,
+        dept: this.$store.state.user.userInfo.Department
       }).then((res) => {
-        this.tableData = JSON.parse(res.d);
-      });
+        this.tableData = JSON.parse(res.d)
+      })
     },
     confirm() {
       // if (this.addPerson.Power == "全院管理") {
@@ -244,92 +240,92 @@ export default {
       // } else if (this.addPerson.Power == "个人") {
       //   this.addPerson.Power = -1;
       // }
-      if (this.dialogType === "add") {
-        this.addUser();
+      if (this.dialogType === 'add') {
+        this.addUser()
       } else {
-        this.updateUser();
+        this.updateUser()
       }
     },
     openAddUser() {
-      this.dialogType = "add";
-      this.drawer = true;
+      this.dialogType = 'add'
+      this.drawer = true
       this.addPerson = {
-        department: "",
-        phone: "",
-        name: "",
-        number: "",
-        power: "",
-        password: "",
+        department: '',
+        phone: '',
+        name: '',
+        number: '',
+        power: '',
+        password: '',
         hospitalCode: this.$store.state.user.userInfo.hospitalCode,
-        hospitalName: this.$store.state.user.userInfo.HospitalName,
-      };
+        hospitalName: this.$store.state.user.userInfo.HospitalName
+      }
 
-      if (this.$store.state.user.userInfo.Power == 2) {
-        this.addPerson.department = this.$store.state.user.userInfo.Department;
+      if (this.$store.state.user.userInfo.Power === 2) {
+        this.addPerson.department = this.$store.state.user.userInfo.Department
       }
     },
     addUser() {
       addUserInfo(this.addPerson).then((res) => {
-        if (res.d === "Success") {
+        if (res.d === 'Success') {
           this.$message({
-            type: "success",
-            message: "添加成功",
-          });
-          this.getUser();
-          this.drawer = false;
+            type: 'success',
+            message: '添加成功'
+          })
+          this.getUser()
+          this.drawer = false
         } else {
           this.$message({
-            type: "warning",
-            message: res.d,
-          });
+            type: 'warning',
+            message: res.d
+          })
         }
-      });
+      })
     },
     updateUser() {
       updateUser(this.addPerson).then((res) => {
-        if (res.d == "Success") {
+        if (res.d === 'Success') {
           this.$message({
-            type: "success",
-            message: "修改成功",
-          });
-          this.getUser();
-          this.drawer = false;
+            type: 'success',
+            message: '修改成功'
+          })
+          this.getUser()
+          this.drawer = false
         } else {
           this.$message({
-            type: "warning",
-            message: "修改失败",
-          });
+            type: 'warning',
+            message: '修改失败'
+          })
         }
-      });
+      })
     },
     deleteUser(row) {
-      this.$confirm("删除后不可恢复，是否确认删除？")
+      this.$confirm('删除后不可恢复，是否确认删除？')
         .then((_) => {
           deleteUser({
-            ID: row.ID,
+            ID: row.ID
           }).then((res) => {
-            if (res.d == "Success") {
+            if (res.d === 'Success') {
               this.$message({
-                type: "success",
-                message: "已删除",
-              });
-              this.getUser();
+                type: 'success',
+                message: '已删除'
+              })
+              this.getUser()
             } else {
               this.$message({
-                type: "warning",
-                message: "删除失败",
-              });
+                type: 'warning',
+                message: '删除失败'
+              })
             }
-          });
+          })
         })
-        .catch((_) => {});
+        .catch((_) => {})
     },
 
     handleCurrentChange(Confirmpage) {
-      this.Confirmpage = Confirmpage;
-    },
-  },
-};
+      this.Confirmpage = Confirmpage
+    }
+  }
+}
 </script>
 
 <style scoped>

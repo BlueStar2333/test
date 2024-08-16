@@ -2,13 +2,25 @@
   <div class="login-wrap">
     <div class="ms-login">
       <div class="ms-title">医务人员健康管理</div>
-      <el-form ref="loginForm" :model="loginForm" :rules="loginRules" label-width="0px" class="ms-content"
-        autocomplete="on">
+      <el-form
+        ref="loginForm"
+        :model="loginForm"
+        :rules="loginRules"
+        label-width="0px"
+        class="ms-content"
+        autocomplete="on"
+      >
         <el-form-item prop="username">
-          <el-input v-model="loginForm.username" clearable tabindex="1" autocomplete="on" placeholder="Username"
-            ref="username">
+          <el-input
+            ref="username"
+            v-model="loginForm.username"
+            clearable
+            tabindex="1"
+            autocomplete="on"
+            placeholder="Username"
+          >
             <template #prepend>
-              <el-button icon="el-icon-user"></el-button>
+              <el-button icon="el-icon-user" />
             </template>
           </el-input>
         </el-form-item>
@@ -29,11 +41,21 @@
           <!--          <span class="show-pwd" @click="showPwd">-->
           <!--            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />-->
           <!--          </span>-->
-          <el-input :key="passwordType" ref="password" v-model="loginForm.password" :type="passwordType"
-            placeholder="Password" name="password" tabindex="2" autocomplete="on" @keyup.native="checkCapslock"
-            @blur="capsTooltip = false" @keyup.enter.native="handleLogin">
+          <el-input
+            :key="passwordType"
+            ref="password"
+            v-model="loginForm.password"
+            :type="passwordType"
+            placeholder="Password"
+            name="password"
+            tabindex="2"
+            autocomplete="on"
+            @keyup.native="checkCapslock"
+            @blur="capsTooltip = false"
+            @keyup.enter.native="handleLogin"
+          >
             <template #prepend>
-              <el-button icon="el-icon-lock"></el-button>
+              <el-button icon="el-icon-lock" />
             </template>
           </el-input>
         </el-form-item>
@@ -78,7 +100,7 @@ export default {
       passwordType: 'password',
       capsTooltip: false,
       loading: false,
-      redirect: undefined,
+      redirect: '/custom/CommonForm',
       otherQuery: {}
     }
   },
@@ -129,7 +151,7 @@ export default {
             .then(() => {
               // console.log('kkl[][][')
               // console.log(this.redirect)
-              this.$router.push({ path: this.redirect || '/guide/index', query: this.otherQuery })
+              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
             })
             .catch(() => {
@@ -161,7 +183,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url(../../assets/img/loginbg.jpg);
+  background-image: url(../../assets/img/login-bg.jpg);
   background-size: cover;
 }
 

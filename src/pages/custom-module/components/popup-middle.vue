@@ -1,10 +1,10 @@
 <template>
   <div class="middle">
     <div class="head">
-      <el-link class="head-link" :underline="false" type="primary" @click="deleteInput(0, formData.length)" icon="el-icon-delete">清空</el-link>
-      <el-link class="head-link" :underline="false" type="primary" @click="previewTable" icon="el-icon-view">预览</el-link>
-      <el-link v-if="editForm" class="head-link" :underline="false" type="primary" @click="edit" icon="el-icon-document-checked">确认修改</el-link>
-      <el-link v-else class="head-link" :underline="false" type="primary" @click="save" icon="el-icon-document-add">保存上传</el-link>
+      <el-link class="head-link" :underline="false" type="primary" icon="el-icon-delete" @click="deleteInput(0, formData.length)">清空</el-link>
+      <el-link class="head-link" :underline="false" type="primary" icon="el-icon-view" @click="previewTable">预览</el-link>
+      <el-link v-if="editForm" class="head-link" :underline="false" type="primary" icon="el-icon-document-checked" @click="edit">确认修改</el-link>
+      <el-link v-else class="head-link" :underline="false" type="primary" icon="el-icon-document-add" @click="save">保存上传</el-link>
     </div>
     <div v-show="formData.length === 0" class="description">
       <p>请从左侧列表中选择一个组件,</p>
@@ -22,16 +22,16 @@
           <el-checkbox v-for="(itemB, idx) in itemA.content" :key="idx" :label="itemB">{{ itemB }}</el-checkbox>
         </el-checkbox-group>
         <el-date-picker v-if="itemA.type === 4" v-model="formData[index].content" class="body-input-content" type="date" size="small" placeholder="选择日期" />
-        <el-input-number v-if="itemA.type === 5" v-model="formData[index].content" :min="1" :max="10000" label="数"></el-input-number>
+        <el-input-number v-if="itemA.type === 5" v-model="formData[index].content" :min="1" :max="10000" label="数" />
         <div v-if="itemA.type === 20" class="body-input-content select-department">请选择</div>
         <!--    选中框    -->
         <div v-show="selectIndex === index" class="body-input-nav">
           <span class="nav-name"><i class="el-icon-rank" /> {{ typeMap[itemA.type] }}</span>
           <div class="nav-menu">
-            <a><i class="el-icon-back nav-menu-back" @click.stop="selectIndex = -1"/></a>
-            <a><i class="el-icon-bottom nav-menu-bottom" @click.stop="switchPlaces(index, index+1)"/></a>
-            <a><i class="el-icon-top nav-menu-top" @click.stop="switchPlaces(index, index-1)"/></a>
-            <a><i class="el-icon-delete" @click="deleteInput(index, 1)"/></a>
+            <a><i class="el-icon-back nav-menu-back" @click.stop="selectIndex = -1" /></a>
+            <a><i class="el-icon-bottom nav-menu-bottom" @click.stop="switchPlaces(index, index+1)" /></a>
+            <a><i class="el-icon-top nav-menu-top" @click.stop="switchPlaces(index, index-1)" /></a>
+            <a><i class="el-icon-delete" @click="deleteInput(index, 1)" /></a>
           </div>
         </div>
       </div>
@@ -42,8 +42,9 @@
       title="预览"
       :visible.sync="previewShow"
       width="32%"
-      center>
-      <Preview v-if="previewShow" :preview-data="diyForm"/>
+      center
+    >
+      <Preview v-if="previewShow" :preview-data="diyForm" />
     </el-dialog>
   </div>
 </template>
@@ -136,6 +137,7 @@ export default {
       this.previewShow = true
     },
     checkForm() {
+      let ret = false
       for (const key in warningMap) {
         if (this.diyForm[key] === '') {
           this.$eventBus.$emit('changeTab', 'second')
@@ -143,10 +145,12 @@ export default {
             message: warningMap[key],
             type: 'warning'
           })
-          return true
+          ret = true
+          break
         }
-        return false
+        ret = false
       }
+      return ret
     },
     save() {
       const self = this
@@ -166,6 +170,7 @@ export default {
             message: '添加成功',
             type: 'success'
           })
+          this.$emit('getData', '')
           this.$emit('onClose')
           this.$eventBus.$emit('refresh')
         }

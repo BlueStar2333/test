@@ -1,4 +1,4 @@
-//全局设置
+// 全局设置
 module.exports = {
   title: '医务人员健康管理',
 
@@ -7,9 +7,7 @@ module.exports = {
    */
   tagsView: true,
 
-
   fixedHeader: false,
-
 
   sidebarLogo: true,
 

@@ -13,28 +13,10 @@ const FormListRouter = {
   },
   children: [
     {
-      path: 'exposure',
-      component: () => import('@/pages/exposure/OccupationalExposure'),
-      name: '职业暴露',
-      meta: { title: '职业暴露', noCache: true }
-    },
-    {
       path: 'influenza',
       component: () => import('@/pages/influenza'),
       name: '流感相关',
       meta: { title: '流感相关', noCache: true }
-    },
-    {
-      path: 'COVID-19',
-      component: () => import('@/pages/COVID-19'),
-      name: '新冠相关',
-      meta: { title: '新冠相关', noCache: true }
-    },
-    {
-      path: 'diarrhea',
-      component: () => import('@/pages/diarrhea'),
-      name: '腹泻调查',
-      meta: { title: '腹泻调查', noCache: true }
     }
   ]
 }

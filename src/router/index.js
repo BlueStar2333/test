@@ -7,8 +7,6 @@ import Layout from '@/layout'
 
 import FormListRouter from '@/router/modules/form-list'
 import EmployeeRouter from '@/router/modules/employee'
-import DeptManageRouter from '@/router/modules/deptmanagement'
-import UploadFile from '@/router/modules/uploadFile'
 import CustomModuleRouter from '@/router/modules/custom-module'
 
 export const constantRoutes = [
@@ -46,20 +44,7 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/guide',
-  },
-  {
-    path: '/guide',
-    component: Layout,
-    redirect: '/guide/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/pages/home'),
-        name: '职业暴露统计分析',
-        meta: { title: '职业暴露统计分析', icon: '首页', noCache: true }
-      }
-    ]
+    redirect: '/404'
   }
 
 ]
@@ -68,8 +53,6 @@ export const asyncRoutes = [
   CustomModuleRouter,
   FormListRouter,
   EmployeeRouter,
-  DeptManageRouter,
-  UploadFile,
 
   { path: '*', redirect: '/404', hidden: true }
 ]

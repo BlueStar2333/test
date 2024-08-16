@@ -46,7 +46,7 @@ const mutations = {
 const actions = {
   generateRoutes({ commit }, roles) {
     return new Promise(resolve => {
-      let accessedRoutes, newAccessedRoutes
+      let accessedRoutes
       if (roles.includes('admin')) {
         accessedRoutes = asyncRoutes || []
       } else {
@@ -55,14 +55,14 @@ const actions = {
       switch (store.state.user.userInfo.Power) {
         case 0:
           accessedRoutes.splice(2, 2)
-          break;
+          break
         case 1:
           accessedRoutes.splice(2, 2)
-          break;
+          break
         case 2:
           accessedRoutes.splice(3, 1)
           accessedRoutes.splice(0, 1)
-          break;
+          break
       }
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)

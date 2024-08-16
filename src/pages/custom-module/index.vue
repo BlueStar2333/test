@@ -3,8 +3,8 @@
     <transition name="popup-show">
       <Popup
         v-if="popupShow"
+        :edit-form="editForm"
         @onClose="onClose"
-        :editForm="editForm"
         @getData="getData"
       />
     </transition>
@@ -12,8 +12,8 @@
     <div class="head">
       <div>
         <el-input
-          size="small"
           v-model="searchName"
+          size="small"
           placeholder="按表名搜索"
           style="width: 200px; margin-right: 14px"
         />
@@ -22,21 +22,19 @@
           type="primary"
           icon="el-icon-search"
           @click="getData(searchName)"
-          >查询</el-button
-        >
+        >查询</el-button>
       </div>
       <el-button
-        size="small"
         v-if="
           this.$store.state.user.userInfo.Power == 2 ||
-          this.$store.state.user.userInfo.Power == 3
+            this.$store.state.user.userInfo.Power == 3
         "
-        @click="addDiyTable"
+        size="small"
         type="primary"
         icon="el-icon-plus"
         plain
-        >添加</el-button
-      >
+        @click="addDiyTable"
+      >添加</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -84,27 +82,29 @@
           <i
             class="el-icon-document form-icon"
             @click="lookForm(scope.row)"
-          ></i>
+          />
         </template>
       </el-table-column>
       <el-table-column
+        v-if="
+          this.$store.state.user.userInfo.Power == 2 ||
+            this.$store.state.user.userInfo.Power == 3
+        "
         fixed="right"
         label="操作"
         width="200"
         align="center"
-        v-if="
-          this.$store.state.user.userInfo.Power == 2 ||
-          this.$store.state.user.userInfo.Power == 3
-        "
       >
         <template slot-scope="scope">
           <div class="operation">
-            <el-link type="primary" @click="editDiyTable(scope.row)"
-              >编辑</el-link
-            >
-            <el-link type="danger" @click="deleteDiyTable(scope.row.ID)"
-              >删除</el-link
-            >
+            <el-link
+              type="primary"
+              @click="editDiyTable(scope.row)"
+            >编辑</el-link>
+            <el-link
+              type="danger"
+              @click="deleteDiyTable(scope.row.ID)"
+            >删除</el-link>
           </div>
         </template>
       </el-table-column>
@@ -130,147 +130,148 @@
 </template>
 
 <script>
-import Pagination from "@/components/Pagination";
-import Popup from "./components/popup";
+import Pagination from '@/components/Pagination/index'
+import Popup from './components/popup'
 import {
   getCustomTablebydiyName,
-  deleteCustomTable,
-} from "@/api/custom-module";
-import Preview from "@/pages/custom-module/ordinary-form/components/preview";
-import { deepCopy } from "@/utils";
+  deleteCustomTable
+} from '@/api/custom-module'
+import Preview from '@/pages/custom-module/components/preview'
+import { deepCopy } from '@/utils'
 
 export default {
-  name: "Index",
+  name: 'Index',
   components: {
+    // eslint-disable-next-line vue/no-unused-components
     Pagination,
     Popup,
-    Preview,
+    Preview
   },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: "success",
-        draft: "info",
-        deleted: "danger",
-      };
-      return statusMap[status];
-    },
+        published: 'success',
+        draft: 'info',
+        deleted: 'danger'
+      }
+      return statusMap[status]
+    }
   },
   data() {
     return {
-      searchName: "",
+      searchName: '',
       previewShow: false,
       editForm: null,
       diyForm: [],
       popupShow: false,
       searchModel: {
-        startTime: "",
-        endTime: "",
+        startTime: '',
+        endTime: ''
       },
       listLoading: true,
       total: 60,
       listQuery: {
         page: 1,
         limit: 10,
-        sort: "+id",
+        sort: '+id'
       },
-      tableData: [],
-    };
+      tableData: []
+    }
   },
   created() {
-    this.getData();
-    this.$eventBus.$on("refresh", this.getData);
+    this.getData()
+    this.$eventBus.$on('refresh', this.getData)
   },
   methods: {
     handleCurrentChange(page) {
-      this.listQuery.page = page;
+      this.listQuery.page = page
     },
     getData(name) {
-      this.listLoading = true;
+      this.listLoading = true
       const requestData = {
-        diyName: name || "",
-        hospitalcode: this.$store.state.user.userInfo.HospitalName,
-      };
+        diyName: name || '',
+        hospitalcode: this.$store.state.user.userInfo.HospitalName
+      }
       getCustomTablebydiyName(requestData).then((res) => {
         // console.log(JSON.parse(res.d), 224)
-        this.tableData = JSON.parse(res.d);
+        this.tableData = JSON.parse(res.d)
         for (const key of this.tableData) {
-          key.diyContent = JSON.parse(key.diyContent);
+          key.diyContent = JSON.parse(key.diyContent)
         }
-        this.listLoading = false;
-      });
+        this.listLoading = false
+      })
     },
     lookForm(data) {
       // console.log(data, 456)
-      this.diyForm = deepCopy(data);
-      this.previewShow = true;
+      this.diyForm = deepCopy(data)
+      this.previewShow = true
     },
 
     addDiyTable() {
-      this.editForm = null;
-      this.popupShow = true;
+      this.editForm = null
+      this.popupShow = true
     },
 
     editDiyTable(rowData) {
       // console.log(rowData, 546)
-      this.editForm = deepCopy(rowData);
-      this.popupShow = true;
+      this.editForm = deepCopy(rowData)
+      this.popupShow = true
     },
 
     deleteDiyTable(ID) {
-      this.$confirm("此操作将永久删除该表, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
+      this.$confirm('此操作将永久删除该表, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
         .then(() => {
           deleteCustomTable({ ID }).then((res) => {
-            if (res.d === "Success") {
+            if (res.d === 'Success') {
               this.$message({
-                type: "success",
-                message: "删除成功!",
-              });
-              this.getData();
+                type: 'success',
+                message: '删除成功!'
+              })
+              this.getData()
             }
-          });
+          })
         })
         .catch(() => {
           this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     },
 
     onClose() {
-      this.popupShow = false;
+      this.popupShow = false
     },
 
     sortChange(data) {
-      const { prop, order } = data;
-      this.tableData.reverse();
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      this.tableData.reverse()
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getData();
+      this.listQuery.page = 1
+      this.getData()
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
