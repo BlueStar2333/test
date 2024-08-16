@@ -44,7 +44,7 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/404'
+    redirect: '/login'
   }
 
 ]

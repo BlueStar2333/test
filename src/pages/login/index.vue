@@ -1,8 +1,9 @@
 <template>
   <div class="login-wrap">
     <div class="ms-login">
-      <div class="ms-title">医务人员健康管理</div>
+      <div class="ms-title">华西医院填表系统</div>
       <el-form
+        v-show="!phoneLoginState"
         ref="loginForm"
         :model="loginForm"
         :rules="loginRules"
@@ -25,22 +26,6 @@
           </el-input>
         </el-form-item>
         <el-form-item>
-          <!--          <el-input-->
-          <!--            :key="passwordType"-->
-          <!--            ref="password"-->
-          <!--            v-model="loginForm.password"-->
-          <!--            :type="passwordType"-->
-          <!--            placeholder="Password"-->
-          <!--            name="password"-->
-          <!--            tabindex="2"-->
-          <!--            autocomplete="on"-->
-          <!--            @keyup.native="checkCapslock"-->
-          <!--            @blur="capsTooltip = false"-->
-          <!--            @keyup.enter.native="handleLogin"-->
-          <!--          />-->
-          <!--          <span class="show-pwd" @click="showPwd">-->
-          <!--            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />-->
-          <!--          </span>-->
           <el-input
             :key="passwordType"
             ref="password"
@@ -60,10 +45,39 @@
           </el-input>
         </el-form-item>
         <div class="login-btn">
-          <el-button type="primary" @click="handleLogin">登录</el-button>
+          <el-button type="primary" style="color: #e7e7e7" @click="handleLogin">登录</el-button>
         </div>
-        <p class="login-tips">Tips : 请输入用户名和密码</p>
       </el-form>
+
+      <el-form v-show="phoneLoginState" ref="ruleForm" class="ms-content" :model="ruleForm" :rules="rules" style="padding-bottom: 16px;">
+        <el-form-item prop="phone">
+          <el-input v-model="ruleForm.phone" class="phone-inp" placeholder="请输入手机号">
+            <i slot="prefix" class="el-icon-phone" />
+          </el-input>
+        </el-form-item>
+        <el-form-item prop="code">
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="ruleForm.code" class="phone-inp" placeholder="请输入验证码">
+                <i slot="prefix" class="el-icon-tickets" />
+              </el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-button :disabled="sendDisabled" style="width: 130px" @click="sendCode">{{ btnText }}</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="primary"
+            style="width:100%"
+            @click="phoneLogin"
+          >登录</el-button>
+        </el-form-item>
+      </el-form>
+
+      <a v-if="phoneLoginState" class="login-tips" @click="changePhoneLoginState(false)">账号密码登录 ></a>
+      <a v-else class="login-tips" @click="changePhoneLoginState(true)">手机号登录 ></a>
     </div>
   </div>
 </template>
@@ -88,11 +102,39 @@ export default {
         callback()
       }
     }
+    const checkPhone = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('手机号不能为空'))
+      } else {
+        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+        if (reg.test(value)) {
+          callback()
+        } else {
+          return callback(new Error('请输入正确的手机号'))
+        }
+      }
+    }
     return {
       loginForm: {
         username: '',
         password: ''
       },
+      ruleForm: {
+        phone: '',
+        code: ''
+      },
+      btnText: '发送验证码',
+      phoneLoginState: false,
+      time: 60,
+      rules: {
+        phone: [
+          { validator: checkPhone, trigger: 'change' }
+        ],
+        code: [
+          { required: true, message: '验证码不能为空', trigger: 'blur' }
+        ]
+      },
+      sendDisabled: false,
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
@@ -162,29 +204,57 @@ export default {
           return false
         }
       })
+    },
+    changePhoneLoginState(bool) {
+      this.phoneLoginState = bool
+    },
+    phoneLogin() {
+      this.$refs.ruleForm.validate((valid) => {
+        if (valid) {
+          alert('submit')
+        } else {
+          alert('errHandle')
+        }
+      })
+    },
+    sendCode() {
+      this.$refs.ruleForm.validateField('phone', errorMessage => {
+        if (errorMessage) {
+          this.$message.error(errorMessage)
+        } else {
+          // 1.时间开始倒数
+          // 2.按钮进入禁用状态
+          // 3.如果倒计时结束 按钮恢复可用状态 按钮文字变为重新发送, 时间重置
+          // 4.倒计时的过程中 按钮文字为 多少s后重新发送
+          const timer = setInterval(() => {
+            this.time--
+            this.btnText = `${this.time}s后重新发送`
+            this.sendDisabled = true
+            if (this.time === 0) {
+              this.sendDisabled = false
+              this.btnText = '重新发送'
+              this.time = 60
+              clearInterval(timer)
+            }
+          }, 1000)
+          this.$emit('send')
+        }
+      })
     }
-    // getOtherQuery(query) {
-    //   return Object.keys(query).reduce((acc, cur) => {
-    //     if (cur !== 'redirect') {
-    //       acc[cur] = query[cur]
-    //     }
-    //     console.log(acc[cur])
-    //     console.log(cur)
-    //     console.log(acc)
-    //     console.log()
-    //     return acc
-    //   }, {})
   }
 }
 </script>
 
-<style>
+<style scoped lang="scss">
 .login-wrap {
   position: relative;
   width: 100%;
   height: 100%;
   background-image: url(../../assets/img/login-bg.jpg);
   background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .ms-title {
@@ -192,23 +262,20 @@ export default {
   line-height: 50px;
   text-align: center;
   font-size: 20px;
-  color: #474747;
+  color: #fcfcfc;
   border-bottom: 1px solid #ddd;
 }
 
 .ms-login {
   position: absolute;
-  left: 75%;
-  top: 50%;
-  width: 550px;
-  margin: -190px 0 0 -175px;
+  width: 500px;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(161, 160, 160, 0.5);
   overflow: hidden;
 }
 
 .ms-content {
-  padding: 30px 30px;
+  padding: 30px 34px;
 }
 
 .login-btn {
@@ -222,8 +289,21 @@ export default {
 }
 
 .login-tips {
-  font-size: 12px;
+  font-size: 14px;
   line-height: 30px;
-  color: #474747;
+  color: #dbdbdb;
+  float: right;
+  margin: -20px 40px 20px;
+}
+.login-tips:hover {
+  color: #e2e2e2;
+  opacity: .6;
+}
+
+::v-deep .el-input__prefix {
+  width: 40px;
+}
+::v-deep .el-input--prefix .el-input__inner {
+  padding-left: 50px;
 }
 </style>
