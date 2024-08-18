@@ -9,14 +9,14 @@ const FormListRouter = {
   name: '表单列表',
   meta: {
     title: '表单列表',
-    icon: 'influenza'
+    icon: 'fill-out'
   },
   children: [
     {
-      path: 'influenza',
-      component: () => import('@/pages/influenza'),
-      name: '流感相关',
-      meta: { title: '流感相关', noCache: true }
+      path: 'fill-out',
+      component: () => import('@/pages/fill-out'),
+      name: '表单填写',
+      meta: { title: '表单填写', noCache: true }
     }
   ]
 }

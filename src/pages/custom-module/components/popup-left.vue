@@ -3,29 +3,29 @@
     <el-tabs>
 
       <el-tab-pane>
-        <span slot="label"><i class="el-icon-coin"></i> 组件库</span>
+        <span slot="label"><i class="el-icon-coin" /> 组件库</span>
         <el-collapse>
           <el-collapse-item title="基础组件" name="1">
             <ul class="base">
               <li v-for="(item,index) in baseComponents" :key="index" class="base-component" draggable="true" @dragstart="dragStart($event,index)">
-                <img :src="item.icon" :width="14" height="14" style="margin: 0 4px;position: relative;top: 2px" alt="基础组件"/>{{ item.name }}
+                <img :src="item.icon" :width="14" height="14" style="margin: 0 4px;position: relative;top: 2px" alt="基础组件">{{ item.name }}
               </li>
             </ul>
           </el-collapse-item>
           <el-collapse-item title="特殊组件" name="2">
             <ul class="base">
               <li v-for="(item,index) in specialInputData" :key="index" class="base-component" draggable="true" @dragstart="dragStart($event,baseComponents.length + index)">
-                <img :src="item.icon" :width="14" height="14" style="margin: 0 4px;position: relative;top: 2px" alt="特殊组件"/>{{ item.name }}
+                <img :src="item.icon" :width="14" height="14" style="margin: 0 4px;position: relative;top: 2px" alt="特殊组件">{{ item.name }}
               </li>
             </ul>
           </el-collapse-item>
         </el-collapse>
       </el-tab-pane>
 
-      <el-tab-pane>
-        <span slot="label"><i class="el-icon-document"></i> 表单模板</span>
-        暂无表单模板
-      </el-tab-pane>
+      <!--      <el-tab-pane>-->
+      <!--        <span slot="label"><i class="el-icon-document"></i> 表单模板</span>-->
+      <!--        暂无表单模板-->
+      <!--      </el-tab-pane>-->
     </el-tabs>
   </div>
 </template>

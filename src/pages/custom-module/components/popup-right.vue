@@ -16,7 +16,7 @@
           <el-form-item v-if="dateShow" label="时间选择">
             <el-date-picker v-model="componentData.content" type="date" placeholder="选择日期" style="width: 100%" />
           </el-form-item>
-          <el-form-item label="必填内容">
+          <el-form-item label="校验表单">
             <el-switch v-model="componentData.isNecessary" />
           </el-form-item>
           <div v-show="radioShow" class="setting">

@@ -86,25 +86,33 @@
         </template>
       </el-table-column>
       <el-table-column
-        v-if="
-          this.$store.state.user.userInfo.Power == 2 ||
-            this.$store.state.user.userInfo.Power == 3
-        "
         fixed="right"
         label="操作"
-        width="200"
+        width="260"
         align="center"
       >
         <template slot-scope="scope">
           <div class="operation">
             <el-link
+              v-if="$store.state.user.userInfo.Power == 3"
               type="primary"
               @click="editDiyTable(scope.row)"
             >编辑</el-link>
             <el-link
+              v-if="$store.state.user.userInfo.Power == 3"
               type="danger"
               @click="deleteDiyTable(scope.row.ID)"
             >删除</el-link>
+            <el-link
+              v-if="$store.state.user.userInfo.Power == 3"
+              type="success"
+              @click="closeDiyTable(scope.row.ID)"
+            >关闭</el-link>
+            <el-link
+              v-if="$store.state.user.userInfo.Power == 1"
+              type="primary"
+              @click="toFillOut(scope.row.diyName)"
+            >去填写此表</el-link>
           </div>
         </template>
       </el-table-column>
@@ -225,14 +233,9 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          deleteCustomTable({ ID }).then((res) => {
-            if (res.d === 'Success') {
-              this.$message({
-                type: 'success',
-                message: '删除成功!'
-              })
-              this.getData()
-            }
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
           })
         })
         .catch(() => {
@@ -241,6 +244,28 @@ export default {
             message: '已取消删除'
           })
         })
+    },
+    closeDiyTable(ID) {
+      this.$confirm('关闭之后结束填写, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.$message({
+            type: 'success',
+            message: '已关闭'
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
+    },
+    toFillOut(name) {
+      this.$router.push({ path: '/formList/fill-out?name=' + name })
     },
 
     onClose() {

@@ -16,22 +16,35 @@
         type="date"
         placeholder="选择截止日期"
       />
-      <el-button icon="el-icon-search" type="primary" @click="getData"
-        >查询</el-button
-      >
+      <el-button
+        icon="el-icon-search"
+        type="primary"
+        @click="getData"
+      >查询</el-button>
+      <el-dropdown class="dropdown" @command="handleCommand">
+        <span class="el-dropdown-link">
+          {{ tableName || '请选择表单' }}<i v-if="!tableName" class="el-icon-arrow-down el-icon--right" />
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="自定义新冠感染调查情况表">自定义新冠感染调查情况表</el-dropdown-item>
+          <el-dropdown-item command="测试表2">测试表2</el-dropdown-item>
+          <el-dropdown-item command="表3">表3</el-dropdown-item>
+          <el-dropdown-item command="测试表（已关闭）" disabled>测试表（已关闭）</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </el-form>
     <div style="background: #ceeaf3; height: 40px; line-height: 40px">
       <el-row>
         <el-col :span="23" />
         <el-col :span="1">
-          <el-tooltip class="item" effect="dark" content="导出" placement="top">
-            <i class="el-icon-folder-opened out-icon" @click="handleDownload" />
+          <el-tooltip class="item" effect="dark" content="新增" placement="top">
+            <i class="el-icon-plus add-icon" @click="handleAdd" />
           </el-tooltip>
         </el-col>
       </el-row>
     </div>
     <el-table
-      v-loading="listLoading"
+      v-loading="tableLoading"
       :header-cell-style="{ 'background-color': '#fefefe', color: '#959595' }"
       border
       :data="
@@ -63,18 +76,18 @@
         prop="result.hasInfect"
         label="是否有工作人员出现流感症状"
       />
-      <el-table-column min-width="120px" align="center" label="感染人数">
+      <el-table-column min-width="120px" align="center" label="校验状态">
         <template slot-scope="scope">
           <span
             v-if="scope.row.result.hasInfect === '是'"
-            style="color: #f66a6e; font-weight: 600"
+            style="color: #E6A23C; font-weight: 600"
           >
-            {{ scope.row.result.person.length }}
+            待校验
           </span>
           <span v-else style="color: #666"> 0 </span>
         </template>
       </el-table-column>
-      <el-table-column min-width="120px" align="center" label="感染人员详情">
+      <el-table-column min-width="120px" align="center" label="填写详情">
         <template slot-scope="scope">
           <svg-icon
             v-if="scope.row.result.hasInfect === '是'"
@@ -93,7 +106,7 @@
       :total="tableData.length"
       @current-change="handleCurrentChange"
     />
-    <el-dialog :visible.sync="drawer" title="感染人员表" width="70%">
+    <el-dialog :visible.sync="drawer" title="填写内容" width="70%">
       <el-table
         v-loading="listLoading"
         :header-cell-style="{ 'background-color': '#fefefe', color: '#959595' }"
@@ -114,8 +127,8 @@
             <span
               v-else-if="
                 scope.row.personnel === '医生' ||
-                scope.row.personnel === '护士' ||
-                scope.row.personnel === '技师'
+                  scope.row.personnel === '护士' ||
+                  scope.row.personnel === '技师'
               "
             >
               {{ scope.row.personnelPosition }} - {{ scope.row.personnel }}
@@ -127,12 +140,12 @@
           <template slot-scope="scope">
             <span>
               {{ scope.row.symptoms.join() }}
-              <span v-if="scope.row.symptoms.includes('其他')"
-                >-{{ scope.row.otherSymptoms }}</span
-              >
-              <span v-if="scope.row.symptoms.includes('发热')"
-                >--{{ scope.row.bodyTemperature }}℃</span
-              >
+              <span
+                v-if="scope.row.symptoms.includes('其他')"
+              >-{{ scope.row.otherSymptoms }}</span>
+              <span
+                v-if="scope.row.symptoms.includes('发热')"
+              >--{{ scope.row.bodyTemperature }}℃</span>
             </span>
           </template>
         </el-table-column>
@@ -172,7 +185,7 @@
         </el-table-column>
         <el-table-column
           align="center"
-           width="220"
+          width="220"
           label="是如何确定自己感染了新冠病毒"
         >
           <template slot-scope="scope">
@@ -192,9 +205,9 @@
       </el-table>
     </el-dialog>
     <el-table
+      v-loading="listLoading"
       hidden
       class="tableData"
-      v-loading="listLoading"
       :header-cell-style="{ 'background-color': '#fefefe', color: '#959595' }"
       :data="tableData2"
       style="width: 100%"
@@ -256,8 +269,8 @@
             <span
               v-else-if="
                 scope.row.personnel === '医生' ||
-                scope.row.personnel === '护士' ||
-                scope.row.personnel === '技师'
+                  scope.row.personnel === '护士' ||
+                  scope.row.personnel === '技师'
               "
             >
               {{ scope.row.personnelPosition }} - {{ scope.row.personnel }}
@@ -271,12 +284,12 @@
           <span>
             <span>
               {{ scope.row.symptoms.join() }}
-              <span v-if="scope.row.symptoms.includes('其他')"
-                >-{{ scope.row.otherSymptoms }}</span
-              >
-              <span v-if="scope.row.symptoms.includes('发热')"
-                >--{{ scope.row.bodyTemperature }}℃</span
-              >
+              <span
+                v-if="scope.row.symptoms.includes('其他')"
+              >-{{ scope.row.otherSymptoms }}</span>
+              <span
+                v-if="scope.row.symptoms.includes('发热')"
+              >--{{ scope.row.bodyTemperature }}℃</span>
             </span>
           </span>
         </template>
@@ -358,148 +371,185 @@
 </template>
 
 <script>
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination";
-import FileSaver from "file-saver";
-import XLSX from "xlsx";
-import { getStaffContentTable } from "@/api/influenza";
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination'
+import FileSaver from 'file-saver'
+import XLSX from 'xlsx'
+import { getStaffContentTable } from '@/api/fillout'
 
 export default {
-  name: "HealthEducation",
+  name: 'HealthEducation',
   components: {
-    Pagination,
+    Pagination
   },
   data() {
     return {
+      tableName: '',
+      tableLoading: false,
+
       tableData2: [],
       searchModel: {
-        startTime: "",
-        endTime: "",
-        hospitalCode: this.$store.state.user.userInfo.hospitalCode,
+        startTime: '',
+        endTime: '',
+        hospitalCode: this.$store.state.user.userInfo.hospitalCode
       },
       listLoading: true,
       total: 60,
       listQuery: {
         page: 1,
         limit: 10,
-        sort: "+id",
+        sort: '+id'
       },
       tableData: [],
       drawer: false,
-      selectTable: [],
-    };
+      selectTable: []
+    }
   },
   created() {
-    this.getData();
+    this.tableName = this.$route.query.name
+    this.getData()
   },
   methods: {
+    handleCommand(command) {
+      this.tableName = command
+      this.tableLoading = true
+      const _self = this
+      this.$message('click on item ' + command)
+      setTimeout(() => {
+        _self.tableLoading = false
+      }, 1000)
+    },
+    handleAdd() {
+      if (this.tableName) {
+        this.$message('跳转到填表')
+      } else {
+        this.$message('请先选择表单')
+      }
+    },
+
     handleCurrentChange(page) {
-      this.listQuery.page = page;
+      this.listQuery.page = page
     },
     getData() {
-      this.tableData = [];
+      this.tableData = []
       getStaffContentTable(this.searchModel).then((res) => {
         switch (this.$store.state.user.userInfo.Power) {
           case 3:
-            this.tableData = JSON.parse(res.d);
-            break;
+            this.tableData = JSON.parse(res.d)
+            break
           default:
             JSON.parse(res.d).forEach((v) => {
               if (
                 JSON.parse(v.result).person[0].administrativeOffice ===
                 this.$store.state.user.userInfo.Department
               ) {
-                this.tableData.push(v);
+                this.tableData.push(v)
               }
-            });
-            break;
+            })
+            break
         }
         this.tableData.forEach((item, index) => {
-          item.result = JSON.parse(item.result);
-        });
-        const table = [];
+          item.result = JSON.parse(item.result)
+        })
+        const table = []
         for (let i = 0; i < this.tableData.length; i++) {
           for (let j = 0; j < this.tableData[i].result.person.length; j++) {
             this.tableData[i].result.person[j].cTime =
-              this.tableData[i].createTime;
-            this.tableData[i].result.person[j].pName = this.tableData[i].name;
-            table[table.length] = this.tableData[i].result.person[j];
+              this.tableData[i].createTime
+            this.tableData[i].result.person[j].pName = this.tableData[i].name
+            table[table.length] = this.tableData[i].result.person[j]
           }
         }
-        this.tableData2 = table;
-      });
-      this.listLoading = false;
+        this.tableData2 = table
+      })
+      this.listLoading = false
     },
     personDetails(person) {
-      this.selectTable = person;
+      this.selectTable = person
       // console.log(this.selectTable, 2245)
-      this.drawer = true;
+      this.drawer = true
     },
     otherReplace(arr, item) {
-      const newArr = arr;
-      newArr.pop();
-      newArr.push(item);
-      return newArr;
+      const newArr = arr
+      newArr.pop()
+      newArr.push(item)
+      return newArr
     },
 
     handleDownload() {
-      this.$nextTick(function () {
-        var wb = XLSX.utils.table_to_book(document.querySelector(".tableData"));
+      this.$nextTick(function() {
+        var wb = XLSX.utils.table_to_book(document.querySelector('.tableData'))
         /* 获取二进制字符串作为输出 */
         var wbout = XLSX.write(wb, {
-          bookType: "xlsx",
+          bookType: 'xlsx',
           bookSST: true,
-          type: "array",
-        });
+          type: 'array'
+        })
         try {
           FileSaver.saveAs(
-            new Blob([wbout], { type: "application/octet-stream" }),
-            "流感相关调查表.xlsx"
-          );
+            new Blob([wbout], { type: 'application/octet-stream' }),
+            '流感相关调查表.xlsx'
+          )
         } catch (e) {}
-        return wbout;
-      });
+        return wbout
+      })
     },
     formatJson(filterVal) {
       return this.tableData.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
 
     sortChange(data) {
-      const { prop, order } = data;
-      this.tableData.reverse();
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      this.tableData.reverse()
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
+  .dropdown {
+    float: right;
+    margin-top: 20px;
+  }
+  .el-dropdown-link {
+    cursor: pointer;
+    color: #409EFF;
+    font-size: 22px;
+    font-style: oblique;
+    font-weight: 600;
+    opacity: .6;
+  }
+  .el-icon-arrow-down {
+    font-size: 18px;
+  }
+
 .app-container {
   background-color: #fff;
 }
@@ -518,16 +568,21 @@ export default {
   z-index: 2;
 }
 
-.out-icon {
+.add-icon {
   cursor: pointer;
   position: absolute;
   right: 15px;
   top: 12px;
+  padding: 2px;
+  border: 1px solid #bebebe;
+  font-size: 12px;
+  color: #969696;
+  border-radius: 2px;
 }
 
 .person-icon {
   font-size: 22px;
   cursor: pointer;
-  fill: #5799fb;
+  fill: #99cd80;
 }
 </style>

@@ -12,7 +12,7 @@
     </div>
     <div class="body" @drop="drop($event)" @dragover="allowDrop($event)">
       <div v-for="(itemA,index) in formData" :key="index" class="body-input" @click="selectInput(index,formData[index])">
-        <h5 :class="{'body-input-label':true,'required':itemA.isNecessary}">{{ index+1 + '.' + itemA.label }}</h5>
+        <h5 :class="{'body-input-label':true,'required':itemA.isNecessary}">{{ index+1 + '.' + itemA.label }} {{ itemA.isNecessary ? '（校验值）' : '' }}</h5>
         <el-input v-if="itemA.type === 0" v-model="formData[index].content" class="body-input-content" size="small" placeholder="请输入内容" />
         <el-input v-if="itemA.type === 1" v-model="formData[index].content" class="body-input-content" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" />
         <div v-if="itemA.type === 2" class="body-input-select">
@@ -35,6 +35,8 @@
           </div>
         </div>
       </div>
+      <span class="body-vertical" />
+      <span class="body-cross" />
     </div>
 
     <el-dialog
@@ -237,13 +239,31 @@ export default {
   color: #999;
 }
 .body {
-  width: 420px;
-  min-height: 720px;
+  width: 1024px;
+  min-height: 708px;
   background-color: #fff;
-  margin: 10px auto;
+  margin: 16px auto 60px;
   padding: 10px 12px 22px;
   border: 10px solid #4A4F5F;
   border-radius: 20px;
+  position: relative;
+}
+.body-vertical {
+  position: absolute;
+  width: 10px;
+  height: 40px;
+  left: 50%;
+  bottom: -40px;
+  background-color: #4A4F5F;
+}
+.body-cross {
+  position: absolute;
+  width: 200px;
+  height: 16px;
+  left: 406px;
+  bottom: -50px;
+  border-radius: 5px;
+  background-color: #4A4F5F;
 }
 .body-input {
   position: relative;
