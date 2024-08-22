@@ -12,21 +12,35 @@
     </div>
     <div class="body" @drop="drop($event)" @dragover="allowDrop($event)">
       <div v-for="(itemA,index) in formData" :key="index" class="body-input" @click="selectInput(index,formData[index])">
-        <h5 :class="{'body-input-label':true,'required':itemA.isNecessary}">{{ index+1 + '.' + itemA.label }} {{ itemA.isNecessary ? '（校验值）' : '' }}</h5>
-        <el-input v-if="itemA.type === 0" v-model="formData[index].content" class="body-input-content" size="small" placeholder="请输入内容" />
-        <el-input v-if="itemA.type === 1" v-model="formData[index].content" class="body-input-content" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" />
+        <h5 :class="{'body-input-label':true,'required':itemA.isNecessary}">{{ index+1 + '.' + itemA.label }} {{ itemA.checkValue ? '（校验值）' : '' }}</h5>
+        <!--单行文本-->
+        <el-input v-if="itemA.type === 0" v-model="formData[index].content" :maxlength="formData[index].max" show-word-limit class="body-input-content" size="small" placeholder="请输入内容" />
+        <!--多行文本-->
+        <el-input v-if="itemA.type === 1" v-model="formData[index].content" :maxlength="formData[index].max" show-word-limit class="body-input-content" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" />
+        <!--单选-->
         <div v-if="itemA.type === 2" class="body-input-select">
           <el-radio v-for="(itemB, idx) in itemA.content" :key="idx" v-model="itemA.select" :label="itemB">{{ itemB }}</el-radio>
         </div>
+        <!--多选-->
         <el-checkbox-group v-if="itemA.type === 3" v-model="itemA.select" class="body-input-select">
           <el-checkbox v-for="(itemB, idx) in itemA.content" :key="idx" :label="itemB">{{ itemB }}</el-checkbox>
         </el-checkbox-group>
+        <!--日期选择-->
         <el-date-picker v-if="itemA.type === 4" v-model="formData[index].content" class="body-input-content" type="date" size="small" placeholder="选择日期" />
-        <el-input-number v-if="itemA.type === 5" v-model="formData[index].content" :min="1" :max="10000" label="数" />
-        <div v-if="itemA.type === 20" class="body-input-content select-department">请选择</div>
+        <!--数量选择-->
+        <el-input-number v-if="itemA.type === 5" v-model="formData[index].content" :min="formData[index].min" :max="formData[index].max" label="数" />
+        <!--滑动条-->
+        <el-slider v-if="itemA.type === 6" v-model="formData[index].content" :min="formData[index].min" :max="formData[index].max" style="padding: 0 20px"></el-slider>
+        <!--输入建议选择框-->
+        <el-autocomplete v-if="itemA.type === 7" v-model="formData[index].content" class="inline-input" placeholder="请输入内容"></el-autocomplete>
+        <!--自增表格-->
+        <el-table v-if="itemA.type === 20" :data="itemA.content" class="body-input-content" style="width: 100%" border :header-cell-style="{backgroundColor: '#efefef'}">
+          <el-table-column v-for="(column,colIdx) in itemA.header" :key="colIdx" :prop="colIdx + ''" :label="column"></el-table-column>
+        </el-table>
+
         <!--    选中框    -->
         <div v-show="selectIndex === index" class="body-input-nav">
-          <span class="nav-name"><i class="el-icon-rank" /> {{ typeMap[itemA.type] }}</span>
+<!--          <span class="nav-name"><i class="el-icon-rank" /> {{ typeMap[itemA.type] }}</span>-->
           <div class="nav-menu">
             <a><i class="el-icon-back nav-menu-back" @click.stop="selectIndex = -1" /></a>
             <a><i class="el-icon-bottom nav-menu-bottom" @click.stop="switchPlaces(index, index+1)" /></a>
@@ -81,7 +95,7 @@ export default {
       previewShow: false,
       selectIndex: -1,
       formData: [],
-      typeMap: ['单行文本', '多行文本', '单选框', '多选框', '日期选择'],
+      typeMap: ['单行文本', '多行文本', '单选框', '多选框', '日期选择', '数量选择', '滑动条', '带建议输入'],
       diyForm: null
     }
   },
@@ -287,16 +301,6 @@ export default {
     background-color: #fdfdfd;
     border-radius: 4px;
   }
-  .select-department {
-    background-color: #fefefe;
-    border: 1px solid #d3d3d3;
-    border-radius: 4px;
-    text-align: center;
-    line-height: 40px;
-    height: 40px;
-    color: #d2d2d2;
-    cursor: not-allowed;
-  }
 }
 
 .body-input-nav {
@@ -306,6 +310,7 @@ export default {
   right: -4px;
   bottom: -4px;
   border: 2px solid #409eff;
+  z-index: 9;
   .nav-name {
     position: absolute;
     top: 0;

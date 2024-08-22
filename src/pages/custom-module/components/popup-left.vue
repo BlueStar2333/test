@@ -54,12 +54,18 @@ export default {
         }, {
           icon: require('../../../assets/icons/select-number.svg'),
           name: '数量选择'
+        }, {
+          icon: require('../../../assets/icons/select-number.svg'),
+          name: '滑动条'
+        }, {
+          icon: require('../../../assets/icons/select-number.svg'),
+          name: '带建议框'
         }
       ],
       specialInputData: [
         {
           icon: require('../../../assets/icons/department.svg'),
-          name: '科室选择'
+          name: '自增表格'
         }
       ]
     }

@@ -4,20 +4,33 @@
       <el-tab-pane label="组件设置" name="first">
         <p v-if="!componentData" class="prompt-text">请选择</p>
         <el-form v-else ref="form" label-width="80px" size="mini" label-position="left">
-          <el-form-item label="唯一名称">
-            <el-input v-model="componentData.uniqueName" />
+          <el-form-item label="表单类型">
+            <el-input v-model="componentData.uniqueName" :placeholder="typeMap[componentData.type]" disabled />
           </el-form-item>
           <el-form-item label="标签">
             <el-input v-model="componentData.label" />
           </el-form-item>
-          <el-form-item v-if="!radioShow && !dateShow" label="预置内容">
-            <el-input v-model="componentData.content" />
+          <el-form-item v-if="suggestionShow" label="建议内容">
+            <el-input v-model="componentData.suggestion" placeholder="每条建议,隔开" />
+          </el-form-item>
+          <el-form-item v-if="!radioShow && !dateShow && !tableShow" label="预置内容">
+            <el-autocomplete v-if="suggestionShow" v-model="componentData.content" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" />
+            <el-input v-else v-model="componentData.content" />
           </el-form-item>
           <el-form-item v-if="dateShow" label="时间选择">
             <el-date-picker v-model="componentData.content" type="date" placeholder="选择日期" style="width: 100%" />
           </el-form-item>
-          <el-form-item label="校验表单">
+          <el-form-item v-if="numShow || sliderShow" label="最小范围">
+            <el-input-number v-model="componentData.min" :min="0" :max="10000" size="small" label="描述文字" />
+          </el-form-item>
+          <el-form-item v-if="!radioShow && !dateShow && !suggestionShow && !tableShow" label="最大范围">
+            <el-input-number v-model="componentData.max" :min="componentData.min" :max="10000" size="small" label="描述文字" />
+          </el-form-item>
+          <el-form-item v-if="!tableShow" label="必填项">
             <el-switch v-model="componentData.isNecessary" />
+          </el-form-item>
+          <el-form-item v-if="!tableShow" label="校验表单">
+            <el-switch v-model="componentData.checkValue" />
           </el-form-item>
           <div v-show="radioShow" class="setting">
             <el-divider>选项设置</el-divider>
@@ -31,6 +44,19 @@
             </div>
             <div class="setting-link">
               <el-link :underline="false" type="primary" @click="componentData.content.push(`选项${componentData.content.length + 1}`)">增加选项</el-link>
+              <el-link :underline="false" type="primary" @click="componentData.select = []">重设选中项</el-link>
+            </div>
+          </div>
+          <div v-show="tableShow" class="setting">
+            <el-divider>自增表设置</el-divider>
+            <div v-for="(item,index) in componentData.header" :key="index" class="setting-main">
+              <span class="setting-main-span">列{{ index+1 }}：</span>
+              <el-input v-model="componentData.header[index]" size="mini" placeholder="请输入内容" style="width: 130px" />
+              <el-link class="setting-setting-btn" icon="el-icon-setting" @click="tableSetting(index)"/>
+              <a class="setting-delete-btn" @click="decreaseTableColumn(index)">-</a>
+            </div>
+            <div class="setting-link">
+              <el-link :underline="false" type="primary" @click="addTableColumn()">增加列</el-link>
               <el-link :underline="false" type="primary" @click="componentData.select = []">重设选中项</el-link>
             </div>
           </div>
@@ -53,12 +79,27 @@
         </el-form>
       </el-tab-pane>
     </el-tabs>
+
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisible"
+      width="30%"
+      :before-close="handleClose"
+      append-to-body="true"
+    >
+      <ColumnForm :componentData="componentData"/>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import ColumnForm from './column-form.vue'
 export default {
   name: 'PopupRight',
+  components: { ColumnForm },
   props: {
     editForm: {
       type: Object,
@@ -67,6 +108,7 @@ export default {
   },
   data() {
     return {
+      dialogVisible: false,
       activeName: 'first',
       dragIcon: require('../../../assets/icons/drag.svg'),
       dragBlueIcon: require('../../../assets/icons/drag-blue.svg'),
@@ -76,6 +118,7 @@ export default {
         diyStartDate: '',
         diyEndDate: ''
       },
+      typeMap: ['单行文本', '多行文本', '单选框', '多选框', '日期选择', '数量选择', '滑动条', '带建议输入'],
       componentData: null
     }
   },
@@ -83,8 +126,20 @@ export default {
     radioShow() {
       return this.componentData.type === 2 || this.componentData.type === 3
     },
+    tableShow() {
+      return this.componentData.type === 20
+    },
     dateShow() {
       return this.componentData.type === 4
+    },
+    numShow() {
+      return this.componentData.type === 5
+    },
+    sliderShow() {
+      return this.componentData.type === 6
+    },
+    suggestionShow() {
+      return this.componentData.type === 7
     }
   },
   mounted() {
@@ -114,6 +169,49 @@ export default {
     getDiyData(cb) {
       cb(this.diyForm)
     },
+    tableSetting(index) {
+      this.dialogVisible = true
+    },
+    addTableColumn() {
+      const IDX = this.componentData.header.length + 1
+      this.componentData.header.push('列' + IDX)
+      this.componentData.content[0].push('1')
+      this.componentData.bodyForm.push({
+        type: 0,
+        uniqueName: '',
+        label: '单行输入框',
+        max: 10,
+        min: 0,
+        content: ''
+      })
+    },
+    decreaseTableColumn(index) {
+      if (this.componentData.header.length === 1) {
+        this.$message({
+          message: '至少保留一个选项',
+          type: 'warning'
+        })
+        return
+      }
+      this.componentData.header.splice(index, 1)
+      this.componentData.bodyForm.splice(index, 1)
+      this.componentData.content[0].splice(index, 1)
+    },
+    querySearch(queryString, cb) {
+      const oData = this.componentData.suggestion.split(',')
+      const restaurants = []
+      oData.forEach(item => {
+        restaurants.push({ 'value': item, 'address': item })
+      })
+      const results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants
+      // 调用 callback 返回建议列表的数据
+      cb(results)
+    },
+    createFilter(queryString) {
+      return (restaurant) => {
+        return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
+    },
     deleteRadio(index) {
       if (this.componentData.content.length === 1) {
         this.$message({
@@ -123,6 +221,9 @@ export default {
         return
       }
       this.componentData.content.splice(index, 1)
+    },
+    handleClose(done) {
+      done()
     }
   }
 }
@@ -155,6 +256,10 @@ export default {
   ::v-deep .el-radio,::v-deep .el-checkbox__input {
     margin-right: 10px;
   }
+  .setting-main-span {
+    color: #999;
+    font-size: 14px;
+  }
   .setting-delete-btn {
     color: #f56c6c;
     background: #fef0f0;
@@ -170,6 +275,9 @@ export default {
       background-color: #F66A6E;
       color: #fff;
     }
+  }
+  .setting-setting-btn {
+    margin: 0 6px;
   }
 }
 .setting-link {
