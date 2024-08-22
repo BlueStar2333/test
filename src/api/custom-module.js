@@ -26,8 +26,8 @@ export function deleteCustomTable(data) {
 // 查询本医院普通自定义表
 export function getCustomTablebydiyName(data) {
   return request({
-    url: 'GetCustomTablebydiyName',
-    method: 'post',
+    url: 'diy/diyList',
+    method: 'get',
     data
   })
 }

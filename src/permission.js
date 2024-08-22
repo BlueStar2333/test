@@ -17,7 +17,7 @@ router.beforeEach(async(to, from, next) => {
   document.title = getPageTitle(to.meta.title)
 
   const hasToken = getToken()
-  const hasUser = store.state.user.userInfo.Number
+  const hasUser = store.state.user.userInfo.account
 
   // console.log("******hastoken");
   // console.log(hasToken,hasUser,25);

@@ -25,10 +25,7 @@
         >查询</el-button>
       </div>
       <el-button
-        v-if="
-          this.$store.state.user.userInfo.Power == 2 ||
-            this.$store.state.user.userInfo.Power == 3
-        "
+        v-if="this.$store.state.user.userInfo.power === 1"
         size="small"
         type="primary"
         icon="el-icon-plus"
@@ -55,16 +52,11 @@
       @sort-change="sortChange"
     >
       <el-table-column prop="diyName" fiexd label="表名" width="200" />
-      <el-table-column fiexd label="起始日期" width="200" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.diyStartDate.split("T")[0] }}
-        </template>
-      </el-table-column>
-      <el-table-column fiexd label="截止日期" width="200" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.diyEndDate.split("T")[0] }}
-        </template>
-      </el-table-column>
+<!--      <el-table-column fiexd label="截止日期" width="200" align="center">-->
+<!--        <template slot-scope="scope">-->
+<!--          {{ scope.row.diyEndDate.split("T")[0] }}-->
+<!--        </template>-->
+<!--      </el-table-column>-->
       <el-table-column
         prop="diyDescription"
         fiexd
@@ -94,22 +86,22 @@
         <template slot-scope="scope">
           <div class="operation">
             <el-link
-              v-if="$store.state.user.userInfo.Power == 3"
+              v-if="$store.state.user.userInfo.power === 1"
               type="primary"
               @click="editDiyTable(scope.row)"
             >编辑</el-link>
             <el-link
-              v-if="$store.state.user.userInfo.Power == 3"
+              v-if="$store.state.user.userInfo.power === 1"
               type="danger"
               @click="deleteDiyTable(scope.row.ID)"
             >删除</el-link>
             <el-link
-              v-if="$store.state.user.userInfo.Power == 3"
+              v-if="$store.state.user.userInfo.power === 1"
               type="success"
               @click="closeDiyTable(scope.row.ID)"
             >关闭</el-link>
             <el-link
-              v-if="$store.state.user.userInfo.Power == 1"
+              v-if="$store.state.user.userInfo.power === 0"
               type="primary"
               @click="toFillOut(scope.row.diyName)"
             >去填写此表</el-link>
@@ -196,16 +188,13 @@ export default {
     },
     getData(name) {
       this.listLoading = true
-      const requestData = {
-        diyName: name || '',
-        hospitalcode: this.$store.state.user.userInfo.HospitalName
-      }
-      getCustomTablebydiyName(requestData).then((res) => {
-        // console.log(JSON.parse(res.d), 224)
-        this.tableData = JSON.parse(res.d)
-        for (const key of this.tableData) {
-          key.diyContent = JSON.parse(key.diyContent)
+      getCustomTablebydiyName().then(res => {
+        if (res.code) {
+          this.tableData = res.data.list
         }
+        // for (const key of this.tableData) {
+        //   key.diyContent = JSON.parse(key.diyContent)
+        // }
         this.listLoading = false
       })
     },

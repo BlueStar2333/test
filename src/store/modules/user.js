@@ -39,13 +39,17 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ Number: username.trim(), Password: password }).then(response => {
-        // console.log(response, 114)
-        const data = JSON.parse(response.d) // 登录获取回复，并设置状态token
-        commit('SET_TOKEN', 'admin-token')
-        commit('SET_USER_INFO', data)
-        setToken(data.Number + data.Password)
-        resolve()
+      login({ account: username.trim(), password: password }).then(response => {
+        console.log(response, 114)
+        if (response.code) {
+          const data = response.data.result[0] // 登录获取回复，并设置状态token
+          commit('SET_TOKEN', JSON.stringify(response.data.token))
+          commit('SET_USER_INFO', data)
+          setToken(JSON.stringify(response.data.token))
+          resolve()
+        } else {
+          reject(response.msg)
+        }
       }).catch(error => {
         reject(error)
       })
@@ -55,29 +59,42 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo('admin-token').then(response => {
-        const { data } = response
-
-        if (!data) {
-          reject('Verification failed, please Login again.')
-        }
-
-        const { roles, name, avatar, introduction } = data
-        // console.log('roles' + roles)
-
-        // roles must be a non-empty array
-        if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
-        }
-
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_INTRODUCTION', introduction)
-        resolve(data)
-      }).catch(error => {
-        reject(error)
-      })
+      const data = state.userInfo
+      if (!data) {
+        reject('Verification failed, please Login again.')
+      }
+      const { roles, name, avatar, introduction } = data
+      if (!roles || roles.length <= 0) {
+        reject('getInfo: roles must be a non-null array!')
+      }
+      commit('SET_ROLES', roles)
+      commit('SET_NAME', name)
+      commit('SET_AVATAR', avatar)
+      commit('SET_INTRODUCTION', introduction)
+      resolve(data)
+      // getInfo('admin-token').then(response => {
+      //   const { data } = response
+      //
+      //   if (!data) {
+      //     reject('Verification failed, please Login again.')
+      //   }
+      //
+      //   const { roles, name, avatar, introduction } = data
+      //   // console.log('roles' + roles)
+      //
+      //   // roles must be a non-empty array
+      //   if (!roles || roles.length <= 0) {
+      //     reject('getInfo: roles must be a non-null array!')
+      //   }
+      //
+      //   commit('SET_ROLES', roles)
+      //   commit('SET_NAME', name)
+      //   commit('SET_AVATAR', avatar)
+      //   commit('SET_INTRODUCTION', introduction)
+      //   resolve(data)
+      // }).catch(error => {
+      //   reject(error)
+      // })
     })
   },
 

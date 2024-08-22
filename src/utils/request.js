@@ -4,9 +4,8 @@ import store from '@/store'
 import { getToken } from '@/utils/auth'
 
 // let url = 'http://192.168.0.38:8085/XgqkdcService.asmx/';
-let url='https://sws.scyokj.com/XgqkdcSystem/XgqkdcService.asmx/';
-
-sessionStorage.setItem("url", url)
+// let url='https://sws.scyokj.com/XgqkdcSystem/XgqkdcService.asmx/';
+const url = 'http://localhost:3100/api/'
 
 const service = axios.create({
   baseURL: url,
