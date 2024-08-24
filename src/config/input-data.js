@@ -85,6 +85,7 @@ const inputData = [{
     label: '单行输入框',
     max: 10,
     min: 0,
+    suggestion: '',
     content: ''
   }, {
     type: 0,
@@ -92,9 +93,10 @@ const inputData = [{
     label: '单行输入框',
     max: 10,
     min: 0,
+    suggestion: '',
     content: ''
   }], // 表每列内容
-  content: [[4, 5]] // 表每列值
+  content: [['', '']] // 表每列值
 }]
 
 export default inputData

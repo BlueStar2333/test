@@ -8,6 +8,7 @@ function hasPermission(roles, route) {
   if (route.meta && route.meta.roles) {
     return roles.some(role => route.meta.roles.includes(role))
   } else {
+    console.log(663)
     return true
   }
 }
@@ -20,7 +21,8 @@ export function filterAsyncRoutes(routes, roles) {
 
   routes.forEach(route => {
     const tmp = { ...route }
-    if (hasPermission(roles, tmp)) {
+    console.log(tmp, 888)
+    if (roles.includes(tmp.name)) {
       if (tmp.children) {
         tmp.children = filterAsyncRoutes(tmp.children, roles)
       }
@@ -52,18 +54,16 @@ const actions = {
       } else {
         accessedRoutes = filterAsyncRoutes(asyncRoutes, roles)
       }
-      switch (store.state.user.userInfo.Power) {
-        case 0:
-          accessedRoutes.splice(2, 2)
-          break
-        case 1:
-          accessedRoutes.splice(2, 2)
-          break
-        case 2:
-          accessedRoutes.splice(3, 1)
-          accessedRoutes.splice(0, 1)
-          break
-      }
+      console.log(accessedRoutes,896)
+      // switch (store.state.user.userInfo.power) {
+      //   case 0:
+      //     accessedRoutes.splice(2, 1)
+      //     break
+      //   case 1:
+      //     accessedRoutes.splice(1, 1)
+      //     // accessedRoutes.splice(3, 1)
+      //     break
+      // }
       commit('SET_ROUTES', accessedRoutes)
       resolve(accessedRoutes)
     })

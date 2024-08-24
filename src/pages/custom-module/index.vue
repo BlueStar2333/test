@@ -11,18 +11,9 @@
 
     <div class="head">
       <div>
-        <el-input
-          v-model="searchName"
-          size="small"
-          placeholder="按表名搜索"
-          style="width: 200px; margin-right: 14px"
-        />
-        <el-button
-          size="small"
-          type="primary"
-          icon="el-icon-search"
-          @click="getData(searchName)"
-        >查询</el-button>
+        <el-input placeholder="按表名搜索" v-model="searchName" class="input-with-select">
+          <el-button slot="append" icon="el-icon-search" type="primary"></el-button>
+        </el-input>
       </div>
       <el-button
         v-if="this.$store.state.user.userInfo.power === 1"
@@ -41,40 +32,44 @@
         color: '#666',
         'text-align': 'center',
       }"
-      :data="
-        tableData.slice(
-          (listQuery.page - 1) * listQuery.limit,
-          listQuery.page * listQuery.limit
-        )
-      "
+      :data="filteredTables.slice((listQuery.page - 1) * listQuery.limit,listQuery.page * listQuery.limit)"
       fit
       highlight-current-row
       @sort-change="sortChange"
     >
-      <el-table-column prop="diyName" fiexd label="表名" width="200" />
+      <el-table-column prop="id" fiexd label="序号" min-width="50" />
+      <el-table-column prop="table_name" fiexd label="表名" width="200" />
 <!--      <el-table-column fiexd label="截止日期" width="200" align="center">-->
 <!--        <template slot-scope="scope">-->
 <!--          {{ scope.row.diyEndDate.split("T")[0] }}-->
 <!--        </template>-->
 <!--      </el-table-column>-->
       <el-table-column
-        prop="diyDescription"
+        prop="description"
         fiexd
         label="描述"
         width="390"
         align="center"
       />
-      <el-table-column fiexd label="填报人数" width="100" align="center">
+      <el-table-column fiexd label="创建人" min-width="120" align="center">
         <template slot-scope="scope">
-          {{ scope.row.COUNTID || "0" }}
+          {{ scope.row.creator }}
+        </template>
+      </el-table-column>
+      <el-table-column fiexd label="创建时间" min-width="160" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.creat_date.split('T')[0] }}
+        </template>
+      </el-table-column>
+      <el-table-column fiexd label="状态" min-width="100" align="center">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.state">已开放</el-tag>
+          <el-tag v-else type="info">已关闭</el-tag>
         </template>
       </el-table-column>
       <el-table-column fiexd label="表单内容" align="center">
         <template slot-scope="scope">
-          <i
-            class="el-icon-document form-icon"
-            @click="lookForm(scope.row)"
-          />
+          <i class="el-icon-document form-icon" @click="lookForm(scope.row)" />
         </template>
       </el-table-column>
       <el-table-column
@@ -93,17 +88,22 @@
             <el-link
               v-if="$store.state.user.userInfo.power === 1"
               type="danger"
-              @click="deleteDiyTable(scope.row.ID)"
+              @click="deleteDiyTable(scope.row.id)"
             >删除</el-link>
             <el-link
-              v-if="$store.state.user.userInfo.power === 1"
+              v-if="$store.state.user.userInfo.power === 1 && !scope.row.state"
               type="success"
-              @click="closeDiyTable(scope.row.ID)"
+              @click="closeDiyTable(scope.row.id, 1)"
+            >开放</el-link>
+            <el-link
+              v-if="$store.state.user.userInfo.power === 1 && scope.row.state"
+              type="warning"
+              @click="closeDiyTable(scope.row.id, 0)"
             >关闭</el-link>
             <el-link
               v-if="$store.state.user.userInfo.power === 0"
               type="primary"
-              @click="toFillOut(scope.row.diyName)"
+              @click="toFillOut(scope.row)"
             >去填写此表</el-link>
           </div>
         </template>
@@ -122,6 +122,7 @@
       title="表单内容"
       :visible.sync="previewShow"
       width="32%"
+      style="min-height: 80vh"
       center
     >
       <Preview v-if="previewShow" :preview-data="diyForm" />
@@ -133,10 +134,11 @@
 import Pagination from '@/components/Pagination/index'
 import Popup from './components/popup'
 import {
-  getCustomTablebydiyName,
+  getCustomTable,
+  changeCustomTable,
   deleteCustomTable
 } from '@/api/custom-module'
-import Preview from '@/pages/custom-module/components/preview'
+import Preview from './components/preview'
 import { deepCopy } from '@/utils'
 
 export default {
@@ -182,24 +184,32 @@ export default {
     this.getData()
     this.$eventBus.$on('refresh', this.getData)
   },
+  computed: {
+    // 使用计算属性来过滤数据
+    filteredTables() {
+      return this.tableData.filter(table => {
+        return table.table_name.toLowerCase().includes(this.searchName.toLowerCase())
+      })
+    }
+  },
   methods: {
     handleCurrentChange(page) {
       this.listQuery.page = page
     },
     getData(name) {
       this.listLoading = true
-      getCustomTablebydiyName().then(res => {
+      getCustomTable().then(res => {
         if (res.code) {
           this.tableData = res.data.list
         }
         // for (const key of this.tableData) {
-        //   key.diyContent = JSON.parse(key.diyContent)
+        //   key.content = JSON.parse(key.content)
         // }
         this.listLoading = false
       })
     },
     lookForm(data) {
-      // console.log(data, 456)
+      console.log(data, 456)
       this.diyForm = deepCopy(data)
       this.previewShow = true
     },
@@ -210,21 +220,33 @@ export default {
     },
 
     editDiyTable(rowData) {
-      // console.log(rowData, 546)
+      console.log(rowData, !rowData.filled,546)
+      if (rowData.filled) {
+        this.$message({
+          type: 'info',
+          message: '表开放过填写，不能再编辑'
+        })
+        return
+      }
       this.editForm = deepCopy(rowData)
       this.popupShow = true
     },
 
-    deleteDiyTable(ID) {
+    deleteDiyTable(id) {
       this.$confirm('此操作将永久删除该表, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
+          deleteCustomTable({ id }).then(res => {
+            if (res.code === 1) {
+              this.getData()
+              this.$message({
+                type: 'success',
+                message: res.msg
+              })
+            }
           })
         })
         .catch(() => {
@@ -234,16 +256,23 @@ export default {
           })
         })
     },
-    closeDiyTable(ID) {
-      this.$confirm('关闭之后结束填写, 是否继续?', '提示', {
+    closeDiyTable(id, state) {
+      const title = state ? '开放填写?' : '关闭之后结束填写, 是否继续?'
+      const message = state ? '已开放' : '已关闭'
+      this.$confirm(title, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          this.$message({
-            type: 'success',
-            message: '已关闭'
+          changeCustomTable({ id, state }).then(res => {
+            if (res.code === 1) {
+              this.getData()
+              this.$message({
+                type: 'success',
+                message: message
+              })
+            }
           })
         })
         .catch(() => {
@@ -253,8 +282,9 @@ export default {
           })
         })
     },
-    toFillOut(name) {
-      this.$router.push({ path: '/formList/fill-out?name=' + name })
+    toFillOut(params) {
+      // this.$router.push({ path: '/formList/fill-out?name=' + name })
+      this.$router.push({ name: '表单填写', params })
     },
 
     onClose() {
@@ -294,6 +324,9 @@ export default {
   .el-dialog__title {
     color: #999;
   }
+}
+::v-deep .el-dialog__body {
+  margin-bottom: 50px;
 }
 .popup-show-enter-active {
   animation: out 0.2s linear;

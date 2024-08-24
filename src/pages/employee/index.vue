@@ -32,34 +32,28 @@
         "
         border
       >
-        <el-table-column prop="Name" label="用户名" />
-        <el-table-column prop="Number" label="用户编号" />
-        <!-- <el-table-column prop="PWD" label="密码" /> -->
-        <el-table-column prop="Department" label="科室" />
-        <el-table-column prop="Iphone" label="联系电话" />
-        <el-table-column label="是否管理员">
+        <el-table-column prop="name" label="用户名" />
+        <el-table-column label="用户等级">
           <template slot-scope="scope">
-            <label v-if="scope.row.Power === 3">全院管理</label>
-            <label v-else-if="scope.row.Power === 2">科室管理</label>
-            <label v-else-if="scope.row.Power === 1">追踪处理</label>
-            <label v-else-if="scope.row.Power === 0">录入</label>
-            <label v-else-if="scope.row.Power === -1">个人</label>
+            <label v-if="scope.row.power === 1">管理员</label>
+            <label v-if="scope.row.power === 0">普通用户</label>
           </template>
         </el-table-column>
+        <el-table-column prop="phone" label="电话号码" />
+        <el-table-column prop="account" label="账号" />
+        <el-table-column prop="password" label="密码" />
         <el-table-column label="创建时间">
           <template slot-scope="scope">
-            {{ scope.row.CreateDate.split("T")[0] }}
+            {{ scope.row.create_date.split("T")[0] }}
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作">
           <template slot-scope="scope">
             <el-link
-              v-if="user.power >= scope.row.Power"
               type="primary"
               @click="editPerson(scope.row)"
             >编辑</el-link>
             <el-link
-              v-if="user.power > scope.row.Power"
               type="danger"
               style="margin-left: 10px"
               @click="deleteUser(scope.row)"
@@ -90,17 +84,17 @@
         style="max-width: 400px; margin-left: 5%"
         :model="addPerson"
       >
-        <el-form-item label="用户名">
+        <el-form-item label="姓名">
           <el-input
             v-model="addPerson.name"
             clearable
             placeholder="请输入用户名"
           />
         </el-form-item>
-        <el-form-item label="用户编号">
+        <el-form-item label="账号">
           <el-input
-            v-model="addPerson.number"
-            :disabled="dialogType === 'edit' && addPerson.name !== user.name"
+            v-model="addPerson.account"
+            :disabled="dialogType === 'edit'"
             clearable
             placeholder="请输入用户编号"
           />
@@ -109,25 +103,9 @@
           <el-input
             v-model="addPerson.password"
             type="password"
-            :disabled="dialogType === 'edit' && addPerson.name !== user.name"
             clearable
             placeholder="请输入用户密码"
           />
-        </el-form-item>
-        <el-form-item label="科室">
-          <el-select
-            v-model="addPerson.department"
-            clearable
-            filterable
-            placeholder="请选择所属科室"
-          >
-            <el-option
-              v-for="item in dept"
-              :key="item.ID"
-              :label="item.Name"
-              :value="item.Name"
-            />
-          </el-select>
         </el-form-item>
         <el-form-item label="联系电话">
           <el-input
@@ -138,20 +116,9 @@
         </el-form-item>
         <el-form-item label="设置为管理员">
           <el-select v-model="addPerson.power">
-            <el-option label="全院管理" :value="3">全院管理</el-option>
-            <el-option label="科室管理" :value="2">科室管理</el-option>
-            <el-option label="追踪处理" :value="1">追踪处理</el-option>
-            <el-option label="录入" :value="0">录入</el-option>
-            <el-option label="个人" :value="-1">个人</el-option>
+            <el-option label="管理员" :value="1">管理员</el-option>
+            <el-option label="普通用户" :value="0">普通用户</el-option>
           </el-select>
-          <!-- <el-switch
-            v-model="addPerson.Power"
-            :disabled="user.power < 2"
-            :active-value="2"
-            :inactive-value="1"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-          /> -->
         </el-form-item>
       </el-form>
       <div style="text-align: right; margin: 10px 10px 0">
@@ -179,8 +146,8 @@ export default {
     return {
       userName: '',
       user: {
-        name: this.$store.state.user.userInfo.Name,
-        power: this.$store.state.user.userInfo.Power
+        name: this.$store.state.user.userInfo.name,
+        power: this.$store.state.user.userInfo.power
       },
       tableData: [],
       deptName: '',
@@ -188,14 +155,11 @@ export default {
       drawer: false,
       isAdmin: false,
       addPerson: {
-        department: '',
-        phone: '',
         name: '',
-        number: '',
-        power: '',
+        account: '',
         password: '',
-        hospitalCode: this.$store.state.user.userInfo.hospitalCode,
-        hospitalName: this.$store.state.user.userInfo.HospitalName
+        phone: '',
+        power: ''
       },
       dialogType: '',
       dept: [],
@@ -211,35 +175,23 @@ export default {
     editPerson(row) {
       this.dialogType = 'edit'
       this.drawer = true
-      this.addPerson.power = row.Power
-      this.addPerson.department = row.Department
-      this.addPerson.phone = row.Iphone
-      this.addPerson.name = row.Name
-      this.addPerson.number = row.Number
-      this.addPerson.password = row.Password
+      this.addPerson.name = row.name
+      this.addPerson.account = row.account
+      this.addPerson.password = row.password
+      this.addPerson.phone = row.phone
+      this.addPerson.power = row.power
     },
     getUser() {
       getUserinfoByName({
-        Name: this.userName,
-        hospitalCode: this.$store.state.user.userInfo.hospitalCode,
-        power: this.$store.state.user.userInfo.Power,
-        dept: this.$store.state.user.userInfo.Department
+        name: this.userName
       }).then((res) => {
-        this.tableData = JSON.parse(res.d)
+        if (res.code === 1) {
+          console.log(res,78)
+          this.tableData = res.data.list
+        }
       })
     },
     confirm() {
-      // if (this.addPerson.Power == "全院管理") {
-      //   this.addPerson.Power = 3;
-      // } else if (this.addPerson.Power == "科室管理") {
-      //   this.addPerson.Power = 2;
-      // } else if (this.addPerson.Power == "追踪处理") {
-      //   this.addPerson.Power = 1;
-      // } else if (this.addPerson.Power == "录入") {
-      //   this.addPerson.Power = 0;
-      // } else if (this.addPerson.Power == "个人") {
-      //   this.addPerson.Power = -1;
-      // }
       if (this.dialogType === 'add') {
         this.addUser()
       } else {
@@ -249,24 +201,15 @@ export default {
     openAddUser() {
       this.dialogType = 'add'
       this.drawer = true
-      this.addPerson = {
-        department: '',
-        phone: '',
-        name: '',
-        number: '',
-        power: '',
-        password: '',
-        hospitalCode: this.$store.state.user.userInfo.hospitalCode,
-        hospitalName: this.$store.state.user.userInfo.HospitalName
-      }
-
-      if (this.$store.state.user.userInfo.Power === 2) {
-        this.addPerson.department = this.$store.state.user.userInfo.Department
-      }
+      this.addPerson.name = ''
+      this.addPerson.account = ''
+      this.addPerson.password = ''
+      this.addPerson.phone = ''
+      this.addPerson.power = ''
     },
     addUser() {
       addUserInfo(this.addPerson).then((res) => {
-        if (res.d === 'Success') {
+        if (res.code === 1) {
           this.$message({
             type: 'success',
             message: '添加成功'
@@ -276,14 +219,14 @@ export default {
         } else {
           this.$message({
             type: 'warning',
-            message: res.d
+            message: res.msg
           })
         }
       })
     },
     updateUser() {
       updateUser(this.addPerson).then((res) => {
-        if (res.d === 'Success') {
+        if (res.code === 1) {
           this.$message({
             type: 'success',
             message: '修改成功'
@@ -299,12 +242,19 @@ export default {
       })
     },
     deleteUser(row) {
+      if (row.account === this.$store.state.user.userInfo.account) {
+        this.$message({
+          type: 'warning',
+          message: '不能删除自己'
+        })
+        return
+      }
       this.$confirm('删除后不可恢复，是否确认删除？')
         .then((_) => {
           deleteUser({
-            ID: row.ID
+            account: row.account
           }).then((res) => {
-            if (res.d === 'Success') {
+            if (res.code === 1) {
               this.$message({
                 type: 'success',
                 message: '已删除'

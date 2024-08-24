@@ -2,34 +2,25 @@
   <div class="app-container">
     <el-form class="search" label-width="100px" size="small">
       <el-date-picker
-        v-model="searchModel.startTime"
-        class="date-component"
-        value-format="yyyy-MM-dd"
-        type="date"
-        placeholder="选择起始日期"
-      />
-      <span>-</span>
-      <el-date-picker
-        v-model="searchModel.endTime"
-        class="date-component"
-        value-format="yyyy-MM-dd"
-        type="date"
-        placeholder="选择截止日期"
-      />
+        v-model="searchDate"
+        type="datetimerange"
+        format="yyyy-MM-dd HH:mm"
+        style="margin-right: 20px"
+        range-separator="至"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期">
+      </el-date-picker>
       <el-button
         icon="el-icon-search"
         type="primary"
-        @click="getData"
+        @click="searchByDate"
       >查询</el-button>
       <el-dropdown class="dropdown" @command="handleCommand">
         <span class="el-dropdown-link">
           {{ tableName || '请选择表单' }}<i v-if="!tableName" class="el-icon-arrow-down el-icon--right" />
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="自定义新冠感染调查情况表">自定义新冠感染调查情况表</el-dropdown-item>
-          <el-dropdown-item command="测试表2">测试表2</el-dropdown-item>
-          <el-dropdown-item command="表3">表3</el-dropdown-item>
-          <el-dropdown-item command="测试表（已关闭）" disabled>测试表（已关闭）</el-dropdown-item>
+          <el-dropdown-item v-for="(item,index) in formList" :key="index" :command="item">{{ item.table_name }}</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </el-form>
@@ -38,7 +29,7 @@
         <el-col :span="23" />
         <el-col :span="1">
           <el-tooltip class="item" effect="dark" content="新增" placement="top">
-            <i class="el-icon-plus add-icon" @click="handleAdd" />
+            <i class="el-icon-plus add-icon" @click="editFillIn(diyTable, '新增')" />
           </el-tooltip>
         </el-col>
       </el-row>
@@ -58,47 +49,63 @@
       style="width: 100%"
       @sort-change="sortChange"
     >
-      <el-table-column
-        min-width="120px"
-        fiexd
-        align="center"
-        prop="name"
-        label="填报人"
-      />
+      <el-table-column min-width="120px" fiexd align="center" prop="written_by" label="填报人" />
       <el-table-column min-width="120px" align="center" label="填报时间">
         <template slot-scope="scope">
-          {{ scope.row.createTime.split("T")[0] }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        min-width="220px"
-        align="center"
-        prop="result.hasInfect"
-        label="是否有工作人员出现流感症状"
-      />
-      <el-table-column min-width="120px" align="center" label="校验状态">
-        <template slot-scope="scope">
-          <span
-            v-if="scope.row.result.hasInfect === '是'"
-            style="color: #E6A23C; font-weight: 600"
-          >
-            待校验
-          </span>
-          <span v-else style="color: #666"> 0 </span>
+          {{ formatDate(scope.row.date) }}
         </template>
       </el-table-column>
       <el-table-column min-width="120px" align="center" label="填写详情">
         <template slot-scope="scope">
           <svg-icon
-            v-if="scope.row.result.hasInfect === '是'"
             icon-class="person"
             class="person-icon"
-            @click="personDetails(scope.row.result.person)"
+            @click="editFillIn(scope.row, '查看')"
           />
-          <span v-else>-</span>
+        </template>
+      </el-table-column>
+      <el-table-column min-width="120px" align="center" label="校验状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.state === 2" type="success">正确</el-tag>
+          <el-tag v-if="scope.row.state === 1" type="warning">待校验</el-tag>
+          <el-tag v-if="scope.row.state === 3" type="danger">错误</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" label="操作">
+        <template slot-scope="scope">
+          <el-link
+            type="primary"
+            @click="editFillIn(scope.row, '编辑')"
+          >编辑</el-link>
+          <el-link
+            type="danger"
+            style="margin-left: 10px"
+            @click="deleteFillIn(scope.row)"
+          >删除
+          </el-link>
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog
+      :modal-append-to-body="false"
+      :title="'☆' + fillInForm.redactState"
+      :visible.sync="fillInShow"
+      :close-on-click-modal="false"
+      width="60%"
+    >
+      <Preview v-if="fillInShow" :preview-data="fillInForm" @close="searchByDate"/>
+    </el-dialog>
+
+
+
+
+
+
+
+
+
+
     <el-pagination
       :current-page="listQuery.page"
       :page-size="listQuery.limit"
@@ -375,17 +382,29 @@ import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination'
 import FileSaver from 'file-saver'
 import XLSX from 'xlsx'
-import { getStaffContentTable } from '@/api/fillout'
+import { getStaffContentTable, deleteContentTable } from '@/api/fillout'
+import Preview from './components/preview'
+import { getCustomTable } from '@/api/custom-module'
+import {deleteUser} from "@/api/employee";
 
 export default {
   name: 'HealthEducation',
   components: {
+    Preview,
     Pagination
   },
   data() {
     return {
       tableName: '',
       tableLoading: false,
+      formList: [],
+      searchDate: '',
+      tableData: [],
+      fillInShow: false,
+      fillInForm: '',
+      diyTable: '',
+
+
 
       tableData2: [],
       searchModel: {
@@ -400,25 +419,114 @@ export default {
         limit: 10,
         sort: '+id'
       },
-      tableData: [],
       drawer: false,
       selectTable: []
     }
   },
   created() {
-    this.tableName = this.$route.query.name
+    if (Object.keys(this.$route.params).length > 0) {
+      this.tableName = this.$route.params.table_name
+      this.diyTable = this.$route.params
+    } else {
+      console.log('没有 params 参数')
+    }
     this.getData()
+    this.searchByDate()
   },
   methods: {
-    handleCommand(command) {
-      this.tableName = command
-      this.tableLoading = true
-      const _self = this
-      this.$message('click on item ' + command)
-      setTimeout(() => {
-        _self.tableLoading = false
-      }, 1000)
+    getData() {
+      this.tableData = []
+      this.listLoading = true
+      getCustomTable().then(res => {
+        if (res.code) {
+          this.formList = res.data.list
+          console.log(this.formList, 789)
+        }
+        this.listLoading = false
+      })
     },
+    searchByDate() {
+      this.fillInShow = false
+      this.listLoading = true
+      const data = {
+        form_id: this.diyTable.id || '',
+        written_account: this.$store.state.user.userInfo.account,
+        startDate: '',
+        endDate: '',
+        power: this.$store.state.user.userInfo.power
+      }
+      if (this.searchDate) {
+        data.startDate = new Date(this.searchDate[0])
+        data.endDate = new Date(this.searchDate[1])
+      }
+      getStaffContentTable(data).then(res => {
+        if (res.code === 1) {
+          console.log(res,'111')
+          this.tableData = res.data
+        }
+        this.listLoading = false
+      })
+    },
+    deleteFillIn(row) {
+      this.$confirm('删除后不可恢复，是否确认删除？').then((_) => {
+        deleteContentTable({ id: row.id }).then(res => {
+          if (res.code === 1) {
+            this.$message({
+              type: 'success',
+              message: '已删除'
+            })
+            this.searchByDate()
+          } else {
+            this.$message({
+              type: 'warning',
+              message: '删除失败'
+            })
+          }
+        })
+      }).catch((_) => {})
+    },
+    editFillIn(row, redactState) {
+      console.log(this.diyTable,89)
+      if (this.diyTable) {
+        this.fillInForm = {
+          id: row.id,
+          content: row.content,
+          table_name: this.diyTable.table_name,
+          description: this.diyTable.description,
+          redactState: redactState
+        }
+        this.fillInShow = true
+      } else {
+        this.$message({
+          type: 'info',
+          message: '请先选择表单'
+        })
+      }
+    },
+    handleCommand(command) {
+      this.tableName = command.table_name
+      this.diyTable = command
+      this.searchByDate()
+    },
+    formatDate(date) {
+      date = new Date(date)
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0') // 月份是从0开始的
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+
+      return `${year}-${month}-${day} ${hours}:${minutes}`
+    },
+
+
+
+
+
+
+
+
+
     handleAdd() {
       if (this.tableName) {
         this.$message('跳转到填表')
@@ -429,40 +537,6 @@ export default {
 
     handleCurrentChange(page) {
       this.listQuery.page = page
-    },
-    getData() {
-      this.tableData = []
-      getStaffContentTable(this.searchModel).then((res) => {
-        switch (this.$store.state.user.userInfo.Power) {
-          case 3:
-            this.tableData = JSON.parse(res.d)
-            break
-          default:
-            JSON.parse(res.d).forEach((v) => {
-              if (
-                JSON.parse(v.result).person[0].administrativeOffice ===
-                this.$store.state.user.userInfo.Department
-              ) {
-                this.tableData.push(v)
-              }
-            })
-            break
-        }
-        this.tableData.forEach((item, index) => {
-          item.result = JSON.parse(item.result)
-        })
-        const table = []
-        for (let i = 0; i < this.tableData.length; i++) {
-          for (let j = 0; j < this.tableData[i].result.person.length; j++) {
-            this.tableData[i].result.person[j].cTime =
-              this.tableData[i].createTime
-            this.tableData[i].result.person[j].pName = this.tableData[i].name
-            table[table.length] = this.tableData[i].result.person[j]
-          }
-        }
-        this.tableData2 = table
-      })
-      this.listLoading = false
     },
     personDetails(person) {
       this.selectTable = person
@@ -550,8 +624,23 @@ export default {
     font-size: 18px;
   }
 
+  ::v-deep .el-dialog__header {
+    background-color: #f1f2f3;
+    .el-dialog__title {
+      color: #999;
+    }
+  }
 .app-container {
   background-color: #fff;
+  ::v-deep .el-dialog__header {
+    background-image: repeating-linear-gradient(135deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(45deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(67.5deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(135deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(45deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(112.5deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(112.5deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(45deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(22.5deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(45deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(22.5deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(135deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(157.5deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(67.5deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),repeating-linear-gradient(67.5deg, hsla(264,0%,88%,0.03) 0px, hsla(264,0%,88%,0.03) 1px,transparent 1px, transparent 12px),linear-gradient(90deg, rgba(151,26,210, 0),rgba(57,199,205, 0));
+    .el-dialog__title {
+      color: #c6c6c6;
+    }
+  }
+  ::v-deep .el-dialog__body {
+    margin-bottom: 50px;
+  }
 }
 
 .search {

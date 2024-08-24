@@ -57,7 +57,6 @@
             </div>
             <div class="setting-link">
               <el-link :underline="false" type="primary" @click="addTableColumn()">增加列</el-link>
-              <el-link :underline="false" type="primary" @click="componentData.select = []">重设选中项</el-link>
             </div>
           </div>
         </el-form>
@@ -65,31 +64,25 @@
       <el-tab-pane label="表单设置" name="second">
         <el-form ref="form" class="form-setting" label-width="80px" size="mini">
           <el-form-item label="表名">
-            <el-input v-model="diyForm.diyName" placeholder="请输入表名" />
+            <el-input v-model="diyForm.table_name" placeholder="请输入表名" />
           </el-form-item>
           <el-form-item label="表说明">
-            <el-input v-model="diyForm.diyDescription" type="textarea" autosize placeholder="请输入此表的描述,目的等" />
-          </el-form-item>
-          <el-form-item label="起始日期">
-            <el-date-picker v-model="diyForm.diyStartDate" type="date" placeholder="选择日期" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 100%;" />
-          </el-form-item>
-          <el-form-item label="截止日期">
-            <el-date-picker v-model="diyForm.diyEndDate" type="date" placeholder="选择日期" format="yyyy-MM-dd" value-format="yyyy-MM-dd" style="width: 100%;" />
+            <el-input v-model="diyForm.description" type="textarea" :autosize="{ minRows: 2, maxRows: 10}" placeholder="请输入此表的描述,目的等" />
           </el-form-item>
         </el-form>
       </el-tab-pane>
     </el-tabs>
 
     <el-dialog
-      title="提示"
+      :title="'第' + (columnIdx + 1) + '列'"
       :visible.sync="dialogVisible"
       width="30%"
       :before-close="handleClose"
       append-to-body="true"
     >
-      <ColumnForm :componentData="componentData"/>
+      <ColumnForm v-if="dialogVisible" :component-data="componentData" :column-idx="columnIdx" ref="ColumnForm"/>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="sureColumn">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -113,13 +106,22 @@ export default {
       dragIcon: require('../../../assets/icons/drag.svg'),
       dragBlueIcon: require('../../../assets/icons/drag-blue.svg'),
       diyForm: {
-        diyName: '',
-        diyDescription: '',
-        diyStartDate: '',
-        diyEndDate: ''
+        table_name: '',
+        description: ''
       },
-      typeMap: ['单行文本', '多行文本', '单选框', '多选框', '日期选择', '数量选择', '滑动条', '带建议输入'],
-      componentData: null
+      typeMap: {
+        0: '单行文本',
+        1: '多行文本',
+        2: '单选框',
+        3: '多选框',
+        4: '日期选择',
+        5: '数量选择',
+        6: '滑动条',
+        7: '带建议输入',
+        20: '自增表格'
+      },
+      componentData: null,
+      columnIdx: 0
     }
   },
   computed: {
@@ -148,10 +150,8 @@ export default {
     this.$eventBus.$on('changeTab', this.changeTab)
     if (this.editForm) {
       this.diyForm = {
-        diyName: this.editForm.diyName,
-        diyDescription: this.editForm.diyDescription,
-        diyStartDate: this.editForm.diyStartDate,
-        diyEndDate: this.editForm.diyEndDate
+        table_name: this.editForm.table_name,
+        description: this.editForm.description,
       }
     }
   },
@@ -170,18 +170,30 @@ export default {
       cb(this.diyForm)
     },
     tableSetting(index) {
+      this.columnIdx = index
       this.dialogVisible = true
+    },
+    sureColumn() {
+      const aColumnForm = this.$refs.ColumnForm.formData
+      console.log(this.componentData.bodyForm[this.columnIdx],this.$refs.ColumnForm.formData, 996)
+      this.componentData.bodyForm[this.columnIdx].type = aColumnForm.type
+      this.componentData.bodyForm[this.columnIdx].label = this.typeMap[aColumnForm.type]
+      this.componentData.bodyForm[this.columnIdx].max = aColumnForm.max
+      this.componentData.bodyForm[this.columnIdx].min = aColumnForm.min
+      this.componentData.bodyForm[this.columnIdx].suggestion = aColumnForm.suggestion
+      this.dialogVisible = false
     },
     addTableColumn() {
       const IDX = this.componentData.header.length + 1
       this.componentData.header.push('列' + IDX)
-      this.componentData.content[0].push('1')
+      this.componentData.content[0].push('')
       this.componentData.bodyForm.push({
         type: 0,
         uniqueName: '',
         label: '单行输入框',
         max: 10,
         min: 0,
+        suggestion: '',
         content: ''
       })
     },

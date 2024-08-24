@@ -1,20 +1,37 @@
 <template>
   <div class="preview">
-    <h4 class="preview-title">{{ previewData.diyName }}</h4>
-    <p class="preview-description">{{ previewData.diyDescription }}</p>
-    <div v-for="(item,index) in previewData.diyContent" :key="index" class="preview-form">
-      <h5 class="preview-form-title" :class="{required: item.isNecessary}">{{ index + 1 }}. {{ item.label }}</h5>
-      <el-input v-if="item.type === 0" size="small" placeholder="请输入内容" v-model="item.content" />
-      <el-input v-if="item.type === 1" v-model="item.content" type="textarea" :rows="2" placeholder="请输入内容" />
+    <h4 class="preview-title">{{ previewData.table_name }}</h4>
+    <p class="preview-description">{{ previewData.description }}</p>
+    <div v-for="(item,index) in previewData.content" :key="index" class="preview-form">
+      <h5 class="preview-form-title" :class="{required: item.isNecessary}">{{ index + 1 }}. {{ item.label }}{{ item.checkValue ? '（校验值）' : '' }}</h5>
+      <!--单行文本-->
+      <el-input v-if="item.type === 0" size="small" placeholder="请输入内容" :maxlength="item.max" show-word-limit v-model="item.content" />
+      <!--多行文本-->
+      <el-input v-if="item.type === 1" v-model="item.content" type="textarea" :maxlength="item.max" show-word-limit :rows="2" placeholder="请输入内容" />
+      <!--单选-->
       <div v-if="item.type === 2">
         <el-radio v-for="(radio,idx) in item.content" :key="idx" v-model="item.select" :label="radio">{{ radio }}</el-radio>
       </div>
+      <!--多选-->
       <el-checkbox-group v-if="item.type === 3" v-model="item.select">
         <el-checkbox v-for="(checkbox,idx) in item.content" :key="idx" :label="checkbox">{{ checkbox }}</el-checkbox>
       </el-checkbox-group>
+      <!--日期选择-->
       <el-date-picker v-if="item.type === 4" size="small" type="date" placeholder="选择日期" />
-      <el-input-number v-if="item.type === 5" v-model="item.content" :min="1" :max="10000" label="数"></el-input-number>
-      <div v-if="item.type === 20" class="body-input-content select-department">请选择</div>
+      <!--数量选择-->
+      <el-input-number v-if="item.type === 5" v-model="item.content" :min="item.min" :max="item.max" label="数"></el-input-number>
+      <!--滑动条-->
+      <el-slider v-if="item.type === 6" v-model="item.content" :min="item.min" :max="item.max" style="padding: 0 20px"></el-slider>
+      <!--输入建议选择框-->
+      <el-autocomplete v-if="item.type === 7" v-model="item.content" class="inline-input" @focus="sugFocus(index)" :fetch-suggestions="querySearch" placeholder="请输入内容"></el-autocomplete>
+      <!--自增表格-->
+      <el-table v-if="item.type === 20" :data="item.content" class="body-input-content" style="width: 100%" border :header-cell-style="{backgroundColor: '#efefef'}">
+        <el-table-column v-for="(column,colIdx) in item.header" :key="colIdx" :label="column">
+          <template slot-scope="scope">
+            {{ item.bodyForm[colIdx].label }}
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </div>
 </template>
@@ -31,10 +48,31 @@ export default {
   data() {
     return {
       // inputData: []
+      sugData: []
     }
   },
   mounted() {
+    this.previewData.content = JSON.parse(this.previewData.content)
     // console.log(this.previewData, 78)
+  },
+  methods: {
+    sugFocus(index) {
+      this.sugData = this.previewData.content[index].suggestion.split(',')
+    },
+    querySearch(queryString, cb) {
+      const restaurants = []
+      this.sugData.forEach(item => {
+        restaurants.push({ 'value': item, 'address': item })
+      })
+      const results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants
+      // 调用 callback 返回建议列表的数据
+      cb(results)
+    },
+    createFilter(queryString) {
+      return (restaurant) => {
+        return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+      }
+    },
   }
 }
 </script>

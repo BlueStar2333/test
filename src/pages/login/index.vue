@@ -3,7 +3,6 @@
     <div class="ms-login">
       <div class="ms-title">华西医院填表系统</div>
       <el-form
-        v-show="!phoneLoginState"
         ref="loginForm"
         :model="loginForm"
         :rules="loginRules"
@@ -11,6 +10,23 @@
         class="ms-content"
         autocomplete="on"
       >
+        <el-form-item prop="phone">
+          <el-input v-model="loginForm.phone" class="phone-inp" placeholder="请输入手机号">
+            <i slot="prefix" class="el-icon-phone" />
+          </el-input>
+        </el-form-item>
+        <el-form-item prop="code">
+          <el-row :gutter="20">
+            <el-col :span="16">
+              <el-input v-model="loginForm.code" class="phone-inp" placeholder="请输入验证码">
+                <i slot="prefix" class="el-icon-tickets" />
+              </el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-button :disabled="sendDisabled" style="width: 130px" @click="sendCode">{{ btnText }}</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
         <el-form-item prop="username">
           <el-input
             ref="username"
@@ -18,7 +34,7 @@
             clearable
             tabindex="1"
             autocomplete="on"
-            placeholder="Username"
+            placeholder="请输入账号"
           >
             <template #prepend>
               <el-button icon="el-icon-user" />
@@ -31,7 +47,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="Password"
+            placeholder="请输入密码"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -49,35 +65,6 @@
         </div>
       </el-form>
 
-      <el-form v-show="phoneLoginState" ref="ruleForm" class="ms-content" :model="ruleForm" :rules="rules" style="padding-bottom: 16px;">
-        <el-form-item prop="phone">
-          <el-input v-model="ruleForm.phone" class="phone-inp" placeholder="请输入手机号">
-            <i slot="prefix" class="el-icon-phone" />
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="code">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="ruleForm.code" class="phone-inp" placeholder="请输入验证码">
-                <i slot="prefix" class="el-icon-tickets" />
-              </el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-button :disabled="sendDisabled" style="width: 130px" @click="sendCode">{{ btnText }}</el-button>
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            style="width:100%"
-            @click="phoneLogin"
-          >登录</el-button>
-        </el-form-item>
-      </el-form>
-
-      <a v-if="phoneLoginState" class="login-tips" @click="changePhoneLoginState(false)">账号密码登录 ></a>
-      <a v-else class="login-tips" @click="changePhoneLoginState(true)">手机号登录 ></a>
     </div>
   </div>
 </template>
@@ -116,26 +103,17 @@ export default {
     }
     return {
       loginForm: {
+        phone: '',
+        code: '',
         username: '',
         password: ''
       },
-      ruleForm: {
-        phone: '',
-        code: ''
-      },
       btnText: '发送验证码',
-      phoneLoginState: false,
       time: 60,
-      rules: {
-        phone: [
-          { validator: checkPhone, trigger: 'change' }
-        ],
-        code: [
-          { required: true, message: '验证码不能为空', trigger: 'blur' }
-        ]
-      },
       sendDisabled: false,
       loginRules: {
+        phone: [{ validator: checkPhone, trigger: 'change' }],
+        code: [{ required: true, message: '验证码不能为空', trigger: 'blur' }],
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
@@ -210,20 +188,8 @@ export default {
         }
       })
     },
-    changePhoneLoginState(bool) {
-      this.phoneLoginState = bool
-    },
-    phoneLogin() {
-      this.$refs.ruleForm.validate((valid) => {
-        if (valid) {
-          alert('submit')
-        } else {
-          alert('errHandle')
-        }
-      })
-    },
     sendCode() {
-      this.$refs.ruleForm.validateField('phone', errorMessage => {
+      this.$refs.loginForm.validateField('phone', errorMessage => {
         if (errorMessage) {
           this.$message.error(errorMessage)
         } else {

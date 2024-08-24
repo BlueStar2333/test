@@ -1,7 +1,7 @@
 <template>
   <div class="middle">
     <div class="head">
-      <el-link class="head-link" :underline="false" type="primary" icon="el-icon-delete" @click="deleteInput(0, formData.length)">清空</el-link>
+      <el-link class="head-link" :underline="false" type="primary" icon="el-icon-delete" @click="deleteInput(1, formData.length)">清空</el-link>
       <el-link class="head-link" :underline="false" type="primary" icon="el-icon-view" @click="previewTable">预览</el-link>
       <el-link v-if="editForm" class="head-link" :underline="false" type="primary" icon="el-icon-document-checked" @click="edit">确认修改</el-link>
       <el-link v-else class="head-link" :underline="false" type="primary" icon="el-icon-document-add" @click="save">保存上传</el-link>
@@ -35,7 +35,11 @@
         <el-autocomplete v-if="itemA.type === 7" v-model="formData[index].content" class="inline-input" placeholder="请输入内容"></el-autocomplete>
         <!--自增表格-->
         <el-table v-if="itemA.type === 20" :data="itemA.content" class="body-input-content" style="width: 100%" border :header-cell-style="{backgroundColor: '#efefef'}">
-          <el-table-column v-for="(column,colIdx) in itemA.header" :key="colIdx" :prop="colIdx + ''" :label="column"></el-table-column>
+          <el-table-column v-for="(column,colIdx) in itemA.header" :key="colIdx" :label="column">
+            <template slot-scope="scope">
+              {{ itemA.bodyForm[colIdx].label }}
+            </template>
+          </el-table-column>
         </el-table>
 
         <!--    选中框    -->
@@ -43,9 +47,9 @@
 <!--          <span class="nav-name"><i class="el-icon-rank" /> {{ typeMap[itemA.type] }}</span>-->
           <div class="nav-menu">
             <a><i class="el-icon-back nav-menu-back" @click.stop="selectIndex = -1" /></a>
-            <a><i class="el-icon-bottom nav-menu-bottom" @click.stop="switchPlaces(index, index+1)" /></a>
-            <a><i class="el-icon-top nav-menu-top" @click.stop="switchPlaces(index, index-1)" /></a>
-            <a><i class="el-icon-delete" @click="deleteInput(index, 1)" /></a>
+            <a v-if="index !== 0"><i class="el-icon-bottom nav-menu-bottom" @click.stop="switchPlaces(index, index+1)" /></a>
+            <a v-if="index !== 0"><i class="el-icon-top nav-menu-top" @click.stop="switchPlaces(index, index-1)" /></a>
+            <a v-if="index !== 0"><i class="el-icon-delete" @click="deleteInput(index, 1)" /></a>
           </div>
         </div>
       </div>
@@ -73,10 +77,8 @@ import Preview from './preview'
 
 // 必填内容未填提示映射表
 const warningMap = {
-  'diyName': '请填写表名',
-  'diyDescription': '请填写表说明',
-  'diyStartDate': '请选择起始时间',
-  'diyEndDate': '请选择截止时间'
+  'table_name': '请填写表名',
+  'description': '请填写表说明'
 }
 export default {
   name: 'PopupMiddle',
@@ -95,16 +97,39 @@ export default {
       previewShow: false,
       selectIndex: -1,
       formData: [],
-      typeMap: ['单行文本', '多行文本', '单选框', '多选框', '日期选择', '数量选择', '滑动条', '带建议输入'],
+      typeMap: {
+        0: '单行文本',
+        1: '多行文本',
+        2: '单选框',
+        3: '多选框',
+        4: '日期选择',
+        5: '数量选择',
+        6: '滑动条',
+        7: '带建议输入',
+        20: '自增表格'
+      },
       diyForm: null
     }
   },
   mounted() {
-    if (this.editForm) {
-      this.formData = this.editForm.diyContent
-    }
+    this.init()
   },
   methods: {
+    init() {
+      if (this.editForm) {
+        this.formData = JSON.parse(this.editForm.content)
+      } else {
+        this.formData.push({
+          type: 7,
+          uniqueName: '',
+          label: '人员ID',
+          suggestion: '',
+          content: '',
+          isNecessary: true,
+          checkValue: true
+        })
+      }
+    },
     drop(e) {
       const inputType = e.dataTransfer.getData('type')
       const newInputData = deepClone(inputData[inputType])
@@ -149,7 +174,7 @@ export default {
       this.$eventBus.$emit('getDiyData', function(form) {
         self.diyForm = form
       })
-      this.diyForm.diyContent = this.formData
+      this.diyForm.content = this.formData
       this.previewShow = true
     },
     checkForm() {
@@ -177,11 +202,11 @@ export default {
       if (this.checkForm()) {
         return
       }
-      this.diyForm.diyContent = JSON.stringify(this.formData)
-      this.diyForm.diyUser = this.$store.state.user.userInfo.Name
-      this.diyForm.hospitalcode = this.$store.state.user.userInfo.HospitalName
+      this.diyForm.content = JSON.stringify(this.formData)
+      this.diyForm.creator = this.$store.state.user.userInfo.name
+      console.log(this.diyForm,635)
       addCustomTable(this.diyForm).then(res => {
-        if (res.d === 'Success') {
+        if (res.code === 1) {
           this.$message({
             message: '添加成功',
             type: 'success'
@@ -200,13 +225,11 @@ export default {
       if (this.checkForm()) {
         return
       }
-      this.diyForm.diyContent = JSON.stringify(this.formData)
-      this.diyForm.diyUser = this.$store.state.user.userInfo.Name
-      this.diyForm.hospitalcode = this.$store.state.user.userInfo.HospitalName
-      this.diyForm.createtime = this.editForm.createtime
-      this.diyForm.ID = this.editForm.ID
+      this.diyForm.content = JSON.stringify(this.formData)
+      this.diyForm.creator = this.$store.state.user.userInfo.name
+      this.diyForm.id = this.editForm.id
       editCustomTable(this.diyForm).then(res => {
-        if (res.d === 'Success') {
+        if (res.code === 1) {
           this.$message({
             message: '修改成功',
             type: 'success'
