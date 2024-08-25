@@ -221,7 +221,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url(../../assets/img/login-bg.jpg);
+  background-image: url(../../assets/img/login-bg2.png);
   background-size: cover;
   display: flex;
   justify-content: center;
@@ -241,7 +241,8 @@ export default {
   position: absolute;
   width: 500px;
   border-radius: 5px;
-  background: rgba(161, 160, 160, 0.5);
+  background: rgba(161, 160, 160, 0.6);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   overflow: hidden;
 }
 
