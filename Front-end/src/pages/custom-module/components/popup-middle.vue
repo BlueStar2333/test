@@ -179,6 +179,13 @@ export default {
     },
     checkForm() {
       let ret = false
+      if (this.diyForm['check_number'] < 3) {
+        this.$message({
+          message: '请设置至少3个校验项',
+          type: 'warning'
+        })
+        return true
+      }
       for (const key in warningMap) {
         if (this.diyForm[key] === '') {
           this.$eventBus.$emit('changeTab', 'second')
@@ -204,7 +211,7 @@ export default {
       }
       this.diyForm.content = JSON.stringify(this.formData)
       this.diyForm.creator = this.$store.state.user.userInfo.name
-      console.log(this.diyForm,635)
+      console.log(this.diyForm, 635)
       addCustomTable(this.diyForm).then(res => {
         if (res.code === 1) {
           this.$message({

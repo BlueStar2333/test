@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 25/08/2024 15:32:07
+ Date: 26/08/2024 17:20:46
 */
 
 SET NAMES utf8mb4;
@@ -31,7 +31,7 @@ CREATE TABLE `fill_in`  (
   `state` int NOT NULL COMMENT '三种状态 1：待校验  2：校验正确  3：错误',
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`, `form_id` DESC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 22 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of fill_in
@@ -53,6 +53,8 @@ INSERT INTO `fill_in` VALUES (18, 5, 'wh', '管理员', 'admin', '2024-08-25 00:
 INSERT INTO `fill_in` VALUES (19, 5, 'wh', 'wh', '123', '2024-08-25 02:14:18', 1, '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":\"\",\"content\":[\"选项1\",\"选项2\"],\"isNecessary\":false},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[],\"content\":[\"选项1\",\"选项12\",\"选项3\"],\"isNecessary\":false},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":false},{\"type\":6,\"uniqueName\":\"\",\"label\":\"滑动条\",\"max\":1000,\"min\":0,\"content\":500,\"isNecessary\":false,\"checkValue\":false},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议框\",\"suggestion\":\"1,4,5,6\",\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\",\"列4\",\"列5\",\"列6\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":6,\"uniqueName\":\"\",\"label\":\"滑动条\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议输入\",\"max\":100,\"min\":0,\"suggestion\":\"9,8,7\",\"content\":\"\"}],\"content\":[[4,5,\"1\",1,0,\"1\"]]}]');
 INSERT INTO `fill_in` VALUES (20, 4, 'test2', 'wh', '123', '2024-08-25 02:15:44', 1, '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"7,8,9\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":\"选项2\",\"content\":[\"选项1\",\"选项2\"],\"isNecessary\":false},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[],\"content\":[\"选项1\",\"选项12\",\"选项3\"],\"isNecessary\":false},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议框\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":false},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[4,5]]}]');
 INSERT INTO `fill_in` VALUES (21, 4, 'test2', 'wh', '123', '2024-08-25 02:15:51', 1, '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"7,8,9\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":\"\",\"content\":[\"选项1\",\"选项2\"],\"isNecessary\":false},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[],\"content\":[\"选项1\",\"选项12\",\"选项3\"],\"isNecessary\":false},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议框\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":false},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[4,5],[\"\",\"2024-08-26T16:00:00.000Z\"],[\"\",\"\"]]}]');
+INSERT INTO `fill_in` VALUES (22, 3, 'test9', '管理员', 'admin', '2024-08-25 16:42:14', 1, '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"1\",\"isNecessary\":true,\"checkValue\":true},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"content\":\"22\",\"isNecessary\":true,\"checkValue\":false},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":true}]');
+INSERT INTO `fill_in` VALUES (23, 6, '56456', 'wh', '123', '2024-08-25 18:24:59', 1, '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"1,5,6\",\"content\":\"5\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\",\"列4\"],\"bodyForm\":[{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"\",\"\",\"\"],[\"14\",\"\",\"\",\"\"],[\"\",\"\",\"\",\"\"]]},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":false}]');
 
 -- ----------------------------
 -- Table structure for forn_list
@@ -66,17 +68,20 @@ CREATE TABLE `forn_list`  (
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `state` int NOT NULL DEFAULT 0 COMMENT '0为关闭，1为开启',
+  `check_number` int NOT NULL,
   `filled` int NOT NULL DEFAULT 0 COMMENT '0为没开放过填写 可以编辑，1为开放过填写 不可以编辑',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of forn_list
 -- ----------------------------
-INSERT INTO `forn_list` VALUES (2, '管理员', '2024-08-24 00:44:49', '1', '1', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true}]', 1, 1);
-INSERT INTO `forn_list` VALUES (3, '管理员', '2024-08-25 00:59:56', 'test9', '测试表，用于测试', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":true,\"checkValue\":false},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":true}]', 0, 0);
-INSERT INTO `forn_list` VALUES (4, '管理员', '2024-08-24 00:33:29', 'test2', '测试表2', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"7,8,9\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":\"\",\"content\":[\"选项1\",\"选项2\"],\"isNecessary\":false},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[],\"content\":[\"选项1\",\"选项12\",\"选项3\"],\"isNecessary\":false},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议框\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":false},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[4,5]]}]', 0, 1);
-INSERT INTO `forn_list` VALUES (5, '管理员', '2024-08-24 23:38:54', 'wh', '测试用，用于测试表单所有类型组件填写', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":\"\",\"content\":[\"选项1\",\"选项2\"],\"isNecessary\":false},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[],\"content\":[\"选项1\",\"选项12\",\"选项3\"],\"isNecessary\":false},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":false},{\"type\":6,\"uniqueName\":\"\",\"label\":\"滑动条\",\"max\":1000,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":false},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议框\",\"suggestion\":\"1,4,5,6\",\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\",\"列4\",\"列5\",\"列6\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":6,\"uniqueName\":\"\",\"label\":\"滑动条\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议输入\",\"max\":100,\"min\":0,\"suggestion\":\"9,8,7\",\"content\":\"\"}],\"content\":[[4,5,\"1\",\"1\",\"1\",\"1\"]]}]', 0, 0);
+INSERT INTO `forn_list` VALUES (2, '管理员', '2024-08-24 00:44:49', '1', '1', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true}]', 1, 0, 1);
+INSERT INTO `forn_list` VALUES (3, '管理员', '2024-08-25 00:59:56', 'test9', '测试表，用于测试', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":true,\"checkValue\":false},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":true}]', 0, 0, 0);
+INSERT INTO `forn_list` VALUES (4, '管理员', '2024-08-24 00:33:29', 'test2', '测试表2', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"7,8,9\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":\"\",\"content\":[\"选项1\",\"选项2\"],\"isNecessary\":false},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[],\"content\":[\"选项1\",\"选项12\",\"选项3\"],\"isNecessary\":false},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议框\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":false},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[4,5]]}]', 0, 0, 1);
+INSERT INTO `forn_list` VALUES (5, '管理员', '2024-08-24 23:38:54', 'wh', '测试用，用于测试表单所有类型组件填写', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":\"\",\"content\":[\"选项1\",\"选项2\"],\"isNecessary\":false},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[],\"content\":[\"选项1\",\"选项12\",\"选项3\"],\"isNecessary\":false},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":false},{\"type\":6,\"uniqueName\":\"\",\"label\":\"滑动条\",\"max\":1000,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":false},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议框\",\"suggestion\":\"1,4,5,6\",\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\",\"列4\",\"列5\",\"列6\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":6,\"uniqueName\":\"\",\"label\":\"滑动条\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议输入\",\"max\":100,\"min\":0,\"suggestion\":\"9,8,7\",\"content\":\"\"}],\"content\":[[4,5,\"1\",\"1\",\"1\",\"1\"]]}]', 0, 0, 0);
+INSERT INTO `forn_list` VALUES (6, '管理员', '2024-08-25 18:21:00', '56456', 'hhjj', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"1,5,6\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\",\"列4\"],\"bodyForm\":[{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"\",\"\",\"\"]]},{\"type\":1,\"uniqueName\":\"\",\"label\":\"多行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":false,\"checkValue\":false}]', 1, 0, 1);
+INSERT INTO `forn_list` VALUES (7, '管理员', '2024-08-26 17:20:03', '1', '63', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行输入框\",\"max\":10,\"min\":0,\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"content\":\"\",\"isNecessary\":false,\"checkValue\":false},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[],\"content\":[\"选项1\",\"选项12\",\"选项3\"],\"isNecessary\":false},{\"type\":6,\"uniqueName\":\"\",\"label\":\"滑动条\",\"max\":1000,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":false}]', 0, 2, 0);
 
 -- ----------------------------
 -- Table structure for logs
@@ -89,26 +94,37 @@ CREATE TABLE `logs`  (
   `controls` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `controls_date` datetime NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of logs
 -- ----------------------------
-INSERT INTO `logs` VALUES (1, 'wh', '123', '登录', '2024-08-25 03:56:07');
-INSERT INTO `logs` VALUES (2, '管理员', 'admin', '登录', '2024-08-25 03:25:29');
-INSERT INTO `logs` VALUES (3, 'wh', '123', '登录', '2024-08-25 03:26:58');
-INSERT INTO `logs` VALUES (4, '管理员', 'admin', '登录', '2024-08-25 03:27:02');
-INSERT INTO `logs` VALUES (5, '管理员', 'admin', '登录', '2024-08-25 03:42:56');
-INSERT INTO `logs` VALUES (6, '管理员', 'admin', '登录', '2024-08-25 03:49:10');
-INSERT INTO `logs` VALUES (7, '管理员', 'admin', '登录', '2024-08-25 03:49:32');
-INSERT INTO `logs` VALUES (8, '管理员', 'admin', '登录', '2024-08-25 03:50:44');
-INSERT INTO `logs` VALUES (9, '管理员', 'admin', '登录', '2024-08-25 03:57:27');
-INSERT INTO `logs` VALUES (10, '管理员', 'admin', '登录', '2024-08-25 04:09:57');
-INSERT INTO `logs` VALUES (11, '管理员', 'admin', '登录', '2024-08-25 05:09:06');
-INSERT INTO `logs` VALUES (12, 'wh', '123', '登录', '2024-08-25 05:21:23');
-INSERT INTO `logs` VALUES (13, '管理员', 'admin', '登录', '2024-08-25 05:25:13');
-INSERT INTO `logs` VALUES (14, '管理员', 'admin', '登录', '2024-08-25 05:32:36');
-INSERT INTO `logs` VALUES (15, '管理员', 'admin', '登录', '2024-08-25 05:44:34');
+INSERT INTO `logs` VALUES (1, 'wh', '123', '登录', '2024-08-23 16:56:07');
+INSERT INTO `logs` VALUES (2, '管理员', 'admin', '登录', '2024-08-25 00:00:00');
+INSERT INTO `logs` VALUES (3, 'wh', '123', '登录', '2024-08-25 00:00:00');
+INSERT INTO `logs` VALUES (4, '管理员', 'admin', '登录', '2024-08-25 00:00:00');
+INSERT INTO `logs` VALUES (5, '管理员', 'admin', '登录', '2024-08-25 00:00:00');
+INSERT INTO `logs` VALUES (6, '管理员', 'admin', '登录', '2024-08-25 15:49:10');
+INSERT INTO `logs` VALUES (7, '管理员', 'admin', '登录', '2024-08-25 09:00:00');
+INSERT INTO `logs` VALUES (8, '管理员', 'admin', '登录', '2024-08-25 00:00:00');
+INSERT INTO `logs` VALUES (9, '管理员', 'admin', '登录', '2024-08-25 12:00:00');
+INSERT INTO `logs` VALUES (10, '管理员', 'admin', '登录', '2024-08-25 00:00:00');
+INSERT INTO `logs` VALUES (11, '管理员', 'admin', '登录', '2024-08-25 09:00:00');
+INSERT INTO `logs` VALUES (12, 'wh', '123', '登录', '2024-08-25 08:00:00');
+INSERT INTO `logs` VALUES (13, '管理员', 'admin', '登录', '2024-08-25 00:00:00');
+INSERT INTO `logs` VALUES (14, '管理员', 'admin', '登录', '2024-08-25 00:00:00');
+INSERT INTO `logs` VALUES (15, '管理员', 'admin', '登录', '2024-08-25 10:00:00');
+INSERT INTO `logs` VALUES (16, '管理员', 'admin', '登录', '2024-08-25 16:31:39');
+INSERT INTO `logs` VALUES (17, '管理员', 'admin', '登录', '2024-08-25 16:41:45');
+INSERT INTO `logs` VALUES (18, '管理员', 'admin', '登录', '2024-08-25 18:13:53');
+INSERT INTO `logs` VALUES (19, '管理员', 'admin', '登录', '2024-08-25 18:16:24');
+INSERT INTO `logs` VALUES (20, 'wh', '123', '登录', '2024-08-25 18:23:01');
+INSERT INTO `logs` VALUES (21, '管理员', 'admin', '登录', '2024-08-26 15:19:21');
+INSERT INTO `logs` VALUES (22, '管理员', 'admin', '登录', '2024-08-26 16:04:27');
+INSERT INTO `logs` VALUES (23, '管理员', 'admin', '登录', '2024-08-26 16:09:09');
+INSERT INTO `logs` VALUES (24, '管理员', 'admin', '登录', '2024-08-26 16:10:18');
+INSERT INTO `logs` VALUES (25, '管理员', 'admin', '登录', '2024-08-26 16:34:34');
+INSERT INTO `logs` VALUES (26, '管理员', 'admin', '登录', '2024-08-26 17:05:50');
 
 -- ----------------------------
 -- Table structure for user
@@ -123,7 +139,7 @@ CREATE TABLE `user`  (
   `roles` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '页面权限',
   `create_date` timestamp NOT NULL,
   PRIMARY KEY (`account`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user

@@ -30,7 +30,7 @@
             <el-switch v-model="componentData.isNecessary" />
           </el-form-item>
           <el-form-item v-if="!tableShow" label="校验表单">
-            <el-switch v-model="componentData.checkValue" />
+            <el-switch v-model="componentData.checkValue" @change="changeSwitch" />
           </el-form-item>
           <div v-show="radioShow" class="setting">
             <el-divider>选项设置</el-divider>
@@ -107,7 +107,8 @@ export default {
       dragBlueIcon: require('../../../assets/icons/drag-blue.svg'),
       diyForm: {
         table_name: '',
-        description: ''
+        description: '',
+        check_number: 1 // 初始值为1（人员id）
       },
       typeMap: {
         0: '单行文本',
@@ -152,11 +153,20 @@ export default {
       this.diyForm = {
         table_name: this.editForm.table_name,
         description: this.editForm.description,
+        check_number: this.editForm.check_number // 初始值为1（人员id）
       }
     }
   },
   methods: {
     init(data) {
+    },
+    changeSwitch(bool) {
+      if (bool) {
+        this.diyForm.check_number++
+      } else {
+        this.diyForm.check_number--
+      }
+      console.log(this.diyForm.check_number)
     },
     changeTab(tab) {
       this.activeName = tab

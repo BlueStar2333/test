@@ -1,56 +1,32 @@
 <template>
   <div class="container">
     <transition name="popup-show">
-      <Popup
-        v-if="popupShow"
-        :edit-form="editForm"
-        @onClose="onClose"
-        @getData="getData"
-      />
+      <Popup v-if="popupShow" :edit-form="editForm" @onClose="onClose" @getData="getData"/>
     </transition>
 
     <div class="head">
       <div>
-        <el-input placeholder="按表名搜索" v-model="searchName" class="input-with-select">
+        <el-input v-model="searchName" placeholder="按表名搜索" class="input-with-select">
           <el-button slot="append" icon="el-icon-search" type="primary"></el-button>
         </el-input>
       </div>
-      <el-button
-        v-if="this.$store.state.user.userInfo.power === 1"
-        size="small"
-        type="primary"
-        icon="el-icon-plus"
-        plain
-        @click="addDiyTable"
-      >添加</el-button>
+      <el-button v-if="this.$store.state.user.userInfo.power === 1" size="small" type="primary" icon="el-icon-plus" plain @click="addDiyTable">添加</el-button>
     </div>
     <el-table
       v-loading="listLoading"
       class="table"
-      :header-cell-style="{
-        'background-color': '#f8f8f8',
-        color: '#666',
-        'text-align': 'center',
-      }"
+      :header-cell-style="{ 'background-color': '#f8f8f8', color: '#666',}"
       :data="filteredTables.slice((listQuery.page - 1) * listQuery.limit,listQuery.page * listQuery.limit)"
       fit
       highlight-current-row
       @sort-change="sortChange"
     >
-      <el-table-column prop="id" fiexd label="序号" min-width="50" />
-      <el-table-column prop="table_name" fiexd label="表名" width="200" />
-<!--      <el-table-column fiexd label="截止日期" width="200" align="center">-->
-<!--        <template slot-scope="scope">-->
-<!--          {{ scope.row.diyEndDate.split("T")[0] }}-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-      <el-table-column
-        prop="description"
-        fiexd
-        label="描述"
-        width="390"
-        align="center"
-      />
+      <el-table-column prop="table_name" fiexd label="表名" min-width="200" align="left">
+        <template slot-scope="scope">
+          <span style="font-weight: 600">{{ scope.row.table_name }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="description" fiexd label="描述" min-width="360" align="left"/>
       <el-table-column fiexd label="创建人" min-width="120" align="center">
         <template slot-scope="scope">
           {{ scope.row.creator }}
