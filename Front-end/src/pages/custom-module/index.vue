@@ -10,7 +10,7 @@
           <el-button slot="append" icon="el-icon-search" type="primary"></el-button>
         </el-input>
       </div>
-      <el-button v-if="this.$store.state.user.userInfo.power === 1" size="small" type="primary" icon="el-icon-plus" plain @click="addDiyTable">添加</el-button>
+      <el-button v-if="this.$store.state.user.userInfo.power === 1" size="small" type="primary" icon="el-icon-document-add" plain @click="addDiyTable">新增表单</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -43,6 +43,12 @@
           <el-tag v-else type="info">已关闭</el-tag>
         </template>
       </el-table-column>
+      <el-table-column v-if="$store.state.user.userInfo.power === 1" fiexd label="改变状态" min-width="100" align="center">
+        <template slot-scope="scope">
+          <el-link v-if="!scope.row.state" type="success" @click="closeDiyTable(scope.row.id, 1)">开放</el-link>
+          <el-link v-if="scope.row.state" type="warning" @click="closeDiyTable(scope.row.id, 0)">关闭</el-link>
+        </template>
+      </el-table-column>
       <el-table-column fiexd label="表单内容" align="center">
         <template slot-scope="scope">
           <i class="el-icon-document form-icon" @click="lookForm(scope.row)" />
@@ -51,7 +57,7 @@
       <el-table-column
         fixed="right"
         label="操作"
-        width="260"
+        width="240"
         align="center"
       >
         <template slot-scope="scope">
@@ -59,28 +65,20 @@
             <el-link
               v-if="$store.state.user.userInfo.power === 1"
               type="primary"
+              icon="el-icon-edit"
               @click="editDiyTable(scope.row)"
             >编辑</el-link>
             <el-link
               v-if="$store.state.user.userInfo.power === 1"
               type="danger"
+              icon="el-icon-delete"
               @click="deleteDiyTable(scope.row.id)"
             >删除</el-link>
-            <el-link
-              v-if="$store.state.user.userInfo.power === 1 && !scope.row.state"
-              type="success"
-              @click="closeDiyTable(scope.row.id, 1)"
-            >开放</el-link>
-            <el-link
-              v-if="$store.state.user.userInfo.power === 1 && scope.row.state"
-              type="warning"
-              @click="closeDiyTable(scope.row.id, 0)"
-            >关闭</el-link>
             <el-link
               v-if="$store.state.user.userInfo.power === 0"
               type="primary"
               @click="toFillOut(scope.row)"
-            >去填写此表</el-link>
+            >去填写此表<i class="el-icon-d-arrow-right el-icon--right"></i></el-link>
           </div>
         </template>
       </el-table-column>

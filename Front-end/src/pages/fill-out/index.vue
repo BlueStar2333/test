@@ -1,5 +1,15 @@
 <template>
   <div class="app-container">
+
+    <el-dropdown class="dropdown" @command="handleCommand">
+      <span class="el-dropdown-link">
+        表名：{{ tableName || '请选择表单' }}<i v-if="!tableName" class="el-icon-arrow-down el-icon--right" />
+      </span>
+      <el-dropdown-menu slot="dropdown" style="min-width: 300px">
+        <el-dropdown-item v-for="(item,index) in formList" :key="index" :command="item">{{ item.table_name }}</el-dropdown-item>
+      </el-dropdown-menu>
+    </el-dropdown>
+
     <el-form class="search" label-width="100px" size="small">
       <el-date-picker
         v-model="searchDate"
@@ -8,31 +18,16 @@
         style="margin-right: 20px"
         range-separator="至"
         start-placeholder="开始日期"
-        end-placeholder="结束日期">
-      </el-date-picker>
+        end-placeholder="结束日期"
+      />
       <el-button
         icon="el-icon-search"
         type="primary"
         @click="searchByDate"
       >查询</el-button>
-      <el-dropdown class="dropdown" @command="handleCommand">
-        <span class="el-dropdown-link">
-          {{ tableName || '请选择表单' }}<i v-if="!tableName" class="el-icon-arrow-down el-icon--right" />
-        </span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item v-for="(item,index) in formList" :key="index" :command="item">{{ item.table_name }}</el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
     </el-form>
-    <div style="background: #ceeaf3; height: 40px; line-height: 40px">
-      <el-row>
-        <el-col :span="23" />
-        <el-col :span="1">
-          <el-tooltip class="item" effect="dark" content="新增" placement="top">
-            <i class="el-icon-plus add-icon" @click="editFillIn(diyTable, '新增')" />
-          </el-tooltip>
-        </el-col>
-      </el-row>
+    <div style="background: #ceeaf3; height: 40px; line-height: 40px;position: relative">
+      <el-button class="add-button" size="mini" type="primary" icon="el-icon-document-add" plain @click="editFillIn(diyTable, '新增')">填写</el-button>
     </div>
     <el-table
       v-loading="tableLoading"
@@ -87,25 +82,6 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog
-      :modal-append-to-body="false"
-      :title="'☆' + fillInForm.redactState"
-      :visible.sync="fillInShow"
-      :close-on-click-modal="false"
-      width="60%"
-    >
-      <Preview v-if="fillInShow" :preview-data="fillInForm" @close="searchByDate"/>
-    </el-dialog>
-
-
-
-
-
-
-
-
-
-
     <el-pagination
       :current-page="listQuery.page"
       :page-size="listQuery.limit"
@@ -113,267 +89,16 @@
       :total="tableData.length"
       @current-change="handleCurrentChange"
     />
-    <el-dialog :visible.sync="drawer" title="填写内容" width="70%">
-      <el-table
-        v-loading="listLoading"
-        :header-cell-style="{ 'background-color': '#fefefe', color: '#959595' }"
-        :data="selectTable"
-        style="width: 100%"
-        border
-      >
-        <el-table-column align="center" prop="name" label="姓名" />
-        <el-table-column align="center" prop="age" label="年龄" />
-        <el-table-column align="telephone" prop="telephone" width="120" label="电话" />
-        <el-table-column align="center" prop="brandNumber" label="胸牌号" />
-        <el-table-column align="center" prop="nursingUnit" label="护理单元" />
-        <el-table-column align="center" label="感染人员职业" width="120">
-          <template slot-scope="scope">
-            <span v-if="scope.row.personnel === '其他'">{{
-              scope.row.personnelOccupation
-            }}</span>
-            <span
-              v-else-if="
-                scope.row.personnel === '医生' ||
-                  scope.row.personnel === '护士' ||
-                  scope.row.personnel === '技师'
-              "
-            >
-              {{ scope.row.personnelPosition }} - {{ scope.row.personnel }}
-            </span>
-            <span v-else>{{ scope.row.personnel }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="症状">
-          <template slot-scope="scope">
-            <span>
-              {{ scope.row.symptoms.join() }}
-              <span
-                v-if="scope.row.symptoms.includes('其他')"
-              >-{{ scope.row.otherSymptoms }}</span>
-              <span
-                v-if="scope.row.symptoms.includes('发热')"
-              >--{{ scope.row.bodyTemperature }}℃</span>
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" prop="seeDoctor" label="是否就诊" />
-        <el-table-column align="center" label="疾病诊断结果" width="120">
-          <template slot-scope="scope">
-            <span v-if="scope.row.seeDoctor === '否'" style="color: #999">
-              未就诊
-            </span>
-            <span v-else-if="scope.row.illnessType === '其他'">
-              {{ scope.row.otherIllnessType }}
-            </span>
-            <span v-else>
-              {{
-                scope.row.illnessType === "流行病感冒"
-                  ? "流行病感冒-" + scope.row.influenzaType
-                  : scope.row.illnessType
-              }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          align="center"
-          min-width="140px"
-          label="怀疑感染的来源为"
-        >
-          <template slot-scope="scope">
-            <span v-if="scope.row.source.includes('其他')">
-              {{
-                otherReplace(scope.row.source, scope.row.otherSource).toString()
-              }}
-            </span>
-            <span v-else>
-              {{ scope.row.source.toString() }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          align="center"
-          width="220"
-          label="是如何确定自己感染了新冠病毒"
-        >
-          <template slot-scope="scope">
-            <span v-if="scope.row.howInfect.includes('其他')">
-              {{
-                otherReplace(
-                  scope.row.howInfect,
-                  scope.row.otherHowInfect
-                ).toString()
-              }}
-            </span>
-            <span v-else>
-              {{ scope.row.howInfect.toString() }}
-            </span>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-dialog>
-    <el-table
-      v-loading="listLoading"
-      hidden
-      class="tableData"
-      :header-cell-style="{ 'background-color': '#fefefe', color: '#959595' }"
-      :data="tableData2"
-      style="width: 100%"
-      border
+
+    <el-dialog
+      :modal-append-to-body="false"
+      :title="'☆' + fillInForm.redactState"
+      :visible.sync="fillInShow"
+      :close-on-click-modal="false"
+      width="60%"
     >
-      <el-table-column
-        min-width="120px"
-        fiexd
-        align="center"
-        prop="name"
-        label="填报人"
-      />
-      <el-table-column min-width="120px" align="center" label="填报时间">
-        <template slot-scope="scope">
-          {{ scope.row.cTime.split("T")[0] }}
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="姓名">
-        <template slot-scope="scope">
-          <span>
-            {{ scope.row.pName }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="年龄">
-        <template slot-scope="scope">
-          <span>
-            {{ scope.row.age }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column align="telephone" label="电话">
-        <template slot-scope="scope">
-          <span>
-            {{ scope.row.telephone }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="胸牌号">
-        <template slot-scope="scope">
-          <span>
-            {{ scope.row.brandNumber }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="护理单元">
-        <template slot-scope="scope">
-          <span>
-            {{ scope.row.nursingUnit }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="感染人员职业">
-        <template slot-scope="scope">
-          <span>
-            <span v-if="scope.row.personnel === '其他'">{{
-              scope.row.personnelOccupation
-            }}</span>
-            <span
-              v-else-if="
-                scope.row.personnel === '医生' ||
-                  scope.row.personnel === '护士' ||
-                  scope.row.personnel === '技师'
-              "
-            >
-              {{ scope.row.personnelPosition }} - {{ scope.row.personnel }}
-            </span>
-            <span v-else>{{ scope.row.personnel }}</span>
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="症状">
-        <template slot-scope="scope">
-          <span>
-            <span>
-              {{ scope.row.symptoms.join() }}
-              <span
-                v-if="scope.row.symptoms.includes('其他')"
-              >-{{ scope.row.otherSymptoms }}</span>
-              <span
-                v-if="scope.row.symptoms.includes('发热')"
-              >--{{ scope.row.bodyTemperature }}℃</span>
-            </span>
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="是否就诊">
-        <template slot-scope="scope">
-          <span>
-            {{ scope.row.seeDoctor }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="疾病诊断结果">
-        <template slot-scope="scope">
-          <span>
-            <span v-if="scope.row.seeDoctor === '否'" style="color: #999">
-              未就诊
-            </span>
-            <span v-else-if="scope.row.illnessType === '其他'">
-              {{ scope.row.otherIllnessType }}
-            </span>
-            <span v-else>
-              {{
-                scope.row.illnessType === "流行病感冒"
-                  ? "流行病感冒-" + scope.row.influenzaType
-                  : scope.row.illnessType
-              }}
-            </span>
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        align="center"
-        min-width="140px"
-        label="怀疑感染的来源为"
-      >
-        <template slot-scope="scope">
-          <span>
-            <span v-if="scope.row.source">
-              <span v-if="scope.row.source.includes('其他')">
-                {{
-                  otherReplace(
-                    scope.row.source,
-                    scope.row.otherSource
-                  ).toString()
-                }}
-              </span>
-              <span v-else>
-                {{ scope.row.source.toString() }}
-              </span>
-            </span>
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        align="center"
-        min-width="140px"
-        label="是如何确定自己感染了新冠病毒"
-      >
-        <template slot-scope="scope">
-          <span>
-            <span v-if="scope.row.howInfect">
-              <span v-if="scope.row.howInfect.includes('其他')">
-                {{
-                  otherReplace(
-                    scope.row.howInfect,
-                    scope.row.otherHowInfect
-                  ).toString()
-                }}
-              </span>
-              <span v-else>
-                {{ scope.row.howInfect.toString() }}
-              </span>
-            </span>
-          </span>
-        </template>
-      </el-table-column>
-    </el-table>
+      <Preview v-if="fillInShow" :preview-data="fillInForm" @close="searchByDate" />
+    </el-dialog>
   </div>
 </template>
 
@@ -385,13 +110,12 @@ import XLSX from 'xlsx'
 import { getStaffContentTable, deleteContentTable } from '@/api/fillout'
 import Preview from './components/preview'
 import { getCustomTable } from '@/api/custom-module'
-import {deleteUser} from "@/api/employee";
+import { deleteUser } from '@/api/employee'
 
 export default {
   name: 'HealthEducation',
   components: {
-    Preview,
-    Pagination
+    Preview, Pagination
   },
   data() {
     return {
@@ -403,24 +127,12 @@ export default {
       fillInShow: false,
       fillInForm: '',
       diyTable: '',
-
-
-
-      tableData2: [],
-      searchModel: {
-        startTime: '',
-        endTime: '',
-        hospitalCode: this.$store.state.user.userInfo.hospitalCode
-      },
-      listLoading: true,
       total: 60,
       listQuery: {
         page: 1,
         limit: 10,
         sort: '+id'
-      },
-      drawer: false,
-      selectTable: []
+      }
     }
   },
   created() {
@@ -436,35 +148,39 @@ export default {
   methods: {
     getData() {
       this.tableData = []
-      this.listLoading = true
+      this.tableLoading = true
       getCustomTable().then(res => {
         if (res.code) {
           this.formList = res.data.list
           console.log(this.formList, 789)
         }
-        this.listLoading = false
+        setTimeout(() => {
+          self.tableLoading = false
+        }, 600)
       })
     },
     searchByDate() {
-      this.fillInShow = false
-      this.listLoading = true
+      const self = this
+      self.fillInShow = false
+      self.tableLoading = true
       const data = {
-        form_id: this.diyTable.id || '',
-        written_account: this.$store.state.user.userInfo.account,
+        form_id: self.diyTable.id || '',
+        written_account: self.$store.state.user.userInfo.account,
         startDate: '',
         endDate: '',
-        power: this.$store.state.user.userInfo.power
+        power: self.$store.state.user.userInfo.power
       }
-      if (this.searchDate) {
-        data.startDate = new Date(this.searchDate[0])
-        data.endDate = new Date(this.searchDate[1])
+      if (self.searchDate) {
+        data.startDate = new Date(self.searchDate[0])
+        data.endDate = new Date(self.searchDate[1])
       }
       getStaffContentTable(data).then(res => {
         if (res.code === 1) {
-          console.log(res,'111')
-          this.tableData = res.data
+          self.tableData = res.data
         }
-        this.listLoading = false
+        setTimeout(() => {
+          self.tableLoading = false
+        }, 600)
       })
     },
     deleteFillIn(row) {
@@ -486,7 +202,7 @@ export default {
       }).catch((_) => {})
     },
     editFillIn(row, redactState) {
-      console.log(this.diyTable,89)
+      console.log(this.diyTable, 89)
       if (this.diyTable) {
         this.fillInForm = {
           id: row.id,
@@ -519,14 +235,6 @@ export default {
       return `${year}-${month}-${day} ${hours}:${minutes}`
     },
 
-
-
-
-
-
-
-
-
     handleAdd() {
       if (this.tableName) {
         this.$message('跳转到填表')
@@ -537,11 +245,6 @@ export default {
 
     handleCurrentChange(page) {
       this.listQuery.page = page
-    },
-    personDetails(person) {
-      this.selectTable = person
-      // console.log(this.selectTable, 2245)
-      this.drawer = true
     },
     otherReplace(arr, item) {
       const newArr = arr
@@ -609,14 +312,16 @@ export default {
 
 <style lang="scss" scoped>
   .dropdown {
-    float: right;
-    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    margin: 16px 0 20px;
+    padding-bottom: 16px;
+    border-bottom: solid 1px #f5f5f5;
   }
   .el-dropdown-link {
     cursor: pointer;
     color: #409EFF;
     font-size: 22px;
-    font-style: oblique;
     font-weight: 600;
     opacity: .6;
   }
@@ -630,6 +335,7 @@ export default {
       color: #999;
     }
   }
+
 .app-container {
   background-color: #fff;
   ::v-deep .el-dialog__header {
@@ -653,20 +359,11 @@ export default {
 
 .add-button {
   position: absolute;
-  left: 10px;
-  z-index: 2;
-}
-
-.add-icon {
-  cursor: pointer;
-  position: absolute;
   right: 15px;
-  top: 12px;
-  padding: 2px;
+  top: 6px;
   border: 1px solid #bebebe;
   font-size: 12px;
   color: #969696;
-  border-radius: 2px;
 }
 
 .person-icon {

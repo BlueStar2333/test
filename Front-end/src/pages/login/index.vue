@@ -112,8 +112,8 @@ export default {
       time: 60,
       sendDisabled: false,
       loginRules: {
-        phone: [{ validator: checkPhone, trigger: 'change' }],
-        code: [{ required: true, message: '验证码不能为空', trigger: 'blur' }],
+        // phone: [{ validator: checkPhone, trigger: 'change' }],
+        // code: [{ required: true, message: '验证码不能为空', trigger: 'blur' }],
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },

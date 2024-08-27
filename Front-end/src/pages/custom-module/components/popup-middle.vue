@@ -167,6 +167,7 @@ export default {
     },
     deleteInput(index, num) {
       this.$eventBus.$emit('selectInput', null)
+      this.$eventBus.$emit('changeNum', 1)
       this.formData.splice(index, num)
     },
     previewTable() {
