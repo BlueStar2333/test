@@ -39,14 +39,25 @@
       </el-table-column>
       <el-table-column fiexd label="状态" min-width="100" align="center">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.state">已开放</el-tag>
-          <el-tag v-else type="info">已关闭</el-tag>
+          <el-popover v-if="scope.row.state" placement="right-start" width="210" trigger="hover" content="开放状态，可正常填写">
+            <el-tag slot="reference">已开放</el-tag>
+            <div v-if="$store.state.user.userInfo.power === 1" class="el-popover-text">
+              <span>点此关闭该表单填写，</span>
+              <el-link v-if="scope.row.state" type="warning" @click="closeDiyTable(scope.row.id, 0)">关闭</el-link>
+            </div>
+          </el-popover>
+          <el-popover v-else placement="right-start" width="210" trigger="hover" content="关闭状态，不可填写">
+            <el-tag slot="reference" type="info">已关闭</el-tag>
+            <div v-if="$store.state.user.userInfo.power === 1" class="el-popover-text">
+              <span>点此开放该表单填写，</span>
+              <el-link v-if="!scope.row.state" type="success" @click="closeDiyTable(scope.row.id, 1)">开放</el-link>
+            </div>
+          </el-popover>
         </template>
       </el-table-column>
-      <el-table-column v-if="$store.state.user.userInfo.power === 1" fiexd label="改变状态" min-width="100" align="center">
+      <el-table-column v-if="$store.state.user.userInfo.power === 1" fiexd label="填写人员管理" min-width="120" align="center">
         <template slot-scope="scope">
-          <el-link v-if="!scope.row.state" type="success" @click="closeDiyTable(scope.row.id, 1)">开放</el-link>
-          <el-link v-if="scope.row.state" type="warning" @click="closeDiyTable(scope.row.id, 0)">关闭</el-link>
+          <svg-icon icon-class="persons" class="persons-icon" @click="managePerson(scope.row)"/>
         </template>
       </el-table-column>
       <el-table-column fiexd label="表单内容" align="center">
@@ -93,10 +104,30 @@
 
     <el-dialog
       :modal-append-to-body="false"
+      title="选择可编辑人员"
+      :visible.sync="personManage.personManageShow"
+      width="460px"
+    >
+      <el-select v-model="personManage.permissions" multiple placeholder="暂无，请选择">
+        <el-option
+          v-for="item in personManage.selectOption"
+          :key="item.account"
+          :label="item.name"
+          :value="item.account">
+        </el-option>
+      </el-select>
+      <div class="person-manage-btn">
+        <el-button @click="personManage.personManageShow = false">取消</el-button>
+        <el-button @click="editDiyPerson" type="primary">提交</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog
+      :modal-append-to-body="false"
       title="表单内容"
       :visible.sync="previewShow"
       width="32%"
-      style="min-height: 80vh"
+      class="form-content"
       center
     >
       <Preview v-if="previewShow" :preview-data="diyForm" />
@@ -110,8 +141,9 @@ import Popup from './components/popup'
 import {
   getCustomTable,
   changeCustomTable,
-  deleteCustomTable
+  deleteCustomTable, changePermissions
 } from '@/api/custom-module'
+import { getUserinfoByName } from '@/api/employee'
 import Preview from './components/preview'
 import { deepCopy } from '@/utils'
 
@@ -137,6 +169,12 @@ export default {
     return {
       searchName: '',
       previewShow: false,
+      personManage: {
+        editId: '',
+        personManageShow: false,
+        permissions: [],
+        selectOption: []
+      },
       editForm: null,
       diyForm: [],
       popupShow: false,
@@ -172,6 +210,16 @@ export default {
     },
     getData(name) {
       this.listLoading = true
+      if (this.$store.state.user.userInfo.power === 1) {
+        getUserinfoByName({
+          name: '',
+          getPower: 0
+        }).then((res) => {
+          if (res.code === 1) {
+            this.personManage.selectOption = res.data.list
+          }
+        })
+      }
       getCustomTable().then(res => {
         if (res.code) {
           this.tableData = res.data.list
@@ -256,6 +304,28 @@ export default {
           })
         })
     },
+    managePerson(row) {
+      console.log(row)
+      this.personManage.editId = row.id
+      this.personManage.permissions = row.permissions ? row.permissions.split(',') : ''
+      this.personManage.personManageShow = true
+    },
+    editDiyPerson() {
+      const data = {
+        id: this.personManage.editId,
+        permissions: this.personManage.permissions.toString()
+      }
+      changePermissions(data).then(res => {
+        if (res.code === 1) {
+          this.getData()
+          this.$message({
+            type: 'success',
+            message: '修改成功'
+          })
+        }
+      })
+      this.personManage.personManageShow = false
+    },
     toFillOut(params) {
       // this.$router.push({ path: '/formList/fill-out?name=' + name })
       this.$router.push({ name: '表单填写', params })
@@ -293,12 +363,20 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-::v-deep .el-dialog__header {
-  background-color: #f1f2f3;
-  .el-dialog__title {
-    color: #999;
+  .person-manage-btn {
+    display: flex;
+    justify-content: right;
+    margin-top: 40px;
   }
-}
+  .form-content {
+    min-height: 80vh;
+    ::v-deep .el-dialog__header {
+      background-color: #f1f2f3;
+      .el-dialog__title {
+        color: #999;
+      }
+    }
+  }
 ::v-deep .el-dialog__body {
   margin-bottom: 50px;
 }
@@ -335,8 +413,15 @@ export default {
 
 .form-icon {
   color: #20a0ff;
+  opacity: .6;
   font-size: 22px;
   cursor: pointer;
+}
+.persons-icon {
+  font-size: 22px;
+  cursor: pointer;
+  color: #20a0ff;
+  opacity: .6;
 }
 
 .operation {
@@ -349,5 +434,9 @@ export default {
   ::v-deep .el-table_1_column_1 .cell {
     text-align: left;
   }
+}
+.el-popover-text {
+  display: flex;
+  align-content: center
 }
 </style>

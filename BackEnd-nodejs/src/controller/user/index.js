@@ -11,8 +11,12 @@ const { pool, YES } = require("@/utils");
 // 查询用户列表
 const CoUserList = (req, res) => {
   $api.PostArg(req).then(data => {
-    const { name } = data;
+    const { name, getPower } = data;
 	let sql = "SELECT * FROM user WHERE name LIKE ? ORDER BY power DESC";
+  console.log(getPower,45)
+  if(getPower === 0) {
+    sql  = "SELECT * FROM user WHERE name LIKE ? AND power=0";
+  }
 	pool.query(sql, ['%' + name + '%'], (error, result) => {
 		if (error) throw error;
 		// 判断是否查询到信息

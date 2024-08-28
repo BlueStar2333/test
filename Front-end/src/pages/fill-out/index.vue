@@ -1,44 +1,47 @@
 <template>
   <div class="app-container">
 
-    <el-dropdown class="dropdown" @command="handleCommand">
+    <el-dropdown class="dropdown" @command="handleCommand" placement="bottom">
       <span class="el-dropdown-link">
-        表名：{{ tableName || '请选择表单' }}<i v-if="!tableName" class="el-icon-arrow-down el-icon--right" />
+        表名：{{ tableName || '请选择表单' }}<i v-if="!tableName" class="el-icon-arrow-down el-icon--right" />{{ diyTable.state === 0 ? '（关闭填写）' : '' }}
       </span>
       <el-dropdown-menu slot="dropdown" style="min-width: 300px">
-        <el-dropdown-item v-for="(item,index) in formList" :key="index" :command="item">{{ item.table_name }}</el-dropdown-item>
+        <el-dropdown-item v-for="(item,index) in formList" :key="index" :command="item">
+          <span :class="{'c99': !item.state}">{{ item.table_name }}</span>
+          <span class="c99" style="float: right">{{ item.state === 0 ? '（已关闭）' : '' }}</span>
+        </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
 
     <el-form class="search" label-width="100px" size="small">
-      <el-date-picker
-        v-model="searchDate"
-        type="datetimerange"
-        format="yyyy-MM-dd HH:mm"
-        style="margin-right: 20px"
-        range-separator="至"
-        start-placeholder="开始日期"
-        end-placeholder="结束日期"
-      />
+      <el-date-picker v-model="searchDate" type="datetimerange" format="yyyy-MM-dd HH:mm" style="margin-right: 20px" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"/>
+      <el-select v-model="searchState" placeholder="请选择校验状态" style="margin-right: 20px;width: 150px" clearable>
+        <el-option label="待校验" value="1"></el-option>
+        <el-option label="校验正确" value="2"></el-option>
+        <el-option label="校验错误" value="3"></el-option>
+      </el-select>
+      <el-select v-model="searchId" placeholder="请选择人员id" style="margin-right: 20px;width: 150px" clearable>
+        <el-option v-for="(item,index) in searchIds" :key="index" :label="item.user_id" :value="item.user_id"></el-option>
+      </el-select>
       <el-button
         icon="el-icon-search"
         type="primary"
         @click="searchByDate"
       >查询</el-button>
+      <el-button v-if="this.$store.state.user.userInfo.power === 0" size="small" type="primary" style="float: right" icon="el-icon-document" plain @click="editFillIn(diyTable, '新增')">添加</el-button>
     </el-form>
     <div style="background: #ceeaf3; height: 40px; line-height: 40px;position: relative">
-      <el-button class="add-button" size="mini" type="primary" icon="el-icon-document-add" plain @click="editFillIn(diyTable, '新增')">填写</el-button>
+      <el-tooltip v-if="this.$store.state.user.userInfo.power === 1" class="item" effect="dark" content="导出" placement="top">
+        <el-button class="add-button" size="mini" type="primary" icon="el-icon-folder-opened" plain @click="handleDownload" />
+      </el-tooltip>
     </div>
+
     <el-table
       v-loading="tableLoading"
       :header-cell-style="{ 'background-color': '#fefefe', color: '#959595' }"
       border
-      :data="
-        tableData.slice(
-          (listQuery.page - 1) * listQuery.limit,
-          listQuery.page * listQuery.limit
-        )
-      "
+      class="tableData"
+      :data="tableData.slice((listQuery.page - 1) * listQuery.limit,listQuery.page * listQuery.limit)"
       fit
       highlight-current-row
       style="width: 100%"
@@ -123,6 +126,9 @@ export default {
       tableLoading: false,
       formList: [],
       searchDate: '',
+      searchState: '',
+      searchId: '',
+      searchIds: [],
       tableData: [],
       fillInShow: false,
       fillInForm: '',
@@ -151,7 +157,7 @@ export default {
       this.tableLoading = true
       getCustomTable().then(res => {
         if (res.code) {
-          this.formList = res.data.list
+          this.formList = res.data.resultD
           console.log(this.formList, 789)
         }
         setTimeout(() => {
@@ -168,6 +174,8 @@ export default {
         written_account: self.$store.state.user.userInfo.account,
         startDate: '',
         endDate: '',
+        state: self.searchState,
+        user_id: self.searchId,
         power: self.$store.state.user.userInfo.power
       }
       if (self.searchDate) {
@@ -175,8 +183,10 @@ export default {
         data.endDate = new Date(self.searchDate[1])
       }
       getStaffContentTable(data).then(res => {
+        console.log(res,56)
         if (res.code === 1) {
-          self.tableData = res.data
+          self.tableData = res.data.result
+          self.searchIds = res.data.resultIds
         }
         setTimeout(() => {
           self.tableLoading = false
@@ -235,6 +245,51 @@ export default {
       return `${year}-${month}-${day} ${hours}:${minutes}`
     },
 
+    handleDownload() {
+      if (!this.tableName) {
+        this.$message({
+          type: 'info',
+          message: '请先选择表单'
+        })
+        return
+      }
+      this.$nextTick(function() {
+        const wb = XLSX.utils.table_to_book(document.querySelector('.tableData'))
+        /* 获取二进制字符串作为输出 */
+        const wbout = XLSX.write(wb, {
+          bookType: 'xlsx',
+          bookSST: true,
+          type: 'array'
+        })
+        try {
+          FileSaver.saveAs(
+            new Blob([wbout], { type: 'application/octet-stream' }),
+            this.tableName + '.xlsx'
+          )
+        } catch (e) {}
+        return wbout
+      })
+    },
+    formatJson(filterVal) {
+      return this.tableData.map((v) =>
+        filterVal.map((j) => {
+          if (j === 'timestamp') {
+            return parseTime(v[j])
+          } else {
+            return v[j]
+          }
+        })
+      )
+    },
+
+
+
+
+
+
+
+
+
     handleAdd() {
       if (this.tableName) {
         this.$message('跳转到填表')
@@ -251,36 +306,6 @@ export default {
       newArr.pop()
       newArr.push(item)
       return newArr
-    },
-
-    handleDownload() {
-      this.$nextTick(function() {
-        var wb = XLSX.utils.table_to_book(document.querySelector('.tableData'))
-        /* 获取二进制字符串作为输出 */
-        var wbout = XLSX.write(wb, {
-          bookType: 'xlsx',
-          bookSST: true,
-          type: 'array'
-        })
-        try {
-          FileSaver.saveAs(
-            new Blob([wbout], { type: 'application/octet-stream' }),
-            '流感相关调查表.xlsx'
-          )
-        } catch (e) {}
-        return wbout
-      })
-    },
-    formatJson(filterVal) {
-      return this.tableData.map((v) =>
-        filterVal.map((j) => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
-          } else {
-            return v[j]
-          }
-        })
-      )
     },
 
     sortChange(data) {
@@ -371,4 +396,8 @@ export default {
   cursor: pointer;
   fill: #99cd80;
 }
+
+  .c99 {
+    color: #c9c9c9;
+  }
 </style>

@@ -52,6 +52,20 @@ const CoChangeState = (req, res) => {
 });
 };
 
+const CoChangePermissions = (req, res) => {
+  $api.PostArg(req).then(({ id, permissions }) => {
+    sql = "UPDATE forn_list SET permissions=? WHERE id=?";
+    pool.query(sql, [permissions, id], (error, result2) => {
+      if (error) throw error;
+      $api.ReturnJson(res, {
+        code: 1,
+        msg: "成功",
+        data: null
+      });
+    });
+});
+};
+
 const CoDeleteDiyForm = (req, res) => {
   $api.PostArg(req).then(({ id }) => {
     sql = "DELETE FROM forn_list WHERE id=?";
@@ -71,7 +85,11 @@ const CoCarousel = (req, res) => {
   let sql = "SELECT * FROM forn_list";
   pool.query(sql, (error, result) => {
     if (error) throw error;
-    $api.ReturnJson(res, { code: YES, msg: "查询成功", data: { list: result } });
+    let sqlDESC = "SELECT * FROM forn_list ORDER BY state DESC";
+    pool.query(sqlDESC, (error, resultD) => {
+      if (error) throw error;
+      $api.ReturnJson(res, { code: YES, msg: "查询成功", data: { list: result, resultD } });
+    });
   });
 };
 module.exports = {
@@ -79,5 +97,6 @@ module.exports = {
   CoSaveDiyForm,
   CoEditDiyForm,
   CoChangeState,
-  CoDeleteDiyForm // 
+  CoDeleteDiyForm,
+  CoChangePermissions // 
 };

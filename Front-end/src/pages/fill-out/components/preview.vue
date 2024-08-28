@@ -5,41 +5,41 @@
     <div v-for="(item,index) in previewData.content" :key="index" class="preview-form">
       <h5 class="preview-form-title" :class="{required: item.isNecessary}">{{ index + 1 }}. {{ item.label }}{{ item.checkValue ? '（校验值）' : '' }}</h5>
       <!--单行文本-->
-      <el-input v-if="item.type === 0" v-model="item.content" size="small" placeholder="请输入内容" :maxlength="item.max" show-word-limit />
+      <el-input v-if="item.type === 0" v-model="item.content" size="small" placeholder="请输入内容" :maxlength="item.max" show-word-limit :disabled="redactStateC === '查看'" />
       <!--多行文本-->
-      <el-input v-if="item.type === 1" v-model="item.content" type="textarea" :maxlength="item.max" show-word-limit :rows="2" placeholder="请输入内容" />
+      <el-input v-if="item.type === 1" v-model="item.content" type="textarea" :maxlength="item.max" show-word-limit :rows="2" placeholder="请输入内容" :disabled="redactStateC === '查看'" />
       <!--单选-->
       <div v-if="item.type === 2">
-        <el-radio v-for="(radio,idx) in item.content" :key="idx" v-model="item.select" :label="radio">{{ radio }}</el-radio>
+        <el-radio v-for="(radio,idx) in item.content" :key="idx" v-model="item.select" :label="radio" :disabled="redactStateC === '查看'">{{ radio }}</el-radio>
       </div>
       <!--多选-->
       <el-checkbox-group v-if="item.type === 3" v-model="item.select">
-        <el-checkbox v-for="(checkbox,idx) in item.content" :key="idx" :label="checkbox">{{ checkbox }}</el-checkbox>
+        <el-checkbox v-for="(checkbox,idx) in item.content" :key="idx" :label="checkbox" :disabled="redactStateC === '查看'">{{ checkbox }}</el-checkbox>
       </el-checkbox-group>
       <!--日期选择-->
-      <el-date-picker v-if="item.type === 4" v-model="item.content" size="small" type="date" placeholder="选择日期" />
+      <el-date-picker v-if="item.type === 4" v-model="item.content" size="small" type="date" placeholder="选择日期" :disabled="redactStateC === '查看'" />
       <!--数量选择-->
-      <el-input-number v-if="item.type === 5" v-model="item.content" :min="item.min" :max="item.max" label="数" />
+      <el-input-number v-if="item.type === 5" v-model="item.content" :min="item.min" :max="item.max" label="数" :disabled="redactStateC === '查看'" />
       <!--滑动条-->
-      <el-slider v-if="item.type === 6" v-model="item.content" :min="item.min" :max="item.max" style="padding: 0 20px" />
+      <el-slider v-if="item.type === 6" v-model="item.content" :min="item.min" :max="item.max" style="padding: 0 20px" :disabled="redactStateC === '查看'" />
       <!--输入建议选择框-->
-      <el-autocomplete v-if="item.type === 7" v-model="item.content" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" @focus="sugFocus(index, 'pub')" />
+      <el-autocomplete v-if="item.type === 7" v-model="item.content" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" :disabled="redactStateC === '查看'" @focus="sugFocus(index, 'pub')" />
       <!--自增表格-->
       <el-table v-if="item.type === 20" :data="item.content" class="body-input-content" style="width: 100%" border :header-cell-style="{backgroundColor: '#efefef'}">
         <el-table-column v-for="(column,colIdx) in item.header" :key="colIdx" :label="column">
           <template slot-scope="scope">
-            <el-input v-if="item.bodyForm[colIdx].type === 0" v-model="item.content[scope.$index][colIdx]" placeholder="请输入内容" :maxlength="item.bodyForm[colIdx].max" show-word-limit size="mini" />
-            <el-input v-if="item.bodyForm[colIdx].type === 1" v-model="item.content[scope.$index][colIdx]" type="textarea" :maxlength="item.bodyForm[colIdx].max" show-word-limit :rows="2" placeholder="请输入内容" size="mini" />
-            <el-date-picker v-if="item.bodyForm[colIdx].type === 4" v-model="item.content[scope.$index][colIdx]" type="date" placeholder="选择日期" style="width: 100%" size="mini" />
-            <el-input-number v-if="item.bodyForm[colIdx].type === 5" v-model="item.content[scope.$index][colIdx]" :min="item.bodyForm[colIdx].min" :max="item.bodyForm[colIdx].max" label="数" style="width: 100%" size="mini" />
-            <el-slider v-if="item.bodyForm[colIdx].type === 6" v-model="item.content[scope.$index][colIdx]" :min="item.bodyForm[colIdx].min" :max="item.bodyForm[colIdx].max" style="padding: 0 20px" size="mini" />
-            <el-autocomplete v-if="item.bodyForm[colIdx].type === 7" v-model="item.content[scope.$index][colIdx]" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" @focus="sugFocus(index, 'table', colIdx)" size="mini" />
+            <el-input v-if="item.bodyForm[colIdx].type === 0" v-model="item.content[scope.$index][colIdx]" placeholder="请输入内容" :maxlength="item.bodyForm[colIdx].max" show-word-limit size="mini" :disabled="redactStateC === '查看'" />
+            <el-input v-if="item.bodyForm[colIdx].type === 1" v-model="item.content[scope.$index][colIdx]" type="textarea" :maxlength="item.bodyForm[colIdx].max" show-word-limit :rows="2" placeholder="请输入内容" size="mini" :disabled="redactStateC === '查看'" />
+            <el-date-picker v-if="item.bodyForm[colIdx].type === 4" v-model="item.content[scope.$index][colIdx]" type="date" placeholder="选择日期" style="width: 100%" size="mini" :disabled="redactStateC === '查看'" />
+            <el-input-number v-if="item.bodyForm[colIdx].type === 5" v-model="item.content[scope.$index][colIdx]" :min="item.bodyForm[colIdx].min" :max="item.bodyForm[colIdx].max" label="数" style="width: 100%" size="mini" :disabled="redactStateC === '查看'" />
+            <el-slider v-if="item.bodyForm[colIdx].type === 6" v-model="item.content[scope.$index][colIdx]" :min="item.bodyForm[colIdx].min" :max="item.bodyForm[colIdx].max" style="padding: 0 20px" size="mini" :disabled="redactStateC === '查看'" />
+            <el-autocomplete v-if="item.bodyForm[colIdx].type === 7" v-model="item.content[scope.$index][colIdx]" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" size="mini" :disabled="redactStateC === '查看'" @focus="sugFocus(index, 'table', colIdx)" />
           </template>
         </el-table-column>
-        <el-table-column fixed="right" label="操作">
+        <el-table-column v-if="redactStateC !== '查看'" fixed="right" label="操作">
           <template slot-scope="scope">
             <div class="operation">
-              <el-link v-if="1" type="danger" @click="deleteBodyForm(index, scope.$index)" style="margin: 0 6px">删除</el-link>
+              <el-link v-if="1" type="danger" style="margin: 0 6px" @click="deleteBodyForm(index, scope.$index)">删除</el-link>
               <el-link v-if="item.content.length === (scope.$index + 1)" type="success" @click="addBodyForm(index)">添加</el-link>
             </div>
           </template>
@@ -47,8 +47,8 @@
       </el-table>
     </div>
     <div class="submit-btn">
-      <el-button v-if="previewData.redactState === '新增'" type="primary" @click="addForm">提交</el-button>
-      <el-button v-if="previewData.redactState === '编辑'" type="primary" @click="editForm">修改</el-button>
+      <el-button v-if="redactStateC === '新增'" type="primary" @click="addForm">提交</el-button>
+      <el-button v-if="redactStateC === '编辑'" type="primary" @click="editForm">修改</el-button>
       <el-button @click="$emit('close')">取消</el-button>
     </div>
   </div>
@@ -68,11 +68,13 @@ export default {
   data() {
     return {
       // inputData: []
-      sugData: []
+      sugData: [],
+      redactStateC: ''
     }
   },
   mounted() {
     this.previewData.content = JSON.parse(this.previewData.content)
+    this.redactStateC = this.previewData.redactState
     console.log(this.previewData, 78)
   },
   methods: {
@@ -89,7 +91,8 @@ export default {
         form_name: this.previewData.table_name,
         written_by: this.$store.state.user.userInfo.name,
         written_account: this.$store.state.user.userInfo.account,
-        content: JSON.stringify(this.previewData.content)
+        content: JSON.stringify(this.previewData.content),
+        user_id: this.previewData.content[0].content
       }
       addContentTable(data).then(res => {
         if (res.code === 1) {
@@ -104,7 +107,8 @@ export default {
     editForm() {
       const data = {
         id: this.previewData.id,
-        content: JSON.stringify(this.previewData.content)
+        content: JSON.stringify(this.previewData.content),
+        user_id: this.previewData.content[0].content
       }
       editContentTable(data).then(res => {
         if (res.code === 1) {
@@ -127,7 +131,7 @@ export default {
       }
     },
     addBodyForm(index) {
-      console.log(this.previewData.content[index],36)
+      console.log(this.previewData.content[index], 36)
       const data = this.previewData.content[index]
       const len = data.content[0].length
       data.content.push(new Array(len).fill(''))

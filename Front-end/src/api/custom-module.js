@@ -23,6 +23,14 @@ export function changeCustomTable(data) {
     data
   })
 }
+// 修改普通自定义表填写人员
+export function changePermissions(data) {
+  return request({
+    url: 'diy/changePermissions',
+    method: 'post',
+    data
+  })
+}
 // 查询本医院普通自定义表
 export function getCustomTable(data) {
   return request({
