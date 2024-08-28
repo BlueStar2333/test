@@ -39,14 +39,14 @@
       </el-table-column>
       <el-table-column fiexd label="状态" min-width="100" align="center">
         <template slot-scope="scope">
-          <el-popover v-if="scope.row.state" placement="right-start" width="210" trigger="hover" content="开放状态，可正常填写">
+          <el-popover v-if="scope.row.state" placement="left-start" width="210" trigger="hover" content="开放状态，可正常填写">
             <el-tag slot="reference">已开放</el-tag>
             <div v-if="$store.state.user.userInfo.power === 1" class="el-popover-text">
               <span>点此关闭该表单填写，</span>
               <el-link v-if="scope.row.state" type="warning" @click="closeDiyTable(scope.row.id, 0)">关闭</el-link>
             </div>
           </el-popover>
-          <el-popover v-else placement="right-start" width="210" trigger="hover" content="关闭状态，不可填写">
+          <el-popover v-else placement="left-start" width="210" trigger="hover" content="关闭状态，不可填写">
             <el-tag slot="reference" type="info">已关闭</el-tag>
             <div v-if="$store.state.user.userInfo.power === 1" class="el-popover-text">
               <span>点此开放该表单填写，</span>
@@ -210,6 +210,8 @@ export default {
     },
     getData(name) {
       this.listLoading = true
+      this.tableData = []
+      let account = ''
       if (this.$store.state.user.userInfo.power === 1) {
         getUserinfoByName({
           name: '',
@@ -219,14 +221,13 @@ export default {
             this.personManage.selectOption = res.data.list
           }
         })
+      } else {
+        account = this.$store.state.user.userInfo.account
       }
-      getCustomTable().then(res => {
+      getCustomTable({ account }).then(res => {
         if (res.code) {
           this.tableData = res.data.list
         }
-        // for (const key of this.tableData) {
-        //   key.content = JSON.parse(key.content)
-        // }
         this.listLoading = false
       })
     },

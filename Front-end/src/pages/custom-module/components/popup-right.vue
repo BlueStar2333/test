@@ -26,7 +26,7 @@
           <el-form-item v-if="!radioShow && !dateShow && !suggestionShow && !tableShow" label="最大范围">
             <el-input-number v-model="componentData.max" :min="componentData.min" :max="10000" size="small" label="描述文字" />
           </el-form-item>
-          <el-form-item v-if="!tableShow" label="必填项">
+          <el-form-item v-if="!tableShow && !sliderShow" label="必填项">
             <el-switch v-model="componentData.isNecessary" />
           </el-form-item>
           <el-form-item v-if="!tableShow" label="校验值">
@@ -34,17 +34,17 @@
           </el-form-item>
           <div v-show="radioShow" class="setting">
             <el-divider>选项设置</el-divider>
-            <div v-for="(item,index) in componentData.content" :key="index" class="setting-main">
-              <el-radio v-show="componentData.type === 2" v-model="componentData.select" :label="item" />
-              <el-checkbox v-show="componentData.type === 3" v-model="componentData.select" :label="item" />
-              <el-input v-model="componentData.content[index]" size="mini" placeholder="请输入内容" style="width: 140px" />
+            <div v-for="(item,index) in componentData.select" :key="index" class="setting-main">
+              <el-radio v-show="componentData.type === 2" v-model="componentData.content" :label="item" />
+              <el-checkbox v-show="componentData.type === 3" v-model="componentData.content" :label="item" />
+              <el-input v-model="componentData.select[index]" size="mini" placeholder="请输入内容" style="width: 140px" />
               <img :src="dragIcon" width="22" height="22" style="" alt="拖拽">
               <img v-show="false" :src="dragBlueIcon" width="22" height="22" style="" alt="拖拽">
               <a class="setting-delete-btn" @click="deleteRadio(index)">-</a>
             </div>
             <div class="setting-link">
-              <el-link :underline="false" type="primary" @click="componentData.content.push(`选项${componentData.content.length + 1}`)">增加选项</el-link>
-              <el-link :underline="false" type="primary" @click="componentData.select = []">重设选中项</el-link>
+              <el-link :underline="false" type="primary" @click="componentData.select.push(`选项${componentData.select.length + 1}`)">增加选项</el-link>
+              <el-link :underline="false" type="primary" @click="componentData.content = []">重设选中项</el-link>
             </div>
           </div>
           <div v-show="tableShow" class="setting">

@@ -10,11 +10,11 @@
       <el-input v-if="item.type === 1" v-model="item.content" type="textarea" :maxlength="item.max" show-word-limit :rows="2" placeholder="请输入内容" />
       <!--单选-->
       <div v-if="item.type === 2">
-        <el-radio v-for="(radio,idx) in item.content" :key="idx" v-model="item.select" :label="radio">{{ radio }}</el-radio>
+        <el-radio v-for="(radio,idx) in item.select" :key="idx" v-model="item.content" :label="radio">{{ radio }}</el-radio>
       </div>
       <!--多选-->
-      <el-checkbox-group v-if="item.type === 3" v-model="item.select">
-        <el-checkbox v-for="(checkbox,idx) in item.content" :key="idx" :label="checkbox">{{ checkbox }}</el-checkbox>
+      <el-checkbox-group v-if="item.type === 3" v-model="item.content">
+        <el-checkbox v-for="(checkbox,idx) in item.select" :key="idx" :label="checkbox">{{ checkbox }}</el-checkbox>
       </el-checkbox-group>
       <!--日期选择-->
       <el-date-picker v-if="item.type === 4" size="small" type="date" placeholder="选择日期" />

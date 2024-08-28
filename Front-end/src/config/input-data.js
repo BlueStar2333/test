@@ -31,16 +31,18 @@ const inputData = [{
   type: 2,
   uniqueName: '',
   label: '单选框',
-  select: '',
-  content: ['选项1', '选项2'],
-  isNecessary: false
+  select: ['选项1', '选项2'],
+  content: '',
+  isNecessary: false,
+  checkValue: false
 }, {
   type: 3,
   uniqueName: '',
   label: '多选框',
-  select: [],
-  content: ['选项1', '选项12', '选项3'],
-  isNecessary: false
+  select: ['选项1', '选项12', '选项3'],
+  content: [],
+  isNecessary: false,
+  checkValue: false
 }, {
   type: 4,
   uniqueName: '',
@@ -64,7 +66,6 @@ const inputData = [{
   max: 1000,
   min: 0,
   content: 0,
-  isNecessary: false,
   checkValue: false
 }, {
   type: 7,

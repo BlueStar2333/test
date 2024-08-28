@@ -10,11 +10,11 @@
       <el-input v-if="item.type === 1" v-model="item.content" type="textarea" :maxlength="item.max" show-word-limit :rows="2" placeholder="请输入内容" :disabled="redactStateC === '查看'" />
       <!--单选-->
       <div v-if="item.type === 2">
-        <el-radio v-for="(radio,idx) in item.content" :key="idx" v-model="item.select" :label="radio" :disabled="redactStateC === '查看'">{{ radio }}</el-radio>
+        <el-radio v-for="(radio,idx) in item.select" :key="idx" v-model="item.content" :label="radio" :disabled="redactStateC === '查看'">{{ radio }}</el-radio>
       </div>
       <!--多选-->
-      <el-checkbox-group v-if="item.type === 3" v-model="item.select">
-        <el-checkbox v-for="(checkbox,idx) in item.content" :key="idx" :label="checkbox" :disabled="redactStateC === '查看'">{{ checkbox }}</el-checkbox>
+      <el-checkbox-group v-if="item.type === 3" v-model="item.content">
+        <el-checkbox v-for="(checkbox,idx) in item.select" :key="idx" :label="checkbox" :disabled="redactStateC === '查看'">{{ checkbox }}</el-checkbox>
       </el-checkbox-group>
       <!--日期选择-->
       <el-date-picker v-if="item.type === 4" v-model="item.content" size="small" type="date" placeholder="选择日期" :disabled="redactStateC === '查看'" />
@@ -69,7 +69,8 @@ export default {
     return {
       // inputData: []
       sugData: [],
-      redactStateC: ''
+      redactStateC: '',
+      loading: false
     }
   },
   mounted() {
@@ -85,14 +86,49 @@ export default {
         this.sugData = this.previewData.content[index].bodyForm[twoIndex].suggestion.split(',')
       }
     },
+    verifyContent(content) {
+      let errorTxt = ''
+      let verify = ''
+      const verify_correct = []
+      content.forEach((itemOne, indexOne) => {
+        if (itemOne['isNecessary'] && !itemOne.content.toString()) {
+          errorTxt = '请将必填项填写完整'
+        }
+        if (itemOne.checkValue) {
+          verify += '-' + itemOne.content.toString()
+        }
+        if (itemOne.type === 20) {
+          verify_correct[indexOne] = []
+          itemOne.content.forEach((itemTwo, indexTwo) => {
+            verify_correct[indexOne][indexTwo] = new Array(itemTwo.length).fill(false)
+          })
+        } else {
+          verify_correct[indexOne] = false
+        }
+      })
+      return { errorTxt, verify, verify_correct }
+    },
     addForm() {
+      this.loading = true
+      const verifyData = this.verifyContent(this.previewData.content)
+      console.log(verifyData.verify)
+      if (verifyData.errorTxt) {
+        this.$message({
+          type: 'info',
+          message: verifyData.errorTxt
+        })
+        this.loading = false
+        return
+      }
       const data = {
         form_id: this.previewData.id,
         form_name: this.previewData.table_name,
         written_by: this.$store.state.user.userInfo.name,
         written_account: this.$store.state.user.userInfo.account,
         content: JSON.stringify(this.previewData.content),
-        user_id: this.previewData.content[0].content
+        user_id: this.previewData.content[0].content,
+        verify: verifyData.verify,
+        verify_correct: verifyData.verify_correct
       }
       addContentTable(data).then(res => {
         if (res.code === 1) {
@@ -101,14 +137,34 @@ export default {
             message: res.msg
           })
           this.$emit('close')
+        } else {
+          this.$message({
+            type: 'info',
+            message: res.msg
+          })
         }
+        this.loading = false
       })
     },
     editForm() {
+      this.loading = true
+      const verifyData = this.verifyContent(this.previewData.content)
+      console.log(verifyData.verify)
+      if (verifyData.errorTxt) {
+        this.$message({
+          type: 'info',
+          message: verifyData.errorTxt
+        })
+        this.loading = false
+        return
+      }
       const data = {
         id: this.previewData.id,
         content: JSON.stringify(this.previewData.content),
-        user_id: this.previewData.content[0].content
+        user_id: this.previewData.content[0].content,
+        verify: verifyData.verify,
+        oldVerify: this.previewData.verify,
+        verify_correct: verifyData.verify_correct
       }
       editContentTable(data).then(res => {
         if (res.code === 1) {
@@ -117,7 +173,13 @@ export default {
             message: res.msg
           })
           this.$emit('close')
+        } else {
+          this.$message({
+            type: 'info',
+            message: res.msg
+          })
         }
+        this.loading = false
       })
     },
     deleteBodyForm(index, idx) {

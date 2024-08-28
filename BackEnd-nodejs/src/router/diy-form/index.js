@@ -10,5 +10,5 @@ router.post(BaseUrl + "saveDiyForm", [VaSaveDiyForm], CoSaveDiyForm); // 登录
 router.post(BaseUrl + "editDiyForm", [VaEditDiyForm], CoEditDiyForm); // 登录
 router.post(BaseUrl + "changeState", CoChangeState); // 登录
 router.post(BaseUrl + "deleteDiyForm", CoDeleteDiyForm); // 登录
-router.get(BaseUrl + "diyList", CoCarousel); // 轮播图
+router.post(BaseUrl + "diyList", CoCarousel); // 轮播图
 router.post(BaseUrl + "changePermissions", CoChangePermissions); // 轮播图

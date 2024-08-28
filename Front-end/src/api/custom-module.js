@@ -35,7 +35,7 @@ export function changePermissions(data) {
 export function getCustomTable(data) {
   return request({
     url: 'diy/diyList',
-    method: 'get',
+    method: 'post',
     data
   })
 }

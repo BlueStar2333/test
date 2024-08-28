@@ -74,11 +74,13 @@
           <el-link
             type="primary"
             @click="editFillIn(scope.row, '编辑')"
+            :disabled="!diyTable.state"
           >编辑</el-link>
           <el-link
             type="danger"
             style="margin-left: 10px"
             @click="deleteFillIn(scope.row)"
+            :disabled="!diyTable.state"
           >删除
           </el-link>
         </template>
@@ -155,7 +157,8 @@ export default {
     getData() {
       this.tableData = []
       this.tableLoading = true
-      getCustomTable().then(res => {
+      const account = this.$store.state.user.userInfo.power ? '' : this.$store.state.user.userInfo.account
+      getCustomTable({ account }).then(res => {
         if (res.code) {
           this.formList = res.data.resultD
           console.log(this.formList, 789)
@@ -214,6 +217,13 @@ export default {
     editFillIn(row, redactState) {
       console.log(this.diyTable, 89)
       if (this.diyTable) {
+        if (!this.diyTable.state) {
+          this.$message({
+            type: 'info',
+            message: '该表已关闭填写'
+          })
+          return
+        }
         this.fillInForm = {
           id: row.id,
           content: row.content,

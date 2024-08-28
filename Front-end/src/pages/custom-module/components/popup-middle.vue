@@ -19,11 +19,11 @@
         <el-input v-if="itemA.type === 1" v-model="formData[index].content" :maxlength="formData[index].max" show-word-limit class="body-input-content" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入内容" />
         <!--单选-->
         <div v-if="itemA.type === 2" class="body-input-select">
-          <el-radio v-for="(itemB, idx) in itemA.content" :key="idx" v-model="itemA.select" :label="itemB">{{ itemB }}</el-radio>
+          <el-radio v-for="(itemB, idx) in itemA.select" :key="idx" v-model="itemA.content" :label="itemB">{{ itemB }}</el-radio>
         </div>
         <!--多选-->
-        <el-checkbox-group v-if="itemA.type === 3" v-model="itemA.select" class="body-input-select">
-          <el-checkbox v-for="(itemB, idx) in itemA.content" :key="idx" :label="itemB">{{ itemB }}</el-checkbox>
+        <el-checkbox-group v-if="itemA.type === 3" v-model="itemA.content" class="body-input-select">
+          <el-checkbox v-for="(itemB, idx) in itemA.select" :key="idx" :label="itemB">{{ itemB }}</el-checkbox>
         </el-checkbox-group>
         <!--日期选择-->
         <el-date-picker v-if="itemA.type === 4" v-model="formData[index].content" class="body-input-content" type="date" size="small" placeholder="选择日期" />
