@@ -8,6 +8,7 @@ import Layout from '@/layout'
 import FormListRouter from '@/router/modules/form-list'
 import EmployeeRouter from '@/router/modules/employee'
 import CustomModuleRouter from '@/router/modules/custom-module'
+import Notice from '@/router/modules/notice'
 
 export const constantRoutes = [
   {
@@ -53,6 +54,7 @@ export const asyncRoutes = [
   CustomModuleRouter,
   FormListRouter,
   EmployeeRouter,
+  Notice,
 
   { path: '*', redirect: '/404', hidden: true }
 ]

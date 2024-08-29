@@ -19,6 +19,7 @@
         <el-option label="待校验" value="1"></el-option>
         <el-option label="校验正确" value="2"></el-option>
         <el-option label="校验错误" value="3"></el-option>
+        <el-option label="未校验" value="4"></el-option>
       </el-select>
       <el-select v-model="searchId" placeholder="请选择人员id" style="margin-right: 20px;width: 150px" clearable>
         <el-option v-for="(item,index) in searchIds" :key="index" :label="item.user_id" :value="item.user_id"></el-option>
@@ -30,7 +31,8 @@
       >查询</el-button>
       <el-button v-if="this.$store.state.user.userInfo.power === 0" size="small" type="primary" style="float: right" icon="el-icon-document" plain @click="editFillIn(diyTable, '新增')">添加</el-button>
     </el-form>
-    <div style="background: #ceeaf3; height: 40px; line-height: 40px;position: relative">
+    <div class="table-row">
+      <span class="table-row-num">总计：{{ tableData.length }}</span>
       <el-tooltip v-if="this.$store.state.user.userInfo.power === 1" class="item" effect="dark" content="导出" placement="top">
         <el-button class="add-button" size="mini" type="primary" icon="el-icon-folder-opened" plain @click="handleDownload" />
       </el-tooltip>
@@ -48,6 +50,7 @@
       @sort-change="sortChange"
     >
       <el-table-column min-width="120px" fiexd align="center" prop="written_by" label="填报人" />
+      <el-table-column min-width="60px" fiexd align="center" prop="user_id" label="人员ID" />
       <el-table-column min-width="120px" align="center" label="填报时间">
         <template slot-scope="scope">
           {{ formatDate(scope.row.date) }}
@@ -67,9 +70,10 @@
           <el-tag v-if="scope.row.state === 2" type="success">正确</el-tag>
           <el-tag v-if="scope.row.state === 1" type="warning">待校验</el-tag>
           <el-tag v-if="scope.row.state === 3" type="danger">错误</el-tag>
+          <el-tag v-if="scope.row.state === 4" type="danger">表关闭未校验</el-tag>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作">
+      <el-table-column v-if="$store.state.user.userInfo.power !== 1" fixed="right" label="操作">
         <template slot-scope="scope">
           <el-link
             type="primary"
@@ -198,7 +202,11 @@ export default {
     },
     deleteFillIn(row) {
       this.$confirm('删除后不可恢复，是否确认删除？').then((_) => {
-        deleteContentTable({ id: row.id }).then(res => {
+        const data = {
+          id: row.id,
+          verify: row.verify
+        }
+        deleteContentTable(data).then(res => {
           if (res.code === 1) {
             this.$message({
               type: 'success',
@@ -227,6 +235,7 @@ export default {
         this.fillInForm = {
           id: row.id,
           content: row.content,
+          verify: row.verify,
           table_name: this.diyTable.table_name,
           description: this.diyTable.description,
           redactState: redactState
@@ -409,5 +418,20 @@ export default {
 
   .c99 {
     color: #c9c9c9;
+  }
+
+  .table-row {
+    background: #ceeaf3;
+    height: 40px;
+    line-height: 40px;
+    position: relative;
+    .table-row-num {
+      font-size: 14px;
+      margin-left: 20px;
+      font-weight: 600;
+      color: #999;
+      opacity: .4;
+      font-style: oblique;
+    }
   }
 </style>

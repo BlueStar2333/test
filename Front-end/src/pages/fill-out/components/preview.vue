@@ -128,7 +128,7 @@ export default {
         content: JSON.stringify(this.previewData.content),
         user_id: this.previewData.content[0].content,
         verify: verifyData.verify,
-        verify_correct: verifyData.verify_correct
+        verify_correct_req: verifyData.verify_correct,
       }
       addContentTable(data).then(res => {
         if (res.code === 1) {
@@ -149,7 +149,7 @@ export default {
     editForm() {
       this.loading = true
       const verifyData = this.verifyContent(this.previewData.content)
-      console.log(verifyData.verify)
+      console.log(verifyData.verify_correct,this.previewData,886)
       if (verifyData.errorTxt) {
         this.$message({
           type: 'info',
@@ -161,10 +161,11 @@ export default {
       const data = {
         id: this.previewData.id,
         content: JSON.stringify(this.previewData.content),
+        written_account: this.$store.state.user.userInfo.account,
         user_id: this.previewData.content[0].content,
         verify: verifyData.verify,
         oldVerify: this.previewData.verify,
-        verify_correct: verifyData.verify_correct
+        verify_correct_req: verifyData.verify_correct
       }
       editContentTable(data).then(res => {
         if (res.code === 1) {
