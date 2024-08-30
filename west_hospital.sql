@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 30/08/2024 03:45:39
+ Date: 30/08/2024 17:26:59
 */
 
 SET NAMES utf8mb4;
@@ -28,7 +28,7 @@ CREATE TABLE `fill_in`  (
   `written_by` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '填写人',
   `written_account` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '填写人账号',
   `date` datetime NOT NULL,
-  `state` int NOT NULL COMMENT '三种状态 1：待校验  2：校验正确  3：错误  4: 未校验',
+  `state` int NOT NULL COMMENT '四种状态 1：待校验  2：校验正确  3：错误  4: 未校验',
   `verify` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '表单内容里面校验值组合',
   `verify_correct` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单内容里面每一项是否正确，不正确前端标红，结构与content结构一样,false为错误项',
   `user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '表单内容里面第一项，人员id',
@@ -43,8 +43,8 @@ INSERT INTO `fill_in` VALUES (47, 13, 'tbwh', 'wh', '123', '2024-08-29 06:12:40'
 INSERT INTO `fill_in` VALUES (49, 13, 'tbwh', 'wh', '123', '2024-08-29 06:14:28', 1, '-22-0-选项1', '[true,[[true,true,true]],true,true,true]', '22', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"22\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"\",0]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"选项1\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]');
 INSERT INTO `fill_in` VALUES (51, 13, 'tbwh', 'wh', '123', '2024-08-29 06:15:57', 2, '-3-0-选项2', '[true,[[true,true,true]],true,true,true]', '3', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"3\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"\",0]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"选项2\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]');
 INSERT INTO `fill_in` VALUES (52, 13, 'tbwh', 'wh', '123', '2024-08-29 06:16:12', 2, '-3-0-选项2', '[true,[[true,true,true]],true,true,true]', '3', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"3\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"\",0]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"选项2\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]');
-INSERT INTO `fill_in` VALUES (53, 13, 'tbwh', 'wh', '123', '2024-08-29 06:19:39', 3, '-36-0-选项1', '[true,[[false,true,true]],true,true,true]', '36', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"36\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"\",0]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"选项1\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]');
-INSERT INTO `fill_in` VALUES (54, 13, 'tbwh', 'wh', '123', '2024-08-29 06:19:44', 3, '-36-0-选项1', '[true,[[false,true,true]],true,true,true]', '36', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"36\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"6\",\"\",0]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"选项1\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]');
+INSERT INTO `fill_in` VALUES (53, 13, 'tbwh', 'wh', '123', '2024-08-29 06:19:39', 1, '-36-0-选项1', '[false,[[false,false,false],[false,false,false],[false,false,false],[false,false,false],[false,false,false],[false,false,false]],false,false,false]', '36', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"36\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"\",0]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"选项1\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[\"选项12\"],\"isNecessary\":false,\"checkValue\":false}]');
+INSERT INTO `fill_in` VALUES (54, 13, 'tbwh', 'wh', '123', '2024-08-29 06:19:44', 1, '-36-1-选项1', '', '36', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"36\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"6\",\"\",3],[\"\",\"\",0],[\"\",\"\",1],[\"\",\"\",0],[\"\",\"\",0],[\"\",\"\",1],[\"\",\"\",0]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":1,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"选项1\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]');
 INSERT INTO `fill_in` VALUES (55, 13, 'tbwh', 'wh', '123', '2024-08-29 07:10:16', 1, '-35-0-选项1', '[false,[[false,false,false]],false,false,false]', '35', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"35\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"\",0]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"选项1\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]');
 INSERT INTO `fill_in` VALUES (56, 13, 'tbwh', 'wh', '123', '2024-08-29 07:11:00', 1, '-35-0-选项1', '[false,[[false,false,false]],false,false,false]', '35', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"35\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"2024-08-04T16:00:00.000Z\",0]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"选项1\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]');
 INSERT INTO `fill_in` VALUES (57, 13, 'tbwh', 'wh', '123', '2024-08-30 00:27:20', 1, '-333-0-选项1', '[true,false,true,true,true]', '333', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"333\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"7\",\"2024-08-06T16:00:00.000Z\",0],[\"\",\"\",0]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"选项1\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]');
@@ -75,7 +75,7 @@ CREATE TABLE `form_list`  (
 -- Records of form_list
 -- ----------------------------
 INSERT INTO `form_list` VALUES (12, '管理员', '2024-08-29 03:20:35', 'wh', 'test', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\",\"选项3\"],\"content\":[],\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"58\",\"选项3\",\"选项4\"],\"content\":[],\"isNecessary\":true,\"checkValue\":true},{\"type\":6,\"uniqueName\":\"\",\"label\":\"滑动条\",\"max\":1000,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":7,\"uniqueName\":\"\",\"label\":\"带建议框\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":false,\"checkValue\":false}]', 4, 1, 1, '123');
-INSERT INTO `form_list` VALUES (13, '管理员', '2024-08-29 03:33:37', 'tbwh', 'test', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"\",\"\"]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]', 3, 1, 1, '123');
+INSERT INTO `form_list` VALUES (13, '管理员', '2024-08-30 15:15:20', 'tbwh', 'test', '[{\"type\":7,\"uniqueName\":\"\",\"label\":\"人员ID\",\"suggestion\":\"\",\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":20,\"uniqueName\":\"\",\"label\":\"自增表格\",\"header\":[\"列1\",\"列2\",\"列3\"],\"bodyForm\":[{\"type\":0,\"uniqueName\":\"\",\"label\":\"单行文本\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":4,\"uniqueName\":\"\",\"label\":\"日期选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":100,\"min\":0,\"suggestion\":\"\",\"content\":\"\"}],\"content\":[[\"\",\"\",\"\"]]},{\"type\":5,\"uniqueName\":\"\",\"label\":\"数量选择\",\"max\":10,\"min\":0,\"content\":0,\"isNecessary\":false,\"checkValue\":true},{\"type\":2,\"uniqueName\":\"\",\"label\":\"单选框\",\"select\":[\"选项1\",\"选项2\"],\"content\":\"\",\"isNecessary\":true,\"checkValue\":true},{\"type\":3,\"uniqueName\":\"\",\"label\":\"多选框\",\"select\":[\"选项1\",\"选项12\",\"选项3\"],\"content\":[],\"isNecessary\":false,\"checkValue\":false}]', 3, 1, 1, '123');
 
 -- ----------------------------
 -- Table structure for logs
@@ -88,7 +88,7 @@ CREATE TABLE `logs`  (
   `controls` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `controls_date` datetime NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 93 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 120 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of logs
@@ -185,6 +185,33 @@ INSERT INTO `logs` VALUES (89, '管理员', 'admin', '登录', '2024-08-30 02:53
 INSERT INTO `logs` VALUES (90, '管理员', 'admin', '登录', '2024-08-30 02:54:22');
 INSERT INTO `logs` VALUES (91, '管理员', 'admin', '登录', '2024-08-30 03:29:51');
 INSERT INTO `logs` VALUES (92, '管理员', 'admin', '登录', '2024-08-30 03:36:21');
+INSERT INTO `logs` VALUES (93, '管理员', 'admin', '登录', '2024-08-30 09:06:22');
+INSERT INTO `logs` VALUES (94, '管理员', 'admin', '登录', '2024-08-30 11:18:03');
+INSERT INTO `logs` VALUES (95, '管理员', 'admin', '登录', '2024-08-30 11:20:20');
+INSERT INTO `logs` VALUES (96, '管理员', 'admin', '登录', '2024-08-30 11:28:55');
+INSERT INTO `logs` VALUES (97, '管理员', 'admin', '登录', '2024-08-30 11:33:58');
+INSERT INTO `logs` VALUES (98, '管理员', 'admin', '登录', '2024-08-30 11:36:00');
+INSERT INTO `logs` VALUES (99, '管理员', 'admin', '登录', '2024-08-30 11:37:24');
+INSERT INTO `logs` VALUES (100, '管理员', 'admin', '登录', '2024-08-30 11:41:07');
+INSERT INTO `logs` VALUES (101, '管理员', 'admin', '登录', '2024-08-30 11:41:35');
+INSERT INTO `logs` VALUES (102, '管理员', 'admin', '登录', '2024-08-30 11:41:48');
+INSERT INTO `logs` VALUES (103, '111', '111', '登录', '2024-08-30 11:44:15');
+INSERT INTO `logs` VALUES (104, '111', '111', '登录', '2024-08-30 11:44:51');
+INSERT INTO `logs` VALUES (105, '管理员', 'admin', '登录', '2024-08-30 11:44:55');
+INSERT INTO `logs` VALUES (106, '111', '111', '登录', '2024-08-30 11:45:29');
+INSERT INTO `logs` VALUES (107, '管理员', 'admin', '登录', '2024-08-30 11:46:37');
+INSERT INTO `logs` VALUES (108, '管理员', 'admin', '登录', '2024-08-30 14:57:55');
+INSERT INTO `logs` VALUES (109, '管理员', 'admin', '登录', '2024-08-30 15:14:33');
+INSERT INTO `logs` VALUES (110, 'wh', '123', '登录', '2024-08-30 15:25:06');
+INSERT INTO `logs` VALUES (111, '管理员', 'admin', '登录', '2024-08-30 15:25:22');
+INSERT INTO `logs` VALUES (112, '管理员', 'admin', '登录', '2024-08-30 15:42:59');
+INSERT INTO `logs` VALUES (113, '管理员', 'admin', '登录', '2024-08-30 15:52:26');
+INSERT INTO `logs` VALUES (114, 'wh', '123', '登录', '2024-08-30 15:53:53');
+INSERT INTO `logs` VALUES (115, '管理员', 'admin', '登录', '2024-08-30 16:25:10');
+INSERT INTO `logs` VALUES (116, '管理员', 'admin', '登录', '2024-08-30 16:26:07');
+INSERT INTO `logs` VALUES (117, 'wh', '123', '登录', '2024-08-30 16:33:53');
+INSERT INTO `logs` VALUES (118, 'wh', '123', '登录', '2024-08-30 16:54:18');
+INSERT INTO `logs` VALUES (119, 'wh', '123', '登录', '2024-08-30 17:05:11');
 
 -- ----------------------------
 -- Table structure for notice
@@ -198,11 +225,12 @@ CREATE TABLE `notice`  (
   `have_read` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '已读的人',
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of notice
 -- ----------------------------
+INSERT INTO `notice` VALUES (2, '管理员', 'admin', '9996', NULL, '2024-08-30 10:37:05');
 
 -- ----------------------------
 -- Table structure for user
@@ -222,6 +250,7 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
+INSERT INTO `user` VALUES ('111', '111', '111', '14708267611', 0, '[\'自定义表单\',\'表单列表\',\'表单填写\',\'公告\']', '2024-08-30 11:45:20');
 INSERT INTO `user` VALUES ('123', '123', 'wh', '14705253625', 0, '[\'自定义表单\',\'表单列表\',\'表单填写\']', '2024-08-25 04:13:03');
 INSERT INTO `user` VALUES ('admin', 'admin', '管理员', '14536253625', 1, 'admin', '2024-08-24 02:13:07');
 

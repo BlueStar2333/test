@@ -9,7 +9,7 @@ const employeeFileRouter = {
   name: '公告',
   meta: {
     title: '公告',
-    icon: 'customize'
+    icon: 'notice'
   },
   children: [
     {

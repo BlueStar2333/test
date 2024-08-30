@@ -7,7 +7,7 @@
           <el-button slot="append" icon="el-icon-search" type="primary"></el-button>
         </el-input>
       </div>
-      <el-button v-if="this.$store.state.user.userInfo.power === 1" size="small" type="primary" icon="el-icon-document-add" plain @click="addDiyTable">发布公告</el-button>
+      <el-button v-if="this.$store.state.user.userInfo.power === 1" size="small" type="primary" plain @click="addNoticeShow">发布公告</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -16,13 +16,19 @@
       fit
       highlight-current-row
     >
-      <el-table-column prop="table_name" fiexd label="表名" min-width="200" align="left">
+      <el-table-column fiexd label="发布时间" min-width="100" align="center">
         <template slot-scope="scope">
-          <span style="font-weight: 600">{{ scope.row.table_name }}</span>
+          <span>{{ formatDate(scope.row.date) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="description" fiexd label="描述" min-width="360" align="left"/>
+      <el-table-column prop="publisher" fiexd label="发布人" min-width="100" align="center"/>
+      <el-table-column fiexd label="公告内容" min-width="200" align="left">
+        <template slot-scope="scope">
+          <span style="font-weight: 600;color: #999">{{ scope.row.details }}</span>
+        </template>
+      </el-table-column>
       <el-table-column
+        v-if="$store.state.user.userInfo.power === 1"
         fixed="right"
         label="操作"
         width="240"
@@ -31,10 +37,9 @@
         <template slot-scope="scope">
           <div class="operation">
             <el-link
-              v-if="$store.state.user.userInfo.power === 1"
               type="danger"
               icon="el-icon-delete"
-              @click="deleteDiyTable(scope.row.id)"
+              @click="deleteNotice(scope.row.id)"
             >删除</el-link>
           </div>
         </template>
@@ -50,21 +55,19 @@
 
     <el-dialog
       :modal-append-to-body="false"
-      title="选择可编辑人员"
-      :visible.sync="personManage.personManageShow"
+      title="公告内容"
+      :visible.sync="noticeManage.noticePublishShow"
       width="460px"
     >
-      <el-select v-model="personManage.permissions" multiple placeholder="暂无，请选择">
-        <el-option
-          v-for="item in personManage.selectOption"
-          :key="item.account"
-          :label="item.name"
-          :value="item.account">
-        </el-option>
-      </el-select>
+      <el-input
+        v-model="noticeManage.details"
+        type="textarea"
+        :rows="4"
+        placeholder="请输入内容">
+      </el-input>
       <div class="person-manage-btn">
-        <el-button @click="personManage.personManageShow = false">取消</el-button>
-        <el-button @click="editDiyPerson" type="primary">提交</el-button>
+        <el-button type="primary" @click="submitNotice">提交</el-button>
+        <el-button @click="noticeManage.noticePublishShow = false">取消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -72,7 +75,7 @@
 
 <script>
 import Pagination from '@/components/Pagination/index'
-import { getUserinfoByName } from '@/api/employee'
+import { getNoticeList, addNotice, deleteNotice } from '@/api/notice'
 
 export default {
   name: 'Index',
@@ -83,11 +86,10 @@ export default {
   data() {
     return {
       searchName: '',
-      personManage: {
+      noticeManage: {
         editId: '',
-        personManageShow: false,
-        permissions: [],
-        selectOption: []
+        noticePublishShow: false,
+        details: ''
       },
       listLoading: false,
       total: 60,
@@ -106,7 +108,7 @@ export default {
     // 使用计算属性来过滤数据
     filteredTables() {
       return this.tableData.filter(table => {
-        return table.table_name.toLowerCase().includes(this.searchName.toLowerCase())
+        return table.details.toLowerCase().includes(this.searchName.toLowerCase())
       })
     }
   },
@@ -114,42 +116,54 @@ export default {
     handleCurrentChange(page) {
       this.listQuery.page = page
     },
-    getData(name) {
-      // this.listLoading = true
+    getData() {
+      this.listLoading = true
       this.tableData = []
-      let account = ''
-      if (this.$store.state.user.userInfo.power === 1) {
-        getUserinfoByName({
-          name: '',
-          getPower: 0
-        }).then((res) => {
-          if (res.code === 1) {
-            this.personManage.selectOption = res.data.list
-          }
-        })
-      } else {
-        account = this.$store.state.user.userInfo.account
-      }
-      getCustomTable({ account }).then(res => {
+      getNoticeList().then(res => {
         if (res.code) {
           this.tableData = res.data.list
         }
+        console.log(this.tableData)
         this.listLoading = false
       })
     },
 
-    addDiyTable() {
-      this.popupShow = true
+    addNoticeShow() {
+      this.noticeManage.noticePublishShow = true
+    },
+    submitNotice() {
+      if (this.noticeManage.details === '') {
+        this.$message({
+          type: 'info',
+          message: '内容不能为空'
+        })
+        return
+      }
+      const data = {
+        publisher: this.$store.state.user.userInfo.name,
+        publisher_account: this.$store.state.user.userInfo.account,
+        details: this.noticeManage.details
+      }
+      addNotice(data).then(res => {
+        if (res.code === 1) {
+          this.getData()
+          this.$message({
+            type: 'success',
+            message: '发布成功'
+          })
+        }
+      })
+      this.noticeManage.noticePublishShow = false
     },
 
-    deleteDiyTable(id) {
-      this.$confirm('此操作将永久删除该表, 是否继续?', '提示', {
+    deleteNotice(id) {
+      this.$confirm('此操作将永久删除该公告, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(() => {
-          deleteCustomTable({ id }).then(res => {
+          deleteNotice({ id }).then(res => {
             if (res.code === 1) {
               this.getData()
               this.$message({
@@ -166,22 +180,16 @@ export default {
           })
         })
     },
-    editDiyPerson() {
-      const data = {
-        id: this.personManage.editId,
-        permissions: this.personManage.permissions.toString()
-      }
-      changePermissions(data).then(res => {
-        if (res.code === 1) {
-          this.getData()
-          this.$message({
-            type: 'success',
-            message: '修改成功'
-          })
-        }
-      })
-      this.personManage.personManageShow = false
-    },
+    formatDate(date) {
+      date = new Date(date)
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0') // 月份是从0开始的
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+
+      return `${year}-${month}-${day} ${hours}:${minutes}`
+    }
 
   }
 }
@@ -190,7 +198,8 @@ export default {
 <style lang="scss" scoped>
   .person-manage-btn {
     display: flex;
-    justify-content: right;
+    justify-content: space-around;
+    padding: 0 50px;
     margin-top: 40px;
   }
 ::v-deep .el-dialog__body {

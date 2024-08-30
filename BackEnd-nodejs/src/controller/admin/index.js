@@ -52,7 +52,7 @@ const CoRegister = (req, res) => {
     // 判断是否查询到信息
     if (result.length === 0) {
       // 新增用户账号信息
-      const roles = power ? "admin" : "['自定义表单','表单列表','表单填写']"
+      const roles = power ? "admin" : "['自定义表单','表单列表','表单填写','公告']"
       sql = "INSERT INTO user(name,account,password,phone,power,roles,create_date) VALUES (?,?,?,?,?,?,?)";
       pool.query(sql, [name, account, password, phone, power,roles, new Date()], (error, result2) => {
         if (error) throw error;

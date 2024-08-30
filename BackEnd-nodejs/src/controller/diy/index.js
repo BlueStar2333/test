@@ -37,12 +37,21 @@ const CoEditDiyForm = (req, res) => {
 
 const CoChangeState = (req, res) => {
   $api.PostArg(req).then(({ id, state }) => {
-    pool.query("UPDATE form_list SET filled=? WHERE id=?", [1, id], (error, result2) => {
-      if (error) throw error;
-    });
     sql = "UPDATE form_list SET state=? WHERE id=?";
-    pool.query(sql, [state, id], (error, result2) => {
+    pool.query(sql, [state, id], (error, result) => {
       if (error) throw error;
+      pool.query("UPDATE form_list SET filled=? WHERE id=?", [1, id], (error, result2) => {  // filled置1，开放过不能编辑
+        if (error) throw error;
+      });
+      let sqlT
+      if(state === 1) {
+        sqlT = "UPDATE fill_in SET state = 1 WHERE form_id = ? AND state = 4"
+      } else {
+        sqlT = "UPDATE fill_in SET state = 4 WHERE form_id = ? AND state = 1"
+      }
+      pool.query(sqlT, [id], (error, result2) => {
+        if (error) throw error;
+      })
       $api.ReturnJson(res, {
         code: 1,
         msg: "修改成功",

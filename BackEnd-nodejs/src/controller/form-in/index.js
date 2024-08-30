@@ -2,6 +2,43 @@
  * 图文模块控制器
  */
 const { pool, YES } = require("@/utils");
+
+
+function checkAll(old_ct, new_ct, verify_correct) {
+	const old_content = JSON.parse(old_ct)
+	const new_content = JSON.parse(new_ct)
+	const resultData = {
+		verify_correct: verify_correct,
+		state: 1
+	}
+	old_content.forEach((itemOne, indexOne) => {
+	  if (itemOne.type === 20) {
+		if(old_content[indexOne].content.length === new_content[indexOne].content.length) {
+			itemOne.content.forEach((itemTwo, indexTwo) => {
+				itemTwo.forEach((itemThree, indexThree) => {
+					if(old_content[indexOne].content[indexTwo][indexThree].toString() === new_content[indexOne].content[indexTwo][indexThree].toString()) {
+						resultData.verify_correct[indexOne][indexTwo][indexThree] = true
+					} else {
+						resultData.verify_correct[indexOne][indexTwo][indexThree] = false
+					}
+				})
+			})
+		} else {
+			resultData.verify_correct[indexOne] = false
+		}
+	  } else {
+		if(old_content[indexOne].content.toString() === new_content[indexOne].content.toString()) {
+			resultData.verify_correct[indexOne] = true
+		} else {
+			resultData.verify_correct[indexOne] = false
+		}
+	  }
+	})
+	resultData.state = verify_correct.toString().includes('false') ? 3 : 2
+	return resultData
+}
+
+
 /**
  * 文章列表
  * @param {Object} req - 请求对象
@@ -45,39 +82,6 @@ const inquireByData = (req, res) => {
 	})
 };
 
-function checkAll(old_ct, new_ct, verify_correct) {
-	const old_content = JSON.parse(old_ct)
-	const new_content = JSON.parse(new_ct)
-	const resultData = {
-		verify_correct: verify_correct,
-		state: 1
-	}
-	old_content.forEach((itemOne, indexOne) => {
-	  if (itemOne.type === 20) {
-		if(old_content[indexOne].content.length === new_content[indexOne].content.length) {
-			itemOne.content.forEach((itemTwo, indexTwo) => {
-				itemTwo.forEach((itemThree, indexThree) => {
-					if(old_content[indexOne].content[indexTwo][indexThree].toString() === new_content[indexOne].content[indexTwo][indexThree].toString()) {
-						resultData.verify_correct[indexOne][indexTwo][indexThree] = true
-					} else {
-						resultData.verify_correct[indexOne][indexTwo][indexThree] = false
-					}
-				})
-			})
-		} else {
-			resultData.verify_correct[indexOne] = false
-		}
-	  } else {
-		if(old_content[indexOne].content.toString() === new_content[indexOne].content.toString()) {
-			resultData.verify_correct[indexOne] = true
-		} else {
-			resultData.verify_correct[indexOne] = false
-		}
-	  }
-	})
-	resultData.state = verify_correct.toString().includes('false') ? 3 : 2
-	return resultData
-}
 const addData = (req, res) => {
 	$api.PostArg(req).then(data => {
 		const { form_id, form_name, written_by, written_account, user_id, content, verify, verify_correct_req } = data;
@@ -161,14 +165,13 @@ const editData = (req, res) => {
 							$api.ReturnJson(res, { code: 0, msg: "已存在两条相同数据，请录入其他数据" });
 							return
 						} else if(resultT.length === 1) {
-							checkData = checkAll( resultT[0].content, content, JSON.parse(verify_correct)) // 校验所有值
-							correct = JSON.stringify(checkData.verify_correct)
-							state = checkData.state
+							correct = verify_correct
 							// 确保两条数据校验值一致
-							pool.query("UPDATE fill_in SET verify_correct=?, state=? WHERE id=?", [correct, 1, resultT[0].id], (error, resultTW) => {
+							pool.query("UPDATE fill_in SET verify_correct=?, state=? WHERE id=?", [verify_correct, 1, resultT[0].id], (error, resultTW) => {
 								if (error) throw error;
 							});
-						} else if(resultTW.length === 1) {
+						}
+						if(resultTW.length === 1) {
 							checkData = checkAll( resultTW[0].content, content, JSON.parse(verify_correct)) // 校验所有值
 							correct = JSON.stringify(checkData.verify_correct)
 							state = checkData.state

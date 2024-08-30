@@ -78,20 +78,22 @@
       :title="dialogType === 'edit' ? 'Edit Role' : 'New Role'"
     >
       <el-form
+        ref="addPerson"
         label-position="right"
-        label-width="100px"
-        width="40%"
-        style="max-width: 400px; margin-left: 5%"
+        label-width="180px"
+        width="60%"
+        style="max-width: 600px;"
         :model="addPerson"
+        :rules="personRules"
       >
-        <el-form-item label="姓名">
+        <el-form-item label="姓名：" prop="name">
           <el-input
             v-model="addPerson.name"
             clearable
             placeholder="请输入用户名"
           />
         </el-form-item>
-        <el-form-item label="账号">
+        <el-form-item label="账号：" prop="account">
           <el-input
             v-model="addPerson.account"
             :disabled="dialogType === 'edit'"
@@ -99,7 +101,7 @@
             placeholder="请输入用户编号"
           />
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="密码：" prop="password">
           <el-input
             v-model="addPerson.password"
             type="password"
@@ -107,14 +109,14 @@
             placeholder="请输入用户密码"
           />
         </el-form-item>
-        <el-form-item label="联系电话">
+        <el-form-item label="联系电话：" prop="phone">
           <el-input
             v-model="addPerson.phone"
             clearable
             placeholder="请输入联系电话"
           />
         </el-form-item>
-        <el-form-item label="设置为管理员">
+        <el-form-item label="操作权限：" prop="power">
           <el-select v-model="addPerson.power">
             <el-option label="管理员" :value="1">管理员</el-option>
             <el-option label="普通用户" :value="0">普通用户</el-option>
@@ -143,6 +145,18 @@ import {
 
 export default {
   data() {
+    const checkPhone = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('手机号不能为空'))
+      } else {
+        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+        if (reg.test(value)) {
+          callback()
+        } else {
+          return callback(new Error('请输入正确的手机号'))
+        }
+      }
+    }
     return {
       userName: '',
       user: {
@@ -160,6 +174,13 @@ export default {
         password: '',
         phone: '',
         power: ''
+      },
+      personRules: {
+        name: [{ required: true, trigger: 'blur', message: '姓名不能为空' }],
+        account: [{ required: true, trigger: 'blur', message: '账号不能为空' }],
+        password: [{ required: true, trigger: 'blur', message: '密码不能为空' }],
+        phone: [{ required: true, trigger: 'blur', validator: checkPhone }],
+        power: [{ required: true, trigger: 'blur', message: '权限不能为空' }]
       },
       dialogType: '',
       dept: [],
@@ -192,11 +213,18 @@ export default {
       })
     },
     confirm() {
-      if (this.dialogType === 'add') {
-        this.addUser()
-      } else {
-        this.updateUser()
-      }
+      this.$refs.addPerson.validate(valid => {
+        if (valid) {
+          if (this.dialogType === 'add') {
+            this.addUser()
+          } else {
+            this.updateUser()
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     openAddUser() {
       this.dialogType = 'add'
@@ -205,7 +233,7 @@ export default {
       this.addPerson.account = ''
       this.addPerson.password = ''
       this.addPerson.phone = ''
-      this.addPerson.power = ''
+      this.addPerson.power = 0
     },
     addUser() {
       addUserInfo(this.addPerson).then((res) => {

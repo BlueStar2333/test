@@ -34,7 +34,7 @@
     <div class="table-row">
       <span class="table-row-num">总计：{{ tableData.length }}</span>
       <el-tooltip v-if="this.$store.state.user.userInfo.power === 1" class="item" effect="dark" content="导出" placement="top">
-        <el-button class="add-button" size="mini" type="primary" icon="el-icon-folder-opened" plain @click="handleDownload" />
+        <el-button class="add-button" size="mini" type="primary" icon="el-icon-folder-opened" plain @click="exportExcel" />
       </el-tooltip>
     </div>
 
@@ -47,7 +47,6 @@
       fit
       highlight-current-row
       style="width: 100%"
-      @sort-change="sortChange"
     >
       <el-table-column min-width="120px" fiexd align="center" prop="written_by" label="填报人" />
       <el-table-column min-width="60px" fiexd align="center" prop="user_id" label="人员ID" />
@@ -112,14 +111,13 @@
 </template>
 
 <script>
-import { parseTime } from '@/utils'
+  import { deepClone, parseTime } from '@/utils'
 import Pagination from '@/components/Pagination'
 import FileSaver from 'file-saver'
 import XLSX from 'xlsx'
 import { getStaffContentTable, deleteContentTable } from '@/api/fillout'
 import Preview from './components/preview'
 import { getCustomTable } from '@/api/custom-module'
-import { deleteUser } from '@/api/employee'
 
 export default {
   name: 'HealthEducation',
@@ -236,6 +234,8 @@ export default {
           id: row.id,
           content: row.content,
           verify: row.verify,
+          verify_correct: row.verify_correct,
+          state: row.state,
           table_name: this.diyTable.table_name,
           description: this.diyTable.description,
           redactState: redactState
@@ -264,7 +264,7 @@ export default {
       return `${year}-${month}-${day} ${hours}:${minutes}`
     },
 
-    handleDownload() {
+    exportExcel() {
       if (!this.tableName) {
         this.$message({
           type: 'info',
@@ -272,83 +272,34 @@ export default {
         })
         return
       }
-      this.$nextTick(function() {
-        const wb = XLSX.utils.table_to_book(document.querySelector('.tableData'))
-        /* 获取二进制字符串作为输出 */
-        const wbout = XLSX.write(wb, {
-          bookType: 'xlsx',
-          bookSST: true,
-          type: 'array'
+      const headers = ['表名','填写时间','填报人','填报人账号','校验值', '校验状态(1：待校验  2：校验正确  3：错误  4: 未校验)','每项校验结果（false为未匹配上）','填写内容']
+      const fields = ['form_name','date','written_by','written_account','verify', 'state','verify_correct','content']
+      let data = new Array()
+
+      data = this.tableData.map((obj) => {
+        return fields.map((field) => {
+          return obj[field]
         })
-        try {
-          FileSaver.saveAs(
-            new Blob([wbout], { type: 'application/octet-stream' }),
-            this.tableName + '.xlsx'
-          )
-        } catch (e) {}
-        return wbout
       })
-    },
-    formatJson(filterVal) {
-      return this.tableData.map((v) =>
-        filterVal.map((j) => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
-          } else {
-            return v[j]
-          }
-        })
-      )
-    },
-
-
-
-
-
-
-
-
-
-    handleAdd() {
-      if (this.tableName) {
-        this.$message('跳转到填表')
+      if (headers.length > 0) {
+        data.splice(0, 0, headers)
       } else {
-        this.$message('请先选择表单')
+        // 将headers设置为英文字段表头
+        data.splice(0, 0, fields)
       }
+      const ws = XLSX.utils.aoa_to_sheet(data) // 创建工作表
+      const wb = XLSX.utils.book_new() // 创建工作簿
+
+      // 隐藏表头
+      // let wsrows = [{ hidden: true }]
+      // ws['!rows'] = wsrows // ws - worksheet
+
+      XLSX.utils.book_append_sheet(wb, ws) // 将工作表添加到工作簿中
+      XLSX.writeFile(wb, this.tableName + '填写情况.xlsx') // 导出文件
     },
 
     handleCurrentChange(page) {
       this.listQuery.page = page
-    },
-    otherReplace(arr, item) {
-      const newArr = arr
-      newArr.pop()
-      newArr.push(item)
-      return newArr
-    },
-
-    sortChange(data) {
-      const { prop, order } = data
-      this.tableData.reverse()
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
-      this.handleFilter()
-    },
-    handleFilter() {
-      this.listQuery.page = 1
-      this.getList()
-    },
-    getSortClass: function(key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}` ? 'ascending' : 'descending'
     }
   }
 }
