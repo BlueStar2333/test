@@ -1,9 +1,9 @@
 /**
- * 图文模块控制器
+ * 日志模块控制器
  */
 const { pool, YES } = require("@/utils");
 /**
- * 文章列表
+ * 日志列表
  * @param {Object} req - 请求对象
  * @param {Object} res - 返回对象
  * @returns {Void}

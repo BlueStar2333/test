@@ -3,12 +3,6 @@
  */
 const { pool, YES } = require("@/utils");
 
-function creatToken() {
-  
-  const token = global.$api.AseEnDecode({a:456})
-  console.log(a,222)
-}
-
 /**
  * 登录
  * @param {Object} req - 请求对象
@@ -28,11 +22,11 @@ const CoLogin = (req, res) => {
       pool.query(logSql, [result[0].name, result[0].account, '登录',new Date()], (error, result) => {
         if (error) throw error;
       });
-      const token = global.$api.AseEnDecode(result)
+      const token = global.$api.generateToken({ account: result[0].account, password: result[0].password})
       $api.ReturnJson(res, {
         code: 1,
         msg: "恭喜您登陆成功",
-        data: { result }
+        data: { result,token }
       })
     }
   });

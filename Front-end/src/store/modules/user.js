@@ -43,9 +43,9 @@ const actions = {
         console.log(response, 114)
         if (response.code) {
           const data = response.data.result[0] // 登录获取回复，并设置状态token
-          commit('SET_TOKEN', JSON.stringify(response.data.token))
+          commit('SET_TOKEN', response.data.token)
           commit('SET_USER_INFO', data)
-          setToken(JSON.stringify(response.data.token))
+          setToken(response.data.token)
           resolve()
         } else {
           reject(response.msg)

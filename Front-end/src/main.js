@@ -15,11 +15,6 @@ import './permission'
 
 import * as filters from './filters'
 
-if (process.env.NODE_ENV === 'production') {
-  const { mockXHR } = require('../mock')
-  mockXHR()
-}
-
 Vue.use(Element, {
   size: 'medium'
 })

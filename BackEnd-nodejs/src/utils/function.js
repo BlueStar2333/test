@@ -7,6 +7,27 @@
   const path = require("path"); // 引入路径模块
   const { PublicPath, NO } = require("./variable"); // 引入全局变量
   const crypto = require("crypto"); // 引入crypto模块
+  const jwt = require('jsonwebtoken');
+  const secretKey = 'huaxiyiyuandiyform@2024@2333';
+
+
+function generateToken(data = { userId: 'user_id' }) {
+  return jwt.sign(data, secretKey, { expiresIn: '1h' });
+}
+
+function authToken(req, res, next) {
+  const token = req.headers['x-token'];
+  if (!token) return res.status(401).json({ message: 'Unauthorized' });
+ 
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) return res.status(403).json({ message: 'Invalid token' });
+    next();
+  });
+}
+
+
+
+
 
   /**
    * 时间转换
@@ -214,6 +235,8 @@
     VerifyToken, // token验证
     ReturnJson, // 返回响应JSON数据
     SaveValidData, // 保存验证对象数据
-    convertToTimeZone
+    convertToTimeZone,
+    generateToken,
+    authToken
   };
 })(global);

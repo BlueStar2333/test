@@ -3,9 +3,8 @@ import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
-// let url = 'http://192.168.0.38:8085/XgqkdcService.asmx/';
-// let url='https://sws.scyokj.com/XgqkdcSystem/XgqkdcService.asmx/';
-const url = 'http://localhost:3100/api/'
+// const url = 'http://localhost:3100/api/'
+const url = 'http://124.71.103.53:3100/api/'
 
 const service = axios.create({
   baseURL: url,
@@ -20,7 +19,7 @@ service.interceptors.request.use(
       //让每个请求携带令牌
       //['X-Token']是一个自定义的标头键
       //根据情况修改
-      // config.headers['X-Token'] = getToken()
+      config.headers['x-token'] = getToken()
       config.headers['Content-Type'] = "application/json"
     }
     return config

@@ -1,5 +1,5 @@
 /**
- * diy表单模块控制器
+ * 自定义表单模块控制器
  */
 const { pool, YES } =require("@/utils");
 /**

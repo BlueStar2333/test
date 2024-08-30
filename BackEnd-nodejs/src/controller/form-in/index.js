@@ -1,5 +1,5 @@
 /**
- * 图文模块控制器
+ * 表单填写模块控制器
  */
 const { pool, YES } = require("@/utils");
 
@@ -40,7 +40,7 @@ function checkAll(old_ct, new_ct, verify_correct) {
 
 
 /**
- * 文章列表
+ * 填写列表
  * @param {Object} req - 请求对象
  * @param {Object} res - 返回对象
  * @returns {Void}
@@ -52,9 +52,10 @@ const inquireByData = (req, res) => {
 		const { form_id, written_account, startDate, endDate, state, user_id, power } = data;
 		let sql = 'SELECT * FROM fill_in WHERE form_id = ? '
 		let sqlData = [form_id]
-		let start,end
+		let start,end,str = ''
 		if(!power) { // power为0
 			sql += 'AND written_account = ? '
+			str += 'AND written_account = ?'
 			sqlData.push(written_account)
 		} 
 		if(startDate !== '' || endDate !== '') {
@@ -74,7 +75,7 @@ const inquireByData = (req, res) => {
 		sql += 'ORDER BY date DESC'
 		pool.query(sql, sqlData, (error, result) => {
 			if (error) throw error;
-			pool.query('SELECT DISTINCT user_id FROM fill_in WHERE form_id = ? AND written_account = ?', [form_id, written_account], (errorId, resultIds) => {
+			pool.query('SELECT DISTINCT user_id FROM fill_in WHERE form_id = ? ' + str, [form_id, written_account], (errorId, resultIds) => {
 				if (errorId) throw errorId;
 				$api.ReturnJson(res, { code: YES, msg: "查询成功", data: { result,resultIds } });
 			});
@@ -125,7 +126,7 @@ const editData = (req, res) => {
 	$api.PostArg(req).then(data => {
 		const { id, content, user_id, verify, oldVerify, verify_correct_req, written_account } = data;
 		let verify_correct = JSON.stringify(verify_correct_req)
-		let correct = ''
+		let correct = JSON.stringify(verify_correct_req)
 		let state = 1
 		let checkData = null
 		let sql = "UPDATE fill_in SET content=?, user_id=?, verify=?, verify_correct=?, state=? WHERE id=?";
@@ -211,82 +212,9 @@ const deleteData = (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-const CoArticleList = (req, res) => {
-	let sql = "SELECT * FROM article";
-	pool.query(sql, Object.values(req.validData), (error, result) => {
-		if (error) throw error;
-		// 判断查询到数据是否为空
-		if (result.length !== 0) {
-			// 转化时间
-			result.forEach(elem => {
-				elem.createTime = $api.Format(elem.createTime);
-			});
-		}
-		$api.ReturnJson(res, {
-			code: YES,
-			msg: "查询成功",
-			data: {
-				list: result
-			}
-		});
-	});
-};
-/**
- * 文章详情
- * @param {Object} req - 请求对象
- * @param {Object} res - 返回对象
- * @returns {Void}
- */
-const CoArticleDetails = (req, res) => {
-	$api.PostArg(req).then(data => {
-		const {
-			id
-		} = data;
-		let sql = "SELECT * FROM article WHERE id=?";
-		pool.query(sql, [id], (error, result) => {
-			if (error) throw error;
-			// 判断是否查询到信息
-			if (result.length === 0) {
-				$api.ReturnJson(res, {
-					msg: "查询失败"
-				});
-			} else {
-				// 转化时间
-				result.forEach(elem => {
-					elem.createTime = $api.Format(elem.createTime);
-				});
-				$api.ReturnJson(res, {
-					code: YES,
-					msg: "查询成功",
-					data: result[0]
-				});
-			}
-		});
-	})
-};
-
-
-
 module.exports = {
 	inquireByData,
 	deleteData,
 	addData,
-	editData,
-	
-
-
-	CoArticleList, // 文章列表
-	CoArticleDetails, // 文章详情
+	editData
 };
