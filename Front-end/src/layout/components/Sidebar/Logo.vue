@@ -2,10 +2,11 @@
   <div class="sidebar-logo-container" :class="{'collapse':collapse}">
     <transition name="sidebarLogoFade">
       <a v-if="collapse" key="collapse" class="sidebar-logo-link">
-        <img v-if="logo" :src="logo" class="sidebar-logo">
+        <img v-if="logo" src="../../../assets/icons/logo2.png" class="sidebar-logo">
         <h1 v-else class="sidebar-title">{{ title }} </h1>
       </a>
       <a v-else key="expand" class="sidebar-logo-link">
+        <img v-if="logo" src="../../../assets/icons/logo1.png" class="sidebar-logo">
         <h1 class="sidebar-title">{{ title }} </h1>
       </a>
     </transition>
@@ -24,7 +25,7 @@ export default {
   data() {
     return {
       title: this.$store.state.settings.title,
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      logo: true
     }
   }
 }

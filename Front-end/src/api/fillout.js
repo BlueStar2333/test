@@ -7,6 +7,13 @@ export function getStaffContentTable(data) {
     data
   })
 }
+export function getDrawerNumData(data) {
+  return request({
+    url: 'formIn/getNumData',
+    method: 'post',
+    data
+  })
+}
 
 export function deleteContentTable(data) {
   return request({

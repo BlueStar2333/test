@@ -11,11 +11,20 @@
           <el-option label="带建议框" :value="7"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item v-if="formData.type === 0 || formData.type === 1" label="正则规则">
+        <el-input v-model="formData.regularRule" placeholder="请输入正则匹配规则" />
+      </el-form-item>
+      <el-form-item v-if="formData.type === 0 || formData.type === 1" label="错误提示">
+        <el-input v-model="formData.regularTips" placeholder="正则验证错误时给出提示" />
+      </el-form-item>
       <el-form-item v-if="formData.type === 5 || formData.type === 6" label="最小范围">
         <el-input-number v-model="formData.min" :min="0" :max="10000" size="small" label="描述文字" />
       </el-form-item>
       <el-form-item v-if="formData.type !== 4 && formData.type !== 7" label="最大范围">
         <el-input-number v-model="formData.max" :min="formData.min" :max="10000" size="small" label="描述文字" />
+      </el-form-item>
+      <el-form-item v-if="formData.type === 4" label="时间类型">
+        <el-switch v-model="formData.dateType" active-text="datetime型" inactive-text="date型" active-value="datetime" inactive-value="date" inactive-color="#67C23A"></el-switch>
       </el-form-item>
       <el-form-item v-if="formData.type === 7" label="建议内容">
         <el-input v-model="formData.suggestion" placeholder="每条建议,隔开" />
@@ -43,12 +52,16 @@ export default {
         type: 0,
         min: 0,
         max: 100,
+        regularRule: '',
+        regularTips: '',
         suggestion: ''
       }
     }
   },
   created() {
     this.formData.type = this.componentData['bodyForm'][this.columnIdx].type
+    this.formData.regularRule = this.componentData['bodyForm'][this.columnIdx].regularRule
+    this.formData.regularTips = this.componentData['bodyForm'][this.columnIdx].regularTips
     this.formData.suggestion = this.componentData['bodyForm'][this.columnIdx].suggestion
   }
 }

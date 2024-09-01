@@ -24,12 +24,7 @@
 
     <div class="box-card pm-body-table">
       <el-table
-        :data="
-          tableData.slice(
-            (Confirmpage - 1) * ConfirmpageSize,
-            Confirmpage * ConfirmpageSize
-          )
-        "
+        :data=" tableData.slice((Confirmpage - 1) * ConfirmpageSize,Confirmpage * ConfirmpageSize)"
         border
       >
         <el-table-column prop="name" label="用户名" />

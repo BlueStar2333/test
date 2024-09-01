@@ -1,7 +1,10 @@
 <template>
   <div class="login-wrap">
+    <div class="ms-left">
+      <p class="ms-left-txt">Welcome!</p>
+      <p class="ms-left-txt">华西医院填表系统</p>
+    </div>
     <div class="ms-login">
-      <div class="ms-title">华西医院填表系统</div>
       <el-form
         ref="loginForm"
         :model="loginForm"
@@ -11,34 +14,27 @@
         autocomplete="on"
       >
         <el-form-item prop="phone">
-          <el-input v-model="loginForm.phone" class="phone-inp" placeholder="请输入手机号">
+          <el-input v-model="loginForm.phone" size="small" class="phone-inp" placeholder="请输入手机号">
             <i slot="prefix" class="el-icon-phone" />
           </el-input>
         </el-form-item>
         <el-form-item prop="code">
-          <el-row :gutter="20">
-            <el-col :span="16">
-              <el-input v-model="loginForm.code" class="phone-inp" placeholder="请输入验证码">
-                <i slot="prefix" class="el-icon-tickets" />
-              </el-input>
-            </el-col>
-            <el-col :span="6">
-              <el-button :disabled="sendDisabled" style="width: 130px" @click="sendCode">{{ btnText }}</el-button>
-            </el-col>
-          </el-row>
+          <el-input v-model="loginForm.code" size="small" class="phone-inp" placeholder="请输入验证码">
+            <i slot="prefix" class="el-icon-tickets" style="line-height: 36px;"/>
+            <el-button slot="append" :disabled="sendDisabled" style="width: 130px" size="mini" @click="sendCode">{{ btnText }}</el-button>
+          </el-input>
         </el-form-item>
         <el-form-item prop="username">
           <el-input
             ref="username"
             v-model="loginForm.username"
             clearable
+            size="small"
             tabindex="1"
             autocomplete="on"
             placeholder="请输入账号"
           >
-            <template #prepend>
-              <el-button icon="el-icon-user" />
-            </template>
+            <i slot="prefix" class="el-icon-user"/>
           </el-input>
         </el-form-item>
         <el-form-item>
@@ -47,6 +43,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
+            size="small"
             placeholder="请输入密码"
             name="password"
             tabindex="2"
@@ -55,17 +52,16 @@
             @blur="capsTooltip = false"
             @keyup.enter.native="handleLogin"
           >
-            <template #prepend>
-              <el-button icon="el-icon-lock" />
-            </template>
+            <i slot="prefix" class="el-icon-lock"/>
           </el-input>
         </el-form-item>
         <div class="login-btn">
-          <el-button type="primary" style="color: #e7e7e7" @click="handleLogin">登录</el-button>
+          <el-button type="primary" style="color: #e7e7e7" @click="handleLogin" round>登录</el-button>
         </div>
       </el-form>
 
     </div>
+    <p class="copyright">版权所有 &copy; 2024 四川大学华西医院. 蜀ICP备2024095598号 - 工业和信息化部</p>
   </div>
 </template>
 
@@ -221,27 +217,42 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-image: url(../../assets/img/login-bg2.png);
+  background-image: url(../../assets/img/aa.png);
   background-size: cover;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.ms-title {
-  width: 100%;
-  line-height: 50px;
-  text-align: center;
-  font-size: 20px;
-  color: #fcfcfc;
-  border-bottom: 1px solid #ddd;
+.ms-left {
+  width: 450px;
+  height: 420px;
+  background-image: linear-gradient(330deg, rgba(225, 225, 225, 0.05) 0%, rgba(225, 225, 225, 0.05) 33.333%,rgba(114, 114, 114, 0.05) 33.333%, rgba(114, 114, 114, 0.05) 66.666%,rgba(52, 52, 52, 0.05) 66.666%, rgba(52, 52, 52, 0.05) 99.999%),linear-gradient(66deg, rgba(181, 181, 181, 0.05) 0%, rgba(181, 181, 181, 0.05) 33.333%,rgba(27, 27, 27, 0.05) 33.333%, rgba(27, 27, 27, 0.05) 66.666%,rgba(251, 251, 251, 0.05) 66.666%, rgba(251, 251, 251, 0.05) 99.999%),linear-gradient(225deg, rgba(98, 98, 98, 0.05) 0%, rgba(98, 98, 98, 0.05) 33.333%,rgba(222, 222, 222, 0.05) 33.333%, rgba(222, 222, 222, 0.05) 66.666%,rgba(228, 228, 228, 0.05) 66.666%, rgba(228, 228, 228, 0.05) 99.999%),linear-gradient(90deg, rgb(28, 20, 63),rgb(40, 160, 253));
+  background-position: right bottom;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: .8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 70px;
+  border-radius: 2px 0 0 2px;
+  .ms-left-txt {
+    color: #fff;
+    font-size: 26px;
+    line-height: 36px;
+    margin-bottom: 10px;
+    letter-spacing: 7px;
+  }
 }
 
 .ms-login {
-  position: absolute;
-  width: 500px;
-  border-radius: 5px;
-  background: rgba(161, 160, 160, 0.6);
+  height: 420px;
+  width: 380px;
+  border-radius: 0 2px 2px 0;
+  padding-top: 40px;
+  opacity: .92;
+  background: #fff;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   overflow: hidden;
 }
@@ -251,6 +262,7 @@ export default {
 }
 
 .login-btn {
+  margin-top: 40px;
   text-align: center;
 }
 
@@ -270,6 +282,15 @@ export default {
 .login-tips:hover {
   color: #e2e2e2;
   opacity: .6;
+}
+.copyright {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  text-align: center;
+  color: #999;
+  font-size: 12px;
 }
 
 ::v-deep .el-input__prefix {

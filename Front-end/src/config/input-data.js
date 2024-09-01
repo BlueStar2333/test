@@ -15,6 +15,9 @@ const inputData = [{
   label: '单行输入框',
   max: 10,
   min: 0,
+  regularError: false, // 正则验证正确与否
+  regularRule: '', // 正则校验规则
+  regularTips: '', // 正则校验提示
   content: '',
   isNecessary: false,
   checkValue: false
@@ -25,6 +28,9 @@ const inputData = [{
   max: 10,
   min: 0,
   content: '',
+  regularError: false, // 正则验证正确与否
+  regularRule: '', // 正则校验规则
+  regularTips: '', // 正则校验提示
   isNecessary: false,
   checkValue: false
 }, {
@@ -48,6 +54,7 @@ const inputData = [{
   uniqueName: '',
   label: '日期选择',
   content: '',
+  dateType: 'date',
   isNecessary: false,
   checkValue: false
 }, {
@@ -80,12 +87,16 @@ const inputData = [{
   uniqueName: '',
   label: '自增表格',
   header: ['列1', '列2'], // 表头名称
+  content: [['', '']], // 表每列值
+  regularError: [[false, false]], // 正则验证正确与否
   bodyForm: [{
     type: 0,
     uniqueName: '',
     label: '单行输入框',
     max: 10,
     min: 0,
+    regularRule: '', // 正则校验规则
+    regularTips: '', // 正则校验提示
     suggestion: '',
     content: ''
   }, {
@@ -94,10 +105,11 @@ const inputData = [{
     label: '单行输入框',
     max: 10,
     min: 0,
+    regularRule: '', // 正则校验规则
+    regularTips: '', // 正则校验提示
     suggestion: '',
     content: ''
-  }], // 表每列内容
-  content: [['', '']] // 表每列值
+  }] // 表每列内容
 }]
 
 export default inputData

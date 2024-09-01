@@ -3,7 +3,7 @@
 
     <div class="head">
       <div>
-        <el-input v-model="searchName" placeholder="按表名搜索" class="input-with-select">
+        <el-input v-model="searchName" placeholder="输入关键字搜索" class="input-with-select">
           <el-button slot="append" icon="el-icon-search" type="primary"></el-button>
         </el-input>
       </div>

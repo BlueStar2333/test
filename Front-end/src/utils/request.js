@@ -16,9 +16,9 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     if (store.getters.token) {
-      //让每个请求携带令牌
-      //['X-Token']是一个自定义的标头键
-      //根据情况修改
+      // 让每个请求携带令牌
+      // ['X-Token']是一个自定义的标头键
+      // 根据情况修改
       config.headers['x-token'] = getToken()
       config.headers['Content-Type'] = "application/json"
     }

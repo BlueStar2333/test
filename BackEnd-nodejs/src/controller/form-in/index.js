@@ -83,6 +83,28 @@ const inquireByData = (req, res) => {
 	})
 };
 
+const getNumData = (req, res) => {
+	$api.PostArg(req).then(data => {
+		const { form_id } = data;
+		let sql = `SELECT   
+						written_by,  
+						SUM(CASE WHEN state = 1 THEN 1 ELSE 0 END) AS await_count,  
+						SUM(CASE WHEN state = 2 THEN 1 ELSE 0 END) AS correct_count,  
+						SUM(CASE WHEN state = 3 THEN 1 ELSE 0 END) AS mistake_count,  
+						SUM(CASE WHEN state = 4 THEN 1 ELSE 0 END) AS uncompleted_count  
+					FROM   
+						fill_in  
+					WHERE   
+						form_id = ?
+					GROUP BY   
+						written_by;`
+		pool.query(sql, [form_id], (error, result) => {
+			if (error) throw error;
+			console.log(result,1452)
+			$api.ReturnJson(res, { code: YES, msg: "查询成功", data: { result } });
+		});
+	})
+};
 const addData = (req, res) => {
 	$api.PostArg(req).then(data => {
 		const { form_id, form_name, written_by, written_account, user_id, content, verify, verify_correct_req } = data;
@@ -92,34 +114,34 @@ const addData = (req, res) => {
 		let state = 1
 		let checkData = null
 		// 上线后开放此代码，测试关闭
-		// pool.query('SELECT * FROM fill_in WHERE written_account = ? AND verify=?', [written_account, verify], (error, result) => {
-		// 	if (error) throw error;
-		// 	if(result.length === 1) {
-		// 		$api.ReturnJson(res, { code: 0, msg: "你已录入过此数据，请录入其他数据" });
-		// 		return
-		// 	}
-		// })
-		pool.query('SELECT * FROM fill_in WHERE verify = ?', [verify], (error, result) => {
+		pool.query('SELECT * FROM fill_in WHERE written_account = ? AND verify=?', [written_account, verify], (error, result) => {
 			if (error) throw error;
-			let sql = "INSERT INTO fill_in(form_id, form_name, written_by, written_account, user_id, date, state, content, verify, verify_correct) VALUES (?,?,?,?,?,?,?,?,?,?)";
-			if(result.length === 2) {
-				$api.ReturnJson(res, { code: 0, msg: "已存在两条相同数据，请录入其他数据" });
+			if(result.length === 1) {
+				$api.ReturnJson(res, { code: 0, msg: "你已录入过此数据，请录入其他数据" });
 				return
-			} else if(result.length === 1) {
-				checkData = checkAll( result[0].content, content, JSON.parse(verify_correct)) // 校验所有值
-				state = checkData.state
-				correct = JSON.stringify(checkData.verify_correct)
-				// 确保两条数据校验值一致
-				pool.query("UPDATE fill_in SET state=?, verify_correct=? WHERE id=?", [state, correct, result[0].id], (error, result) => {
-					if (error) throw error;
-				});
 			}
-			pool.query(sql, [form_id, form_name, written_by, written_account, user_id, date, state, content, verify, correct], (error, result) => {
+			pool.query('SELECT * FROM fill_in WHERE verify = ?', [verify], (error, result) => {
 				if (error) throw error;
-				// 判断是否查询到信息
-				$api.ReturnJson(res, { code: 1, msg: "新增成功" });
+				let sql = "INSERT INTO fill_in(form_id, form_name, written_by, written_account, user_id, date, state, content, verify, verify_correct) VALUES (?,?,?,?,?,?,?,?,?,?)";
+				if(result.length === 2) {
+					$api.ReturnJson(res, { code: 0, msg: "已存在两条相同数据，请录入其他数据" });
+					return
+				} else if(result.length === 1) {
+					checkData = checkAll( result[0].content, content, JSON.parse(verify_correct)) // 校验所有值
+					state = checkData.state
+					correct = JSON.stringify(checkData.verify_correct)
+					// 确保两条数据校验值一致
+					pool.query("UPDATE fill_in SET state=?, verify_correct=? WHERE id=?", [state, correct, result[0].id], (error, result) => {
+						if (error) throw error;
+					});
+				}
+				pool.query(sql, [form_id, form_name, written_by, written_account, user_id, date, state, content, verify, correct], (error, result) => {
+					if (error) throw error;
+					// 判断是否查询到信息
+					$api.ReturnJson(res, { code: 1, msg: "新增成功" });
+				});
 			});
-		});
+		})
 	})
 };
 const editData = (req, res) => {
@@ -131,53 +153,23 @@ const editData = (req, res) => {
 		let checkData = null
 		let sql = "UPDATE fill_in SET content=?, user_id=?, verify=?, verify_correct=?, state=? WHERE id=?";
 		// 上线后开放此代码，测试关闭
-		// pool.query('SELECT * FROM fill_in WHERE written_account = ? AND verify=?', [written_account, verify], (error, result) => {
-		// 	if (error) throw error;
-		// 	if(result.length === 1) {
-		// 		$api.ReturnJson(res, { code: 0, msg: "你已录入过此数据，请录入其他数据" });
-		// 		return
-		// 	}
-		// })
-		pool.query('SELECT * FROM fill_in WHERE id = ?', [id], (error, result) => {
+		pool.query('SELECT * FROM fill_in WHERE written_account = ? AND verify=? AND id != ?', [written_account, verify, id], (error, result) => {
 			if (error) throw error;
-			if(verify === oldVerify) { // 校验项的值不变
-				pool.query('SELECT * FROM fill_in WHERE verify = ? AND id != ?', [verify, id], (error, resultT) => {
-					if (error) throw error;
-					if(resultT.length === 1) {
-						checkData = checkAll( resultT[0].content, content, JSON.parse(verify_correct)) // 校验所有值
-						correct = JSON.stringify(checkData.verify_correct)
-						state = checkData.state
-						// 确保两条数据校验值一致
-						pool.query("UPDATE fill_in SET verify_correct=?, state=? WHERE id=?", [correct, state, resultT[0].id], (error, resultTW) => {
-							if (error) throw error;
-						});
-					}
-					pool.query(sql, [content, user_id, verify, correct, state, id], (error, result2) => {
-					  if (error) throw error;
-					  $api.ReturnJson(res, { code: 1, msg: "修改成功", data: null });
-					});
-				})
-			} else if(verify !== oldVerify) { // 校验项的值改变
-				pool.query('SELECT * FROM fill_in WHERE verify = ? AND id != ?', [oldVerify, id], (error, resultT) => {
-					if (error) throw error;
-					pool.query('SELECT * FROM fill_in WHERE verify = ? AND id != ?', [verify, id], (error, resultTW) => {
+			if(result.length === 1) {
+				$api.ReturnJson(res, { code: 0, msg: "你已录入过此数据，请录入其他数据" });
+				return
+			}
+			pool.query('SELECT * FROM fill_in WHERE id = ?', [id], (error, result) => {
+				if (error) throw error;
+				if(verify === oldVerify) { // 校验项的值不变
+					pool.query('SELECT * FROM fill_in WHERE verify = ? AND id != ?', [verify, id], (error, resultT) => {
 						if (error) throw error;
-						if(resultT.length === 2 || resultTW.length === 2) {
-							$api.ReturnJson(res, { code: 0, msg: "已存在两条相同数据，请录入其他数据" });
-							return
-						} else if(resultT.length === 1) {
-							correct = verify_correct
-							// 确保两条数据校验值一致
-							pool.query("UPDATE fill_in SET verify_correct=?, state=? WHERE id=?", [verify_correct, 1, resultT[0].id], (error, resultTW) => {
-								if (error) throw error;
-							});
-						}
-						if(resultTW.length === 1) {
-							checkData = checkAll( resultTW[0].content, content, JSON.parse(verify_correct)) // 校验所有值
+						if(resultT.length === 1) {
+							checkData = checkAll( resultT[0].content, content, JSON.parse(verify_correct)) // 校验所有值
 							correct = JSON.stringify(checkData.verify_correct)
 							state = checkData.state
 							// 确保两条数据校验值一致
-							pool.query("UPDATE fill_in SET verify_correct=?, state=? WHERE id=?", [correct, state, resultTW[0].id], (error, res) => {
+							pool.query("UPDATE fill_in SET verify_correct=?, state=? WHERE id=?", [correct, state, resultT[0].id], (error, resultTW) => {
 								if (error) throw error;
 							});
 						}
@@ -186,9 +178,39 @@ const editData = (req, res) => {
 						  $api.ReturnJson(res, { code: 1, msg: "修改成功", data: null });
 						});
 					})
-				})
-			}
-		});
+				} else if(verify !== oldVerify) { // 校验项的值改变
+					pool.query('SELECT * FROM fill_in WHERE verify = ? AND id != ?', [oldVerify, id], (error, resultT) => {
+						if (error) throw error;
+						pool.query('SELECT * FROM fill_in WHERE verify = ? AND id != ?', [verify, id], (error, resultTW) => {
+							if (error) throw error;
+							if(resultT.length === 2 || resultTW.length === 2) {
+								$api.ReturnJson(res, { code: 0, msg: "已存在两条相同数据，请录入其他数据" });
+								return
+							} else if(resultT.length === 1) {
+								correct = verify_correct
+								// 确保两条数据校验值一致
+								pool.query("UPDATE fill_in SET verify_correct=?, state=? WHERE id=?", [verify_correct, 1, resultT[0].id], (error, resultTW) => {
+									if (error) throw error;
+								});
+							}
+							if(resultTW.length === 1) {
+								checkData = checkAll( resultTW[0].content, content, JSON.parse(verify_correct)) // 校验所有值
+								correct = JSON.stringify(checkData.verify_correct)
+								state = checkData.state
+								// 确保两条数据校验值一致
+								pool.query("UPDATE fill_in SET verify_correct=?, state=? WHERE id=?", [correct, state, resultTW[0].id], (error, res) => {
+									if (error) throw error;
+								});
+							}
+							pool.query(sql, [content, user_id, verify, correct, state, id], (error, result2) => {
+							  if (error) throw error;
+							  $api.ReturnJson(res, { code: 1, msg: "修改成功", data: null });
+							});
+						})
+					})
+				}
+			});
+		})
 	})
 };
 const deleteData = (req, res) => {
@@ -214,6 +236,7 @@ const deleteData = (req, res) => {
 
 module.exports = {
 	inquireByData,
+	getNumData,
 	deleteData,
 	addData,
 	editData

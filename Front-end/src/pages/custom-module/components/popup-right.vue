@@ -10,21 +10,34 @@
           <el-form-item label="标签">
             <el-input v-model="componentData.label" />
           </el-form-item>
+          <el-form-item v-if="inputShow" label="正则规则">
+            <el-input v-model="componentData.regularRule" placeholder="请输入正则匹配规则" />
+          </el-form-item>
+          <el-form-item v-if="inputShow" label="错误提示">
+            <el-input v-model="componentData.regularTips" placeholder="正则验证错误时给出提示" />
+          </el-form-item>
           <el-form-item v-if="suggestionShow" label="建议内容">
             <el-input v-model="componentData.suggestion" placeholder="每条建议,隔开" />
           </el-form-item>
           <el-form-item v-if="!radioShow && !dateShow && !tableShow" label="预置内容">
-            <el-autocomplete v-if="suggestionShow" v-model="componentData.content" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" />
-            <el-input v-else v-model="componentData.content" />
+            <div class="forms">
+              <el-autocomplete v-if="suggestionShow" v-model="componentData.content" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" />
+              <el-input v-else-if="inputShow" v-model="componentData.content" :class="{ 'verify-error': componentData.regularError }" @input="validateInput(componentData.regularRule, componentData.content)" placeholder="可验证正则规则是否正确"/>
+              <el-input v-else v-model="componentData.content" placeholder="请输入内容"/>
+              <span v-if="componentData.regularError" class="regular-tips">{{ componentData.regularTips }}</span>
+            </div>
           </el-form-item>
           <el-form-item v-if="dateShow" label="时间选择">
-            <el-date-picker v-model="componentData.content" type="date" placeholder="选择日期" style="width: 100%" />
+            <el-date-picker v-model="componentData.content" :type="componentData.dateType" placeholder="选择日期" style="width: 100%" />
           </el-form-item>
           <el-form-item v-if="numShow || sliderShow" label="最小范围">
             <el-input-number v-model="componentData.min" :min="0" :max="10000" size="small" label="描述文字" />
           </el-form-item>
           <el-form-item v-if="!radioShow && !dateShow && !suggestionShow && !tableShow" label="最大范围">
             <el-input-number v-model="componentData.max" :min="componentData.min" :max="10000" size="small" label="描述文字" />
+          </el-form-item>
+          <el-form-item v-if="dateShow" label="时间类型">
+            <el-switch v-model="componentData.dateType" active-text="datetime型" inactive-text="date型" active-value="datetime" inactive-value="date" inactive-color="#67C23A"></el-switch>
           </el-form-item>
           <el-form-item v-if="!tableShow && !sliderShow" label="必填项">
             <el-switch v-model="componentData.isNecessary" />
@@ -80,7 +93,7 @@
       :before-close="handleClose"
       append-to-body="true"
     >
-      <ColumnForm v-if="dialogVisible" :component-data="componentData" :column-idx="columnIdx" ref="ColumnForm"/>
+      <ColumnForm v-if="dialogVisible" ref="ColumnForm" :component-data="componentData" :column-idx="columnIdx"/>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="sureColumn">确 定</el-button>
       </span>
@@ -126,6 +139,9 @@ export default {
     }
   },
   computed: {
+    inputShow() {
+      return this.componentData.type === 0 || this.componentData.type === 1
+    },
     radioShow() {
       return this.componentData.type === 2 || this.componentData.type === 3
     },
@@ -161,6 +177,17 @@ export default {
   methods: {
     init(data) {
     },
+    validateInput(rule, txt) {
+      console.log(this.componentData)
+      const regex = new RegExp(rule)
+      if (!regex.test(txt)) {
+        this.componentData['regularError'] = true
+        console.log(11111)
+      } else {
+        this.componentData['regularError'] = false
+        console.log('正确')
+      }
+    },
     changeSwitch(bool) {
       if (bool) {
         this.diyForm.check_number++
@@ -189,11 +216,14 @@ export default {
     },
     sureColumn() {
       const aColumnForm = this.$refs.ColumnForm.formData
-      console.log(this.componentData.bodyForm[this.columnIdx],this.$refs.ColumnForm.formData, 996)
+      console.log(this.componentData.bodyForm[this.columnIdx], this.$refs.ColumnForm.formData, 996)
       this.componentData.bodyForm[this.columnIdx].type = aColumnForm.type
       this.componentData.bodyForm[this.columnIdx].label = this.typeMap[aColumnForm.type]
       this.componentData.bodyForm[this.columnIdx].max = aColumnForm.max
       this.componentData.bodyForm[this.columnIdx].min = aColumnForm.min
+      this.componentData.bodyForm[this.columnIdx].dateType = aColumnForm.dateType
+      this.componentData.bodyForm[this.columnIdx].regularRule = aColumnForm.regularRule
+      this.componentData.bodyForm[this.columnIdx].regularTips = aColumnForm.regularTips
       this.componentData.bodyForm[this.columnIdx].suggestion = aColumnForm.suggestion
       this.dialogVisible = false
     },
@@ -201,12 +231,16 @@ export default {
       const IDX = this.componentData.header.length + 1
       this.componentData.header.push('列' + IDX)
       this.componentData.content[0].push('')
+      this.componentData.regularError[0].push(false)
       this.componentData.bodyForm.push({
         type: 0,
         uniqueName: '',
         label: '单行输入框',
         max: 10,
         min: 0,
+        regularRule: '', // 正则校验规则
+        regularTips: '', // 正则校验提示
+        dateType: 'date',
         suggestion: '',
         content: ''
       })
@@ -222,6 +256,7 @@ export default {
       this.componentData.header.splice(index, 1)
       this.componentData.bodyForm.splice(index, 1)
       this.componentData.content[0].splice(index, 1)
+      this.componentData.regularError[0].splice(index, 1)
     },
     querySearch(queryString, cb) {
       const oData = this.componentData.suggestion.split(',')
@@ -256,6 +291,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .forms {
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .verify-error {
+    ::v-deep * {
+      border-color: red !important;
+    }
+  }
+  .regular-tips {
+    color: #ff4949;
+    font-size: 12px;
+    line-height: 1;
+    padding-top: 4px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
 .right {
   flex: 0 0 300px;
   border-left: 1px dotted #999;

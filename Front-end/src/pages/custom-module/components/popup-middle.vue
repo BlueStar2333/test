@@ -26,7 +26,7 @@
           <el-checkbox v-for="(itemB, idx) in itemA.select" :key="idx" :label="itemB">{{ itemB }}</el-checkbox>
         </el-checkbox-group>
         <!--日期选择-->
-        <el-date-picker v-if="itemA.type === 4" v-model="formData[index].content" class="body-input-content" type="date" size="small" placeholder="选择日期" />
+        <el-date-picker v-if="itemA.type === 4" v-model="formData[index].content" class="body-input-content" :type="formData[index].dateType" size="small" placeholder="选择日期" />
         <!--数量选择-->
         <el-input-number v-if="itemA.type === 5" v-model="formData[index].content" :min="formData[index].min" :max="formData[index].max" label="数" />
         <!--滑动条-->
@@ -201,6 +201,20 @@ export default {
       }
       return ret
     },
+    addVerifyContent(content) {
+      const verify_correct = []
+      content.forEach((itemOne, indexOne) => {
+        if (itemOne.type === 20) {
+          verify_correct[indexOne] = []
+          itemOne.content.forEach((itemTwo, indexTwo) => {
+            verify_correct[indexOne][indexTwo] = new Array(itemTwo.length).fill(false)
+          })
+        } else {
+          verify_correct[indexOne] = false
+        }
+      })
+      return verify_correct
+    },
     save() {
       const self = this
       this.$eventBus.$emit('getDiyData', function(form) {
@@ -210,6 +224,7 @@ export default {
       if (this.checkForm()) {
         return
       }
+      this.diyForm['verify_correct'] = JSON.stringify(this.addVerifyContent(this.formData))
       this.diyForm.content = JSON.stringify(this.formData)
       this.diyForm.creator = this.$store.state.user.userInfo.name
       console.log(this.diyForm, 635)

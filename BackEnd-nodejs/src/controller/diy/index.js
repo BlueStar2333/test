@@ -10,9 +10,9 @@ const { pool, YES } =require("@/utils");
  */
 
 const CoSaveDiyForm = (req, res) => {
-  const { creator, table_name, description, content, check_number } = req.validData; // 验证后数据
-  let sql = "INSERT INTO form_list(creator, table_name, description, content, check_number, creat_date) VALUES (?,?,?,?,?,?)";
-  pool.query(sql, [creator, table_name, description, content, check_number, new Date()], (error, result2) => {
+  const { creator, table_name, description, content, verify_correct, check_number } = req.validData; // 验证后数据
+  let sql = "INSERT INTO form_list(creator, table_name, description, content, verify_correct, check_number, creat_date) VALUES (?,?,?,?,?,?,?)";
+  pool.query(sql, [creator, table_name, description, content, verify_correct, check_number, new Date()], (error, result2) => {
     if (error) throw error;
     $api.ReturnJson(res, {
       code: 1,

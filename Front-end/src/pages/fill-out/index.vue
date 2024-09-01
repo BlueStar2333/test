@@ -36,6 +36,9 @@
       <el-tooltip v-if="this.$store.state.user.userInfo.power === 1" class="item" effect="dark" content="导出" placement="top">
         <el-button class="add-button" size="mini" type="primary" icon="el-icon-folder-opened" plain @click="exportExcel" />
       </el-tooltip>
+      <el-tooltip v-if="this.$store.state.user.userInfo.power === 1" class="item" effect="dark" content="统计" placement="top">
+        <el-button class="add-button statistics-button" size="mini" type="primary" icon="el-icon-coin" plain @click="openStatistics" />
+      </el-tooltip>
     </div>
 
     <el-table
@@ -107,6 +110,23 @@
     >
       <Preview v-if="fillInShow" :preview-data="fillInForm" @close="searchByDate" />
     </el-dialog>
+
+    <el-drawer
+      title="填报数量统计"
+      :visible.sync="drawer"
+      direction="rtl">
+      <el-table
+        :data="drawerData"
+        style="width: 100%">
+        <el-table-column prop="written_by" label="姓名"></el-table-column>
+        <el-table-column :label="tableName + '填报总数:' + tableData.length">
+          <el-table-column prop="await_count" label="待校验"></el-table-column>
+          <el-table-column prop="correct_count" label="正确"></el-table-column>
+          <el-table-column prop="mistake_count" label="错误"></el-table-column>
+          <el-table-column prop="uncompleted_count" label="未校验"></el-table-column>
+        </el-table-column>
+      </el-table>
+    </el-drawer>
   </div>
 </template>
 
@@ -115,7 +135,7 @@
 import Pagination from '@/components/Pagination'
 import FileSaver from 'file-saver'
 import XLSX from 'xlsx'
-import { getStaffContentTable, deleteContentTable } from '@/api/fillout'
+import { getStaffContentTable, deleteContentTable, getDrawerNumData } from '@/api/fillout'
 import Preview from './components/preview'
 import { getCustomTable } from '@/api/custom-module'
 
@@ -128,12 +148,14 @@ export default {
     return {
       tableName: '',
       tableLoading: false,
+      drawer: false,
       formList: [],
       searchDate: '',
       searchState: '',
       searchId: '',
       searchIds: [],
       tableData: [],
+      drawerData: [],
       fillInShow: false,
       fillInForm: '',
       diyTable: '',
@@ -168,6 +190,24 @@ export default {
         setTimeout(() => {
           self.tableLoading = false
         }, 600)
+      })
+    },
+    openStatistics() {
+      if (!this.diyTable.id) {
+        this.$message({
+          type: 'info',
+          message: '请先选择表单'
+        })
+        return
+      }
+      const data = {
+        form_id: this.diyTable.id
+      }
+      getDrawerNumData(data).then(res => {
+        if (res.code === 1) {
+          this.drawerData = res.data.result
+          this.drawer = true
+        }
       })
     },
     searchByDate() {
@@ -359,6 +399,9 @@ export default {
   border: 1px solid #bebebe;
   font-size: 12px;
   color: #969696;
+}
+.statistics-button {
+  right: 76px;
 }
 
 .person-icon {
