@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
+import { getToken, setToken } from '@/utils/auth'
 
 // const url = 'http://localhost:3100/api/'
 const url = 'http://124.71.103.53:3100/api/'
@@ -16,11 +16,22 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     if (store.getters.token) {
+      // axios({
+      //   url: url + 'admin/refreshToken',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     'x-token': getToken()
+      //   },
+      //   method: 'post'
+      // }).then(res => {
+      //   store.commit('SET_TOKEN', res.data.data.token)
+      //   setToken(res.data.data.token)
+      // })
       // 让每个请求携带令牌
       // ['X-Token']是一个自定义的标头键
       // 根据情况修改
       config.headers['x-token'] = getToken()
-      config.headers['Content-Type'] = "application/json"
+      config.headers['Content-Type'] = 'application/json'
     }
     return config
   },
@@ -72,7 +83,7 @@ service.interceptors.response.use(
     }
   },
   error => {
-    // console.log('err' + error)
+    console.log('err' + error.code)
     Message({
       message: error.message,
       type: 'error',

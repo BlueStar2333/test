@@ -68,7 +68,14 @@ const CoRegister = (req, res) => {
   });
 };
 
+
+const refreshToken = (req, res) => {
+  token = req.headers['x-token']
+  const newToken = global.$api.refreshT(token)
+  $api.ReturnJson(res, { code:1,msg: "成功", data: { token: newToken } });
+};
 module.exports = {
   CoLogin, // 登录
   CoRegister, // 注册
+  refreshToken
 };

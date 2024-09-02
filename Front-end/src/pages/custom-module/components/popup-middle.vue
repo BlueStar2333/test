@@ -166,8 +166,8 @@ export default {
       // console.log(oldValue.type,this.formData[oldIndex].type)
     },
     deleteInput(index, num) {
+      console.log(this.formData)
       this.$eventBus.$emit('selectInput', null)
-      this.$eventBus.$emit('changeNum', 1)
       this.formData.splice(index, num)
     },
     previewTable() {
@@ -203,6 +203,7 @@ export default {
     },
     addVerifyContent(content) {
       const verify_correct = []
+      console.log(content)
       content.forEach((itemOne, indexOne) => {
         if (itemOne.type === 20) {
           verify_correct[indexOne] = []
@@ -215,12 +216,23 @@ export default {
       })
       return verify_correct
     },
+    checkNum(content) {
+      let checkNum = 0
+      console.log(content)
+      content.forEach((itemOne, indexOne) => {
+        if (itemOne.checkValue) {
+          checkNum++
+        }
+      })
+      return checkNum
+    },
     save() {
       const self = this
       this.$eventBus.$emit('getDiyData', function(form) {
         self.diyForm = form
       })
       // console.log(this.$store.state.user.userInfo,456)
+      this.diyForm.check_number = this.checkNum(this.formData)
       if (this.checkForm()) {
         return
       }
@@ -245,6 +257,7 @@ export default {
       this.$eventBus.$emit('getDiyData', function(form) {
         self.diyForm = form
       })
+      this.diyForm.check_number = this.checkNum(this.formData)
       if (this.checkForm()) {
         return
       }

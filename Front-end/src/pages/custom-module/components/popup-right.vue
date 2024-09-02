@@ -165,7 +165,6 @@ export default {
     this.$eventBus.$on('selectInput', this.selectInput)
     this.$eventBus.$on('getDiyData', this.getDiyData)
     this.$eventBus.$on('changeTab', this.changeTab)
-    this.$eventBus.$on('changeNum', this.changeNum)
     if (this.editForm) {
       this.diyForm = {
         table_name: this.editForm.table_name,
@@ -198,9 +197,6 @@ export default {
     },
     changeTab(tab) {
       this.activeName = tab
-    },
-    changeNum(num) {
-      this.diyForm.check_number = num
     },
     selectInput(data) {
       this.changeTab('first')
@@ -281,7 +277,7 @@ export default {
         })
         return
       }
-      this.componentData.content.splice(index, 1)
+      this.componentData.select.splice(index, 1)
     },
     handleClose(done) {
       done()

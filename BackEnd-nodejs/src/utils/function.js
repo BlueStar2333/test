@@ -10,8 +10,19 @@
   const jwt = require('jsonwebtoken');
   const secretKey = 'huaxiyiyuandiyform@2024@2333';
 
-
+  
 function generateToken(data = { userId: 'user_id' }) {
+  return jwt.sign(data, secretKey, { expiresIn: '1h' });
+}
+function refreshT(token) {
+  let data = ''
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) return res.status(403).json({ message: 'Failed to refresh the token' });
+    data = {
+      account: decoded.account,
+      password: decoded.password
+    }
+  })
   return jwt.sign(data, secretKey, { expiresIn: '1h' });
 }
 
@@ -237,6 +248,7 @@ function authToken(req, res, next) {
     SaveValidData, // 保存验证对象数据
     convertToTimeZone,
     generateToken,
+    refreshT,
     authToken
   };
 })(global);
