@@ -28,6 +28,7 @@ function refreshT(token) {
 
 function authToken(req, res, next) {
   const token = req.headers['x-token'];
+  console.log(req.headers['x-token'])
   if (!token) return res.status(401).json({ message: 'Unauthorized' });
  
   jwt.verify(token, secretKey, (err, decoded) => {

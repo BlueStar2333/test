@@ -16,20 +16,20 @@ const service = axios.create({
 service.interceptors.request.use(
   config => {
     if (store.getters.token) {
-      // axios({
-      //   url: url + 'admin/refreshToken',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'x-token': getToken()
-      //   },
-      //   method: 'post'
-      // }).then(res => {
-      //   store.commit('SET_TOKEN', res.data.data.token)
-      //   setToken(res.data.data.token)
-      // })
+      axios({
+        url: url + 'admin/refreshToken',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-token': getToken()
+        },
+        method: 'post'
+      }).then(res => {
+        store.commit('SET_TOKEN', res.data.data.token)
+        setToken(res.data.data.token)
+        // console.log(res.data.data.token)
+      })
       // 让每个请求携带令牌
-      // ['X-Token']是一个自定义的标头键
-      // 根据情况修改
+      // ['x-token']是一个自定义的标头键
       config.headers['x-token'] = getToken()
       config.headers['Content-Type'] = 'application/json'
     }
