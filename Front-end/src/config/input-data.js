@@ -87,6 +87,7 @@ const inputData = [{
   uniqueName: '',
   label: '自增表格',
   header: ['列1', '列2'], // 表头名称
+  headerLabel: ['列1', '列2'], // 用于设置v-for循环数据
   content: [['', '']], // 表每列值
   regularError: [[false, false]], // 正则验证正确与否
   bodyForm: [{

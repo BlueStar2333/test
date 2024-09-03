@@ -60,9 +60,9 @@
               <el-link :underline="false" type="primary" @click="componentData.content = []">重设选中项</el-link>
             </div>
           </div>
-          <draggable v-show="tableShow" :v-model="list" animation="500" class="setting" @end="onEnd">
+          <draggable v-show="tableShow" animation="500" class="setting" @end="onEnd">
             <el-divider>自增表设置</el-divider>
-            <div v-for="(item,index) in componentData.header" :key="index" class="setting-main">
+            <div v-for="(item,index) in componentData.headerLabel" :key="item" class="setting-main">
               <span class="setting-main-span">列{{ index+1 }}：</span>
               <el-input v-model="componentData.header[index]" size="mini" placeholder="请输入内容" style="width: 130px" />
               <el-link class="setting-setting-btn" icon="el-icon-setting" @click="tableSetting(index)"/>
@@ -91,7 +91,7 @@
       :visible.sync="dialogVisible"
       width="30%"
       :before-close="handleClose"
-      append-to-body="true"
+      :append-to-body="true"
     >
       <ColumnForm v-if="dialogVisible" ref="ColumnForm" :component-data="componentData" :column-idx="columnIdx"/>
       <span slot="footer" class="dialog-footer">
@@ -178,25 +178,60 @@ export default {
     init(data) {
     },
     onEnd(evt) {
-      console.log('Drag ended:', evt)
-
       const oldIdx = evt.oldIndex - 1
-      const newIdx = evt.oldIndex - 1
-      // 如果'b'和'c'都在数组中
+      const newIdx = evt.newIndex - 1
+
+      // this.componentData.header = this.swapElements(this.componentData.header, newIdx, oldIdx)
+      // this.componentData.bodyForm = this.swapElements(this.componentData.bodyForm, newIdx, oldIdx)
+      // this.componentData.content[0] = this.swapElements(this.componentData.content[0], newIdx, oldIdx)
+
+      console.log('Drag ended:',oldIdx,newIdx,this.componentData.header, evt)
       if (oldIdx !== -1 && newIdx !== -1) {
         // 移除'b'
-        const headElement = this.componentData.header.splice(oldIdx, 1)[0]; // 移除并返回被移除的元素
+        const oldValH = this.componentData.header[oldIdx] // 移除并返回被移除的元素
+        const oldValHL = this.componentData.headerLabel[oldIdx] // 移除并返回被移除的元素
+        const oldValB = this.componentData.bodyForm[oldIdx] // 移除并返回被移除的元素
+        const oldValC = this.componentData.content[0][oldIdx] // 移除并返回被移除的元素
+
+        if (newIdx < oldIdx) {
+          this.componentData.header.splice(oldIdx, 1)
+          this.componentData.header.splice(newIdx, 0, oldValH)
+          this.componentData.headerLabel.splice(oldIdx, 1)
+          this.componentData.headerLabel.splice(newIdx, 0, oldValHL)
+          this.componentData.bodyForm.splice(oldIdx, 1)
+          this.componentData.bodyForm.splice(newIdx, 0, oldValB)
+          this.componentData.content[0].splice(oldIdx, 1)
+          this.componentData.content[0].splice(newIdx, 0, oldValC)
+        } else {
+          console.log('Drag ended:', oldValH)
+          this.componentData.header.splice(evt.newIndex, 0, oldValH)
+          this.componentData.header.splice(oldIdx, 1)
+          this.componentData.headerLabel.splice(evt.newIndex, 0, oldValHL)
+          this.componentData.headerLabel.splice(oldIdx, 1)
+          this.componentData.bodyForm.splice(evt.newIndex, 0, oldValB)
+          this.componentData.bodyForm.splice(oldIdx, 1)
+          this.componentData.content[0].splice(evt.newIndex, 0, oldValC)
+          this.componentData.content[0].splice(oldIdx, 1)
+          console.log(this.componentData.header)
+        }
+        // this.componentData.header[newIdx] = oldValH
+        // this.componentData.bodyForm.splice(newIdx, 1, oldValB)
+        // this.componentData.content[0].splice(newIdx, 1, oldValB)
 
         // 如果'c'的索引在'b'之前（这是自然情况，但检查是个好习惯）
-        if (newIdx < oldIdx) {
-          // 在'c'之后插入'b'
-          this.componentData.header.splice(newIdx + 1, 0, headElement);
-        } else {
-          // 如果'c'的索引在'b'之后或相等（理论上不应该发生，除非数组被修改过），
-          // 你可能需要根据实际情况调整逻辑，但在这个例子中，我们假设'c'在'b'之前
-          // 这里只是为了完整性而添加
-          console.log("Unexpected index order for 'c' and 'b'");
-        }
+        // if (newIdx < oldIdx) {
+        //   // 在'c'之后插入'b'
+        //   this.componentData.header.splice(newIdx + 1, 0, headElement)
+        //   console.log(this.componentData.header)
+        //   this.componentData.bodyForm.splice(newIdx + 1, 0, bodyElement)
+        //   this.componentData.content[0].splice(newIdx + 1, 0, contentElement)
+        // } else {
+        //   this.componentData.header.splice(oldIdx + 1, 0, headElement)
+        //   console.log(this.componentData.header)
+        //   this.componentData.bodyForm.splice(oldIdx + 1, 0, bodyElement)
+        //   this.componentData.content[0].splice(oldIdx + 1, 0, contentElement)
+        //   console.log("Unexpected index order for 'c' and 'b'")
+        // }
       }
     },
     validateInput(rule, txt) {
@@ -249,6 +284,7 @@ export default {
     addTableColumn() {
       const IDX = this.componentData.header.length + 1
       this.componentData.header.push('列' + IDX)
+      this.componentData.headerLabel.push(new Date().toString() + IDX)
       this.componentData.content[0].push('')
       this.componentData.regularError[0].push(false)
       this.componentData.bodyForm.push({
@@ -276,6 +312,7 @@ export default {
       this.componentData.bodyForm.splice(index, 1)
       this.componentData.content[0].splice(index, 1)
       this.componentData.regularError[0].splice(index, 1)
+      this.componentData.headerLabel.splice(index, 1)
     },
     querySearch(queryString, cb) {
       const oData = this.componentData.suggestion.split(',')
