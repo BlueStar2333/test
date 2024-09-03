@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <transition name="popup-show">
-      <Popup v-if="popupShow" :edit-form="editForm" @onClose="onClose" @getData="getData"/>
+      <Popup v-if="popupShow" :edit-form="editForm" :page-status="pageStatus" @onClose="onClose" @getData="getData"/>
     </transition>
 
     <div class="head">
@@ -175,6 +175,7 @@ export default {
         permissions: [],
         selectOption: []
       },
+      pageStatus: 'add',
       editForm: null,
       diyForm: [],
       popupShow: false,
@@ -239,6 +240,7 @@ export default {
 
     addDiyTable() {
       this.editForm = null
+      this.pageStatus = 'add'
       this.popupShow = true
     },
 
@@ -252,6 +254,7 @@ export default {
         return
       }
       this.editForm = deepCopy(rowData)
+      this.pageStatus = 'edit'
       this.popupShow = true
     },
 

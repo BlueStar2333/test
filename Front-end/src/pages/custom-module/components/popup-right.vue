@@ -60,7 +60,7 @@
               <el-link :underline="false" type="primary" @click="componentData.content = []">重设选中项</el-link>
             </div>
           </div>
-          <div v-show="tableShow" class="setting">
+          <draggable v-show="tableShow" :v-model="list" animation="500" class="setting" @end="onEnd">
             <el-divider>自增表设置</el-divider>
             <div v-for="(item,index) in componentData.header" :key="index" class="setting-main">
               <span class="setting-main-span">列{{ index+1 }}：</span>
@@ -68,9 +68,9 @@
               <el-link class="setting-setting-btn" icon="el-icon-setting" @click="tableSetting(index)"/>
               <a class="setting-delete-btn" @click="decreaseTableColumn(index)">-</a>
             </div>
-            <div class="setting-link">
-              <el-link :underline="false" type="primary" @click="addTableColumn()">增加列</el-link>
-            </div>
+          </draggable>
+          <div class="setting-link">
+            <el-link :underline="false" type="primary" @click="addTableColumn()">增加列</el-link>
           </div>
         </el-form>
       </el-tab-pane>
@@ -103,9 +103,10 @@
 
 <script>
 import ColumnForm from './column-form.vue'
+import draggable from 'vuedraggable'
 export default {
   name: 'PopupRight',
-  components: { ColumnForm },
+  components: { ColumnForm, draggable },
   props: {
     editForm: {
       type: Object,
@@ -175,6 +176,28 @@ export default {
   },
   methods: {
     init(data) {
+    },
+    onEnd(evt) {
+      console.log('Drag ended:', evt)
+
+      const oldIdx = evt.oldIndex - 1
+      const newIdx = evt.oldIndex - 1
+      // 如果'b'和'c'都在数组中
+      if (oldIdx !== -1 && newIdx !== -1) {
+        // 移除'b'
+        const headElement = this.componentData.header.splice(oldIdx, 1)[0]; // 移除并返回被移除的元素
+
+        // 如果'c'的索引在'b'之前（这是自然情况，但检查是个好习惯）
+        if (newIdx < oldIdx) {
+          // 在'c'之后插入'b'
+          this.componentData.header.splice(newIdx + 1, 0, headElement);
+        } else {
+          // 如果'c'的索引在'b'之后或相等（理论上不应该发生，除非数组被修改过），
+          // 你可能需要根据实际情况调整逻辑，但在这个例子中，我们假设'c'在'b'之前
+          // 这里只是为了完整性而添加
+          console.log("Unexpected index order for 'c' and 'b'");
+        }
+      }
     },
     validateInput(rule, txt) {
       console.log(this.componentData)

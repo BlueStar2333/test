@@ -3,8 +3,9 @@
     <div class="head">
       <el-link class="head-link" :underline="false" type="primary" icon="el-icon-delete" @click="deleteInput(1, formData.length)">清空</el-link>
       <el-link class="head-link" :underline="false" type="primary" icon="el-icon-view" @click="previewTable">预览</el-link>
-      <el-link v-if="editForm" class="head-link" :underline="false" type="primary" icon="el-icon-document-checked" @click="edit">确认修改</el-link>
-      <el-link v-else class="head-link" :underline="false" type="primary" icon="el-icon-document-add" @click="save">保存上传</el-link>
+      <el-link class="head-link" :underline="false" type="primary" icon="el-icon-refresh-right" @click="temporarilySave" :disabled="saveLoading">暂存</el-link>
+      <el-link v-if="status === 'edit'" class="head-link" :underline="false" type="primary" icon="el-icon-document-checked" @click="edit" :disabled="saveLoading">确认修改</el-link>
+      <el-link v-if="status === 'add'" class="head-link" :underline="false" type="primary" icon="el-icon-document-add" @click="save" :disabled="saveLoading">保存上传</el-link>
     </div>
     <div v-show="formData.length === 0" class="description">
       <p>请从左侧列表中选择一个组件,</p>
@@ -53,9 +54,9 @@
           </div>
         </div>
       </div>
-      <span class="body-vertical" />
-      <span class="body-cross" />
     </div>
+    <span class="body-vertical" />
+    <span class="body-cross" />
 
     <el-dialog
       :modal-append-to-body="false"
@@ -90,6 +91,10 @@ export default {
     editForm: {
       type: Object,
       default: null
+    },
+    pageStatus: {
+      type: String,
+      default: 'add'
     }
   },
   data() {
@@ -108,7 +113,11 @@ export default {
         7: '带建议输入',
         20: '自增表格'
       },
-      diyForm: null
+      status: 'add',
+      id: '',
+      saveLoading: false,
+      diyForm: null,
+      bodyDom: null
     }
   },
   mounted() {
@@ -116,6 +125,8 @@ export default {
   },
   methods: {
     init() {
+      this.status = this.pageStatus
+      this.bodyDom = document.querySelector('.body')
       if (this.editForm) {
         this.formData = JSON.parse(this.editForm.content)
       } else {
@@ -134,6 +145,9 @@ export default {
       const inputType = e.dataTransfer.getData('type')
       const newInputData = deepClone(inputData[inputType])
       this.formData.push(newInputData)
+      this.$nextTick(() => {
+        this.bodyDom.scrollTop = this.bodyDom.scrollHeight + 100
+      })
       // console.log(inputType)
     },
     allowDrop(e) {
@@ -226,7 +240,14 @@ export default {
       })
       return checkNum
     },
-    save() {
+    temporarilySave() {
+      if (this.status === 'add') {
+        this.save(false)
+      } else if (this.status === 'edit') {
+        this.edit(false)
+      }
+    },
+    save(close = true) {
       const self = this
       this.$eventBus.$emit('getDiyData', function(form) {
         self.diyForm = form
@@ -236,6 +257,7 @@ export default {
       if (this.checkForm()) {
         return
       }
+      self.saveLoading = true
       this.diyForm['verify_correct'] = JSON.stringify(this.addVerifyContent(this.formData))
       this.diyForm.content = JSON.stringify(this.formData)
       this.diyForm.creator = this.$store.state.user.userInfo.name
@@ -246,13 +268,19 @@ export default {
             message: '添加成功',
             type: 'success'
           })
-          this.$emit('getData', '')
-          this.$emit('onClose')
+          if (close) {
+            this.$emit('getData', '')
+            this.$emit('onClose')
+          } else {
+            this.status = 'edit'
+            this.id = res.data.result.id
+          }
+          self.saveLoading = false
           this.$eventBus.$emit('refresh')
         }
       })
     },
-    edit() {
+    edit(close = true) {
       const self = this
       this.$eventBus.$emit('getDiyData', function(form) {
         self.diyForm = form
@@ -261,16 +289,20 @@ export default {
       if (this.checkForm()) {
         return
       }
+      self.saveLoading = true
       this.diyForm.content = JSON.stringify(this.formData)
       this.diyForm.creator = this.$store.state.user.userInfo.name
-      this.diyForm.id = this.editForm.id
+      this.diyForm.id = this.id || this.editForm.id
       editCustomTable(this.diyForm).then(res => {
         if (res.code === 1) {
           this.$message({
             message: '修改成功',
             type: 'success'
           })
-          this.$emit('onClose')
+          if (close) {
+            this.$emit('onClose')
+          }
+          self.saveLoading = false
           this.$eventBus.$emit('refresh')
         }
       })
@@ -313,7 +345,8 @@ export default {
 }
 .body {
   width: 1024px;
-  min-height: 708px;
+  height: 80vh;
+  overflow-y: auto;
   background-color: #fff;
   margin: 16px auto 60px;
   padding: 10px 12px 22px;
@@ -326,15 +359,15 @@ export default {
   width: 10px;
   height: 40px;
   left: 50%;
-  bottom: -40px;
+  top: calc(80vh + 56px);
   background-color: #4A4F5F;
 }
 .body-cross {
   position: absolute;
   width: 200px;
   height: 16px;
-  left: 406px;
-  bottom: -50px;
+  left: calc(50% - 100px);
+  top: calc(80vh + 96px);
   border-radius: 5px;
   background-color: #4A4F5F;
 }

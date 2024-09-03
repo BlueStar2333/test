@@ -3,8 +3,8 @@ import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken, setToken } from '@/utils/auth'
 
-// const url = 'http://localhost:3100/api/'
-const url = 'http://124.71.103.53:3100/api/'
+const url = 'http://localhost:3100/api/'
+// const url = 'http://124.71.103.53:3100/api/'
 
 const service = axios.create({
   baseURL: url,
@@ -24,7 +24,7 @@ service.interceptors.request.use(
         },
         method: 'post'
       }).then(res => {
-        store.commit('SET_TOKEN', res.data.data.token)
+        store.commit('user/SET_TOKEN', res.data.data.token)
         setToken(res.data.data.token)
         // console.log(res.data.data.token)
       })

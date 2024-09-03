@@ -23,12 +23,19 @@
       <!--滑动条-->
       <el-slider v-if="item.type === 6" v-model="item.content" :min="item.min" :max="item.max" style="padding: 0 20px"></el-slider>
       <!--输入建议选择框-->
-      <el-autocomplete v-if="item.type === 7" v-model="item.content" class="inline-input" @focus="sugFocus(index)" :fetch-suggestions="querySearch" placeholder="请输入内容"></el-autocomplete>
+      <el-autocomplete v-if="item.type === 7" v-model="item.content" class="inline-input" @focus="sugFocus(index, 'pub')" :fetch-suggestions="querySearch" placeholder="请输入内容"></el-autocomplete>
       <!--自增表格-->
       <el-table v-if="item.type === 20" :data="item.content" class="body-input-content" style="width: 100%" border :header-cell-style="{backgroundColor: '#efefef'}">
         <el-table-column v-for="(column,colIdx) in item.header" :key="colIdx" :label="column">
           <template slot-scope="scope">
-            {{ item.bodyForm[colIdx].label }}
+            <div class="table-forms">
+              <el-input v-if="item.bodyForm[colIdx].type === 0" v-model="item.content[scope.$index][colIdx]" placeholder="请输入内容" :maxlength="item.bodyForm[colIdx].max" show-word-limit size="mini" />
+              <el-input v-if="item.bodyForm[colIdx].type === 1" v-model="item.content[scope.$index][colIdx]" type="textarea" :maxlength="item.bodyForm[colIdx].max" show-word-limit :rows="2" placeholder="请输入内容" size="mini" />
+              <el-date-picker v-if="item.bodyForm[colIdx].type === 4" v-model="item.content[scope.$index][colIdx]" :type="item.bodyForm[colIdx].dateType" placeholder="选择日期" style="width: 100%" size="mini" />
+              <el-input-number v-if="item.bodyForm[colIdx].type === 5" v-model="item.content[scope.$index][colIdx]" :min="item.bodyForm[colIdx].min" :max="item.bodyForm[colIdx].max" label="数" style="width: 100%" size="mini" />
+              <el-slider v-if="item.bodyForm[colIdx].type === 6" v-model="item.content[scope.$index][colIdx]" :min="item.bodyForm[colIdx].min" :max="item.bodyForm[colIdx].max" style="padding: 0 20px" size="mini" />
+              <el-autocomplete v-if="item.bodyForm[colIdx].type === 7" v-model="item.content[scope.$index][colIdx]" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" size="mini" @focus="sugFocus(index, 'table', colIdx)" />
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -56,8 +63,12 @@ export default {
     // console.log(this.previewData, 78)
   },
   methods: {
-    sugFocus(index) {
-      this.sugData = this.previewData.content[index].suggestion.split(',')
+    sugFocus(index, type, twoIndex) {
+      if (type === 'pub') {
+        this.sugData = this.previewData.content[index].suggestion.split(',')
+      } else if (type === 'table') {
+        this.sugData = this.previewData.content[index].bodyForm[twoIndex].suggestion.split(',')
+      }
     },
     querySearch(queryString, cb) {
       const restaurants = []

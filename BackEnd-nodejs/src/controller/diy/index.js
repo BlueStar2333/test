@@ -12,12 +12,16 @@ const { pool, YES } =require("@/utils");
 const CoSaveDiyForm = (req, res) => {
   const { creator, table_name, description, content, verify_correct, check_number } = req.validData; // 验证后数据
   let sql = "INSERT INTO form_list(creator, table_name, description, content, verify_correct, check_number, creat_date) VALUES (?,?,?,?,?,?,?)";
-  pool.query(sql, [creator, table_name, description, content, verify_correct, check_number, new Date()], (error, result2) => {
+  pool.query(sql, [creator, table_name, description, content, verify_correct, check_number, new Date()], (error, result) => {
     if (error) throw error;
-    $api.ReturnJson(res, {
-      code: 1,
-      msg: "添加成功",
-      data: null
+    pool.query('SELECT * FROM form_list WHERE id = ?', [result.insertId], (error, resultT) => {
+      if (error) throw error;
+      console.log(result.insertId, resultT[0],4456)
+      $api.ReturnJson(res, {
+        code: 1,
+        msg: "添加成功",
+        data: { result: resultT[0] }
+      });
     });
   });
 };

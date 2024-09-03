@@ -1,7 +1,7 @@
 <template>
   <div class="popup">
     <div class="popup-head">
-      <h4 class="popup-head-title">普通表单设计</h4>
+      <h4 class="popup-head-title">工作台</h4>
       <i class="el-icon-close popup-head-close" @click="onClose" />
     </div>
     <div class="popup-body">
