@@ -2,3 +2,23 @@
 》 nodejs ：v20.16.0版本
 》》 node里面安装nodemon模块
 》 mysql：8.0.39版本
+
+
+外网面板地址: https://124.71.103.53:8888/login
+内网面板地址: https://192.168.0.224:8888/login
+username: administrator
+password: wanghao123
+
+
+
+阿里云 2024年9月6日 01:46:00
+外网面板地址: https://121.40.66.121:8888/dbaa574e
+内网面板地址: https://172.27.139.195:8888/dbaa574e
+username: user
+password: baotaGZz3Nyq
+
+阿里云 2024年9月6日 02:04:00
+外网面板地址: https://121.41.116.243:8888/ea1379cd
+内网面板地址: https://172.27.139.196:8888/ea1379cd
+username: user
+password: baotasteo83g
