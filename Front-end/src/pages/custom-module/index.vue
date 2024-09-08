@@ -126,11 +126,11 @@
       :modal-append-to-body="false"
       title="表单内容"
       :visible.sync="previewShow"
-      width="32%"
+      width="70%"
       class="form-content"
       center
     >
-      <Preview v-if="previewShow" :preview-data="diyForm" />
+      <Preview v-if="previewShow" :view-data="diyForm" @close="previewShow = false" />
     </el-dialog>
   </div>
 </template>

@@ -27,9 +27,9 @@ const CoSaveDiyForm = (req, res) => {
 };
 
 const CoEditDiyForm = (req, res) => {
-  const { id, creator, table_name, description, content, check_number } = req.validData; // 验证后数据
-  sql = "UPDATE form_list SET creator=?, table_name=?, description=?, content=?, check_number=?, creat_date=? WHERE id=?";
-  pool.query(sql, [creator, table_name, description, content, check_number, new Date(), id], (error, result2) => {
+  const { id, creator, table_name, description, content, check_number, verify_correct } = req.validData; // 验证后数据
+  sql = "UPDATE form_list SET creator=?, table_name=?, description=?, content=?, check_number=?, verify_correct=?, creat_date=? WHERE id=?";
+  pool.query(sql, [creator, table_name, description, content, check_number, verify_correct, new Date(), id], (error, result2) => {
     if (error) throw error;
     $api.ReturnJson(res, {
       code: 1,

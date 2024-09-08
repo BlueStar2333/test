@@ -64,7 +64,7 @@
             <el-divider>自增表设置</el-divider>
             <div v-for="(item,index) in componentData.headerLabel" :key="item" class="setting-main">
               <span class="setting-main-span">列{{ index+1 }}：</span>
-              <el-input v-model="componentData.header[index]" size="mini" placeholder="请输入内容" style="width: 130px" />
+              <el-input v-model="componentData.header[index]" size="mini" placeholder="请输入内容" style="width: 130px" clearable/>
               <el-link class="setting-setting-btn" icon="el-icon-setting" @click="tableSetting(index)"/>
               <a class="setting-delete-btn" @click="decreaseTableColumn(index)">-</a>
             </div>
@@ -270,14 +270,30 @@ export default {
     },
     sureColumn() {
       const aColumnForm = this.$refs.ColumnForm.formData
+      if (aColumnForm.type === 7 && aColumnForm.suggestion === '') {
+        this.$message({
+          message: '建议内容必填',
+          type: 'warning'
+        })
+        return
+      }
+      if (aColumnForm.regularError) {
+        this.$message({
+          message: '请输入正确值',
+          type: 'warning'
+        })
+        return
+      }
       console.log(this.componentData.bodyForm[this.columnIdx], this.$refs.ColumnForm.formData, 996)
       this.componentData.bodyForm[this.columnIdx].type = aColumnForm.type
       this.componentData.bodyForm[this.columnIdx].label = this.typeMap[aColumnForm.type]
       this.componentData.bodyForm[this.columnIdx].max = aColumnForm.max
       this.componentData.bodyForm[this.columnIdx].min = aColumnForm.min
       this.componentData.bodyForm[this.columnIdx].dateType = aColumnForm.dateType
+      this.componentData.content[0][this.columnIdx] = aColumnForm.content
       this.componentData.bodyForm[this.columnIdx].regularRule = aColumnForm.regularRule
       this.componentData.bodyForm[this.columnIdx].regularTips = aColumnForm.regularTips
+      this.componentData.bodyForm[this.columnIdx].regularError = aColumnForm.regularError
       this.componentData.bodyForm[this.columnIdx].suggestion = aColumnForm.suggestion
       this.dialogVisible = false
     },

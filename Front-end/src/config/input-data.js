@@ -80,6 +80,8 @@ const inputData = [{
   label: '带建议框',
   suggestion: '',
   content: '',
+  regularError: false, // 验证正确与否
+  regularTips: '只能选择建议内容', // 校验提示
   isNecessary: false,
   checkValue: false
 }, {

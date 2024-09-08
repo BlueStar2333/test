@@ -29,7 +29,7 @@
         <!--日期选择-->
         <el-date-picker v-if="itemA.type === 4" v-model="formData[index].content" class="body-input-content" :type="formData[index].dateType" size="small" placeholder="选择日期" />
         <!--数量选择-->
-        <el-input-number v-if="itemA.type === 5" v-model="formData[index].content" :min="formData[index].min" :max="formData[index].max" label="数" />
+        <el-input-number v-if="itemA.type === 5" v-model="formData[index].content" :min="formData[index].min" :max="formData[index].max" label="数"/>
         <!--滑动条-->
         <el-slider v-if="itemA.type === 6" v-model="formData[index].content" :min="formData[index].min" :max="formData[index].max" style="padding: 0 20px"></el-slider>
         <!--输入建议选择框-->
@@ -55,17 +55,15 @@
         </div>
       </div>
     </div>
-    <span class="body-vertical" />
-    <span class="body-cross" />
 
     <el-dialog
       :modal-append-to-body="false"
       title="预览"
       :visible.sync="previewShow"
-      width="32%"
+      width="70%"
       center
     >
-      <Preview v-if="previewShow" :preview-data="diyForm" />
+      <Preview v-if="previewShow" :view-data="diyForm" @close="previewShow = false"/>
     </el-dialog>
   </div>
 </template>
@@ -136,6 +134,8 @@ export default {
           label: '人员ID',
           suggestion: '',
           content: '',
+          regularError: false, // 验证正确与否
+          regularTips: '只能选择建议内容', // 校验提示
           isNecessary: true,
           checkValue: true
         })
@@ -189,7 +189,8 @@ export default {
       this.$eventBus.$emit('getDiyData', function(form) {
         self.diyForm = form
       })
-      this.diyForm.content = this.formData
+      this.diyForm['verify_correct'] = JSON.stringify(this.addVerifyContent(this.formData))
+      this.diyForm.content = JSON.stringify(this.formData)
       this.previewShow = true
     },
     checkForm() {
@@ -201,6 +202,19 @@ export default {
         })
         return true
       }
+      const LEN = this.formData.length
+      for (let i = 0; i < LEN; i++) {
+        if (this.formData[i].type === 7 && this.formData[i].suggestion === '') {
+          this.$message({
+            message: '第' + (i + 1) + '题建议框必须输入建议内容',
+            type: 'warning'
+          })
+          return true
+        }
+      }
+      this.formData.forEach((item, index) => {
+
+      })
       for (const key in warningMap) {
         if (this.diyForm[key] === '') {
           this.$eventBus.$emit('changeTab', 'second')
@@ -241,6 +255,19 @@ export default {
       return checkNum
     },
     temporarilySave() {
+      const self = this
+      this.$eventBus.$emit('getDiyData', function(form) {
+        self.diyForm = form
+      })
+      this.diyForm.check_number = this.checkNum(this.formData)
+      if (this.checkForm()) {
+        return
+      }
+      this.saveLoading = true
+      this.diyForm['verify_correct'] = JSON.stringify(this.addVerifyContent(this.formData))
+      this.diyForm.content = JSON.stringify(this.formData)
+      this.diyForm.creator = this.$store.state.user.userInfo.name
+      // 添加或保存
       if (this.status === 'add') {
         this.save(false)
       } else if (this.status === 'edit') {
@@ -248,19 +275,6 @@ export default {
       }
     },
     save(close = true) {
-      const self = this
-      this.$eventBus.$emit('getDiyData', function(form) {
-        self.diyForm = form
-      })
-      // console.log(this.$store.state.user.userInfo,456)
-      this.diyForm.check_number = this.checkNum(this.formData)
-      if (this.checkForm()) {
-        return
-      }
-      self.saveLoading = true
-      this.diyForm['verify_correct'] = JSON.stringify(this.addVerifyContent(this.formData))
-      this.diyForm.content = JSON.stringify(this.formData)
-      this.diyForm.creator = this.$store.state.user.userInfo.name
       console.log(this.diyForm, 635)
       addCustomTable(this.diyForm).then(res => {
         if (res.code === 1) {
@@ -275,23 +289,12 @@ export default {
             this.status = 'edit'
             this.id = res.data.result.id
           }
-          self.saveLoading = false
+          this.saveLoading = false
           this.$eventBus.$emit('refresh')
         }
       })
     },
     edit(close = true) {
-      const self = this
-      this.$eventBus.$emit('getDiyData', function(form) {
-        self.diyForm = form
-      })
-      this.diyForm.check_number = this.checkNum(this.formData)
-      if (this.checkForm()) {
-        return
-      }
-      self.saveLoading = true
-      this.diyForm.content = JSON.stringify(this.formData)
-      this.diyForm.creator = this.$store.state.user.userInfo.name
       this.diyForm.id = this.id || this.editForm.id
       editCustomTable(this.diyForm).then(res => {
         if (res.code === 1) {
@@ -302,7 +305,7 @@ export default {
           if (close) {
             this.$emit('onClose')
           }
-          self.saveLoading = false
+          this.saveLoading = false
           this.$eventBus.$emit('refresh')
         }
       })
@@ -344,32 +347,16 @@ export default {
   color: #999;
 }
 .body {
-  width: 1024px;
-  height: 80vh;
+  width: 96%;
+  min-width: 400px;
+  height: 88%;
   overflow-y: auto;
   background-color: #fff;
-  margin: 16px auto 60px;
+  margin: 16px auto 0;
   padding: 10px 12px 22px;
   border: 10px solid #4A4F5F;
   border-radius: 20px;
   position: relative;
-}
-.body-vertical {
-  position: absolute;
-  width: 10px;
-  height: 40px;
-  left: 50%;
-  top: calc(80vh + 56px);
-  background-color: #4A4F5F;
-}
-.body-cross {
-  position: absolute;
-  width: 200px;
-  height: 16px;
-  left: calc(50% - 100px);
-  top: calc(80vh + 96px);
-  border-radius: 5px;
-  background-color: #4A4F5F;
 }
 .body-input {
   position: relative;

@@ -20,23 +20,24 @@
         <!--日期选择-->
         <el-date-picker v-if="item.type === 4" v-model="item.content" :class="{ 'verify-error': correct[index] === false }" size="small" :type="item.dateType" placeholder="选择日期" :disabled="redactStateC === '查看'" />
         <!--数量选择-->
-        <el-input-number v-if="item.type === 5" v-model="item.content" :class="{ 'verify-error': correct[index] === false }" :min="item.min" :max="item.max" label="数" :disabled="redactStateC === '查看'" />
+        <el-input-number v-if="item.type === 5" v-model="item.content" :class="{ 'verify-error': correct[index] === false }" @change="numChange(item.content, index)" label="数" :disabled="redactStateC === '查看'" />
         <!--滑动条-->
         <el-slider v-if="item.type === 6" v-model="item.content" :class="{ 'verify-error': correct[index] === false }" :min="item.min" :max="item.max" style="padding: 0 20px" :disabled="redactStateC === '查看'" />
         <!--输入建议选择框-->
-        <el-autocomplete v-if="item.type === 7" v-model="item.content" :class="{ 'verify-error': correct[index] === false }" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" :disabled="redactStateC === '查看'" @focus="sugFocus(index, 'pub')" />
+        <el-autocomplete v-if="item.type === 7" v-model="item.content" :class="{ 'verify-error': correct[index] === false, 'regular-error': item.regularError }" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" :disabled="redactStateC === '查看'" @focus="sugFocus(index, 'pub')" @select="selectTips($event.value, index)" @blur="selectTips(item.content, index)" />
         <span v-if="item.regularError" class="regular-tips">{{ item.regularTips }}</span>
         <!--自增表格-->
         <el-table v-if="item.type === 20" :class="{ 'verify-error': correct[index] === false }" :data="item.content" class="body-input-content" style="width: 100%" border :header-cell-style="{backgroundColor: '#efefef'}">
+          <el-table-column type="index" width="40" />
           <el-table-column v-for="(column,colIdx) in item.header" :key="colIdx" :label="column">
             <template slot-scope="scope">
               <div class="table-forms">
-                <el-input v-if="item.bodyForm[colIdx].type === 0" v-model="item.content[scope.$index][colIdx]" :class="{ 'regular-error': item.regularError[scope.$index][colIdx], 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" @input="validateInput(item.bodyForm[colIdx].regularRule, item.content[scope.$index][colIdx], index, { row: scope.$index, col: colIdx })" placeholder="请输入内容" :maxlength="item.bodyForm[colIdx].max" show-word-limit size="mini" :disabled="redactStateC === '查看'" />
-                <el-input v-if="item.bodyForm[colIdx].type === 1" v-model="item.content[scope.$index][colIdx]" :class="{ 'regular-error': item.regularError[scope.$index][colIdx], 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" @input="validateInput(item.bodyForm[colIdx].regularRule, item.content[scope.$index][colIdx], index, { row: scope.$index, col: colIdx })" type="textarea" :maxlength="item.bodyForm[colIdx].max" show-word-limit :rows="2" placeholder="请输入内容" size="mini" :disabled="redactStateC === '查看'" />
-                <el-date-picker v-if="item.bodyForm[colIdx].type === 4" v-model="item.content[scope.$index][colIdx]" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" :type="item.bodyForm[colIdx].dateType" placeholder="选择日期" style="width: 100%" size="mini" :disabled="redactStateC === '查看'" />
-                <el-input-number v-if="item.bodyForm[colIdx].type === 5" v-model="item.content[scope.$index][colIdx]" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" :min="item.bodyForm[colIdx].min" :max="item.bodyForm[colIdx].max" label="数" style="width: 100%" size="mini" :disabled="redactStateC === '查看'" />
-                <el-slider v-if="item.bodyForm[colIdx].type === 6" v-model="item.content[scope.$index][colIdx]" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" :min="item.bodyForm[colIdx].min" :max="item.bodyForm[colIdx].max" style="padding: 0 20px" size="mini" :disabled="redactStateC === '查看'" />
-                <el-autocomplete v-if="item.bodyForm[colIdx].type === 7" v-model="item.content[scope.$index][colIdx]" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" size="mini" :disabled="redactStateC === '查看'" @focus="sugFocus(index, 'table', colIdx)" />
+                <el-input v-if="item.bodyForm[colIdx].type === 0" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'regular-error': item.regularError[scope.$index][colIdx], 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" @input="validateInput(item.bodyForm[colIdx].regularRule, item.content[scope.$index][colIdx], index, { row: scope.$index, col: colIdx })" placeholder="请输入内容" :maxlength="item.bodyForm[colIdx].max" show-word-limit size="mini" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
+                <el-input v-if="item.bodyForm[colIdx].type === 1" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'regular-error': item.regularError[scope.$index][colIdx], 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" @input="validateInput(item.bodyForm[colIdx].regularRule, item.content[scope.$index][colIdx], index, { row: scope.$index, col: colIdx })" type="textarea" :maxlength="item.bodyForm[colIdx].max" show-word-limit :rows="2" placeholder="请输入内容" size="mini" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
+                <el-date-picker v-if="item.bodyForm[colIdx].type === 4" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" :type="item.bodyForm[colIdx].dateType" placeholder="选择日期" style="width: 100%" size="mini" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
+                <el-input-number v-if="item.bodyForm[colIdx].type === 5" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" @change="numChange(item.content[scope.$index][colIdx], index, { row: scope.$index, col: colIdx })" label="数" style="width: 100%" size="mini" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
+                <el-slider v-if="item.bodyForm[colIdx].type === 6" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" :min="item.bodyForm[colIdx].min" :max="item.bodyForm[colIdx].max" style="padding: 0 20px" size="mini" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
+                <el-autocomplete v-if="item.bodyForm[colIdx].type === 7" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'regular-error': item.regularError[scope.$index][colIdx], 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" @select="selectTips($event.value, index, { row: scope.$index, col: colIdx })" @blur="selectTips(item.content[scope.$index][colIdx], index, { row: scope.$index, col: colIdx })" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" size="mini" :disabled="redactStateC === '查看'" @focus="sugFocus(index, 'table', colIdx)" :id="'input' + index + scope.$index + colIdx"/>
                 <span v-if="item.regularError[scope.$index][colIdx]" class="regular-tips">{{ item.bodyForm[colIdx].regularTips }}</span>
               </div>
             </template>
@@ -44,8 +45,9 @@
           <el-table-column v-if="redactStateC !== '查看'" fixed="right" label="操作">
             <template slot-scope="scope">
               <div class="operation">
-                <el-link v-if="1" type="danger" style="margin: 0 6px" @click="deleteBodyForm(index, scope.$index)">删除</el-link>
-                <el-link v-if="item.content.length === (scope.$index + 1)" type="success" @click="addBodyForm(index)">添加</el-link>
+                <el-link v-if="1" type="danger" @click="deleteBodyForm(index, scope.$index)">删除</el-link>
+                <el-link v-if="item.content.length === (scope.$index + 1)" style="margin: 0 6px" type="success" @click="addBodyForm(index)">添加</el-link>
+                <el-link v-if="item.content.length === (scope.$index + 1)" type="success" @click="addBodyFormCope(index)">复制</el-link>
               </div>
             </template>
           </el-table-column>
@@ -57,11 +59,25 @@
       <el-button v-if="redactStateC === '编辑'" type="primary" @click="editForm">修改</el-button>
       <el-button @click="$emit('close')">取消</el-button>
     </div>
+
+    <el-dialog
+      title="错误提示"
+      :visible.sync="errorForm.dialogVisible"
+      width="30%"
+      :modal="false"
+      :append-to-body="true">
+      <span>{{ errorForm.content }}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="errorForm.dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="errorForm.dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { addContentTable, editContentTable } from '@/api/fillout'
+import { deepClone } from "@/utils"
 
 export default {
   name: 'Preview',
@@ -77,7 +93,11 @@ export default {
       sugData: [],
       redactStateC: '',
       loading: false,
-      correct: []
+      correct: [],
+      errorForm: {
+        content: '',
+        dialogVisible: false
+      }
     }
   },
   created() {
@@ -91,6 +111,84 @@ export default {
       console.log(this.previewData, 782)
       this.redactStateC = this.previewData.redactState
       this.correct = JSON.parse(this.previewData.verify_correct)
+    },
+    enterLine(e, idx, rowIdx, colIdx) {
+      if (rowIdx === this.previewData.content[idx].content.length - 1) {
+        return
+      }
+      if (e.ctrlKey) {
+        this.previewData.content[idx].content[rowIdx + 1][colIdx] = this.previewData.content[idx].content[rowIdx][colIdx]
+        const newErrorRow = [...this.previewData.content[idx]['content'][rowIdx + 1]]
+        newErrorRow[colIdx] = this.previewData.content[idx].content[rowIdx][colIdx]
+        // 使用 Vue.set 替换整个对象,确保数据双向绑定
+        this.$set(this.previewData.content[idx]['content'], rowIdx + 1, newErrorRow)
+      }
+      const oldId = 'input' + idx + rowIdx + colIdx
+      const newId = 'input' + idx + (rowIdx + 1) + colIdx
+      document.getElementById(oldId).blur()
+      document.getElementById(newId).focus()
+      // 对于数字输入框
+      if (document.getElementById(oldId).querySelector('input')) {
+        document.getElementById(oldId).querySelector('input').blur()
+        document.getElementById(newId).querySelector('input').focus()
+      }
+    },
+    numChange(num, idxOne, coordinate) {
+      if (coordinate) {
+        if (num > this.previewData.content[idxOne].bodyForm[coordinate.col].max) {
+          this.errorForm.content = '输入的值大于最大值，请重新输入'
+          this.errorForm.dialogVisible = true
+        }
+        if (num < this.previewData.content[idxOne].bodyForm[coordinate.col].min) {
+          this.errorForm.content = '输入的值小于最小值，请重新输入'
+          this.errorForm.dialogVisible = true
+        }
+      } else {
+        if (num > this.previewData.content[idxOne].max) {
+          this.errorForm.content = '输入的值大于最大值，请重新输入'
+          this.errorForm.dialogVisible = true
+        }
+        if (num < this.previewData.content[idxOne].min) {
+          this.errorForm.content = '输入的值小于最小值，请重新输入'
+          this.errorForm.dialogVisible = true
+        }
+      }
+    },
+    selectTips(content, idx, coordinate) {
+      let result = ''
+      if (coordinate) {
+        this.previewData.content[idx].bodyForm[coordinate.col].regularTips = '只能选择建议内容'
+        if (content === '' || !this.previewData.content[idx].bodyForm[coordinate.col].suggestion.split(',').includes(content)) {
+          const newErrorRow = { ...this.previewData.content[idx]['regularError'][coordinate.row] }
+          newErrorRow[coordinate.col] = true
+          // 使用 Vue.set 替换整个对象,确保数据双向绑定
+          this.$set(this.previewData.content[idx]['regularError'], coordinate.row, newErrorRow)
+          result = 'error'
+        } else {
+          const newErrorRow = { ...this.previewData.content[idx]['regularError'][coordinate.row] }
+          newErrorRow[coordinate.col] = false
+          // 使用 Vue.set 替换整个对象,确保数据双向绑定
+          this.$set(this.previewData.content[idx]['regularError'], coordinate.row, newErrorRow)
+        }
+      } else {
+        console.log(this.previewData.content[idx])
+        if (content === '' || !this.previewData.content[idx].suggestion.split(',').includes(content)) {
+          this.previewData.content[idx]['regularError'] = true
+          result = 'error'
+        } else {
+          this.previewData.content[idx]['regularError'] = false
+        }
+      }
+      return result
+      // if (content === '' || !this.formData.suggestion.split(',').includes(content)) {
+      //   this.formData.regularTips = '只能选择建议内容'
+      //   this.formData.regularError = true
+      //   console.log(this.formData.regularError)
+      // } else {
+      //   this.formData.regularTips = ''
+      //   this.formData.regularError = false
+      //   console.log('正确')
+      // }
     },
     validateInput(rule, txt, idx, coordinate) {
       let result = ''
@@ -144,6 +242,14 @@ export default {
         if (itemOne.type === 0 || itemOne.type === 1) {
           errorRegular += this.validateInput(itemOne['regularRule'], itemOne.content, indexOne)
         }
+        if (itemOne.type === 7) {
+          errorRegular += this.selectTips(itemOne.content, indexOne)
+        }
+        if (itemOne.type === 5) {
+          if (itemOne.content > itemOne.max || itemOne.content < itemOne.min) {
+            errorTxt = '第' + (indexOne + 1) + '题输入的值不在有效范围内'
+          }
+        }
         if (itemOne.checkValue) {
           verify += '-' + itemOne.content.toString()
         }
@@ -151,10 +257,19 @@ export default {
           verify_correct[indexOne] = []
           itemOne.content.forEach((itemTwo, indexTwo) => {
             verify_correct[indexOne][indexTwo] = new Array(itemTwo.length).fill(false)
+            console.log(itemTwo,789)
             itemTwo.forEach((itemThree, indexThree) => {
+              if (itemOne.bodyForm[indexThree].type === 5) {
+                if (itemThree > itemOne.bodyForm[indexThree].max || itemThree < itemOne.bodyForm[indexThree].min) {
+                  errorTxt = '第' + (indexOne + 1) + '题第' + (indexTwo + 1) + '行输入的值不在有效范围内'
+                }
+              }
               console.log(itemOne.bodyForm,indexOne,itemThree,14,indexTwo,indexThree)
               if (itemOne.bodyForm[indexThree].type === 0 || itemOne.bodyForm[indexThree].type === 1) {
                 errorRegular += this.validateInput(itemOne.bodyForm[indexThree]['regularRule'], itemThree, indexOne, { row: indexTwo, col: indexThree })
+              }
+              if (itemOne.bodyForm[indexThree].type === 7) {
+                errorRegular += this.selectTips(itemThree, indexOne, { row: indexTwo, col: indexThree })
               }
             })
           })
@@ -167,10 +282,10 @@ export default {
     addForm() {
       this.loading = true
       const verifyData = this.verifyContent(this.previewData.content)
-      console.log(verifyData.errorRegular,6635)
+      console.log(verifyData.errorRegular, 6635)
       if (verifyData.errorRegular.includes('error')) {
         this.$message({
-          type: 'info',
+          type: 'warning',
           message: '表单项有格式填写错误'
         })
         this.loading = false
@@ -178,7 +293,7 @@ export default {
       }
       if (verifyData.errorTxt) {
         this.$message({
-          type: 'info',
+          type: 'warning',
           message: verifyData.errorTxt
         })
         this.loading = false
@@ -214,9 +329,17 @@ export default {
       this.loading = true
       const verifyData = this.verifyContent(this.previewData.content)
       console.log(verifyData.verify_correct, this.previewData, 886)
+      if (verifyData.errorRegular.includes('error')) {
+        this.$message({
+          type: 'warning',
+          message: '表单项有格式填写错误'
+        })
+        this.loading = false
+        return
+      }
       if (verifyData.errorTxt) {
         this.$message({
-          type: 'info',
+          type: 'warning',
           message: verifyData.errorTxt
         })
         this.loading = false
@@ -264,6 +387,15 @@ export default {
       const len = data.content[0].length
       console.log(this.correct[index], 78)
       data.content.push(new Array(len).fill(''))
+      data.regularError.push(new Array(len).fill(false))
+      this.correct[index].push(new Array(len).fill(false))
+    },
+    addBodyFormCope(index) {
+      console.log(this.previewData.content[index], 36)
+      const data = this.previewData.content[index]
+      const len = data.content[0].length
+      console.log(this.correct[index], data.content[data.content.length - 1], 78)
+      data.content.push(deepClone(data.content[data.content.length - 1]))
       data.regularError.push(new Array(len).fill(false))
       this.correct[index].push(new Array(len).fill(false))
     },

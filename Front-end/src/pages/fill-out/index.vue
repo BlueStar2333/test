@@ -106,7 +106,7 @@
       :title="'☆' + fillInForm.redactState"
       :visible.sync="fillInShow"
       :close-on-click-modal="false"
-      width="60%"
+      width="70%"
     >
       <Preview v-if="fillInShow" :preview-data="fillInForm" @close="searchByDate" />
     </el-dialog>

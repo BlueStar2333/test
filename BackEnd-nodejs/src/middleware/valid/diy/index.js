@@ -18,8 +18,8 @@ const VaSaveDiyForm = (req, res, next) => {
 };
 const VaEditDiyForm = (req, res, next) => {
   // POST接收参数
-  $api.PostArg(req).then(({ id, creator, table_name, description, content, check_number }) => {
-      req.validData = $api.SaveValidData(req.validData, { id, creator, table_name, description, content, check_number }); // 保存校验对象
+  $api.PostArg(req).then(({ id, creator, table_name, description, content, check_number, verify_correct }) => {
+      req.validData = $api.SaveValidData(req.validData, { id, creator, table_name, description, content, check_number, verify_correct }); // 保存校验对象
       next(); // 校验通过
   });
 };
