@@ -100,7 +100,6 @@ const getNumData = (req, res) => {
 						written_by;`
 		pool.query(sql, [form_id], (error, result) => {
 			if (error) throw error;
-			console.log(result,1452)
 			$api.ReturnJson(res, { code: YES, msg: "查询成功", data: { result } });
 		});
 	})
