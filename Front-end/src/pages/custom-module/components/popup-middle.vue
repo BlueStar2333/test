@@ -255,6 +255,15 @@ export default {
       return checkNum
     },
     temporarilySave() {
+      // 添加或保存
+      if (this.status === 'add') {
+        this.save(false)
+      } else if (this.status === 'edit') {
+        this.edit(false)
+      }
+    },
+    save(close = true) {
+      console.log(this.diyForm, 635)
       const self = this
       this.$eventBus.$emit('getDiyData', function(form) {
         self.diyForm = form
@@ -267,15 +276,6 @@ export default {
       this.diyForm['verify_correct'] = JSON.stringify(this.addVerifyContent(this.formData))
       this.diyForm.content = JSON.stringify(this.formData)
       this.diyForm.creator = this.$store.state.user.userInfo.name
-      // 添加或保存
-      if (this.status === 'add') {
-        this.save(false)
-      } else if (this.status === 'edit') {
-        this.edit(false)
-      }
-    },
-    save(close = true) {
-      console.log(this.diyForm, 635)
       addCustomTable(this.diyForm).then(res => {
         if (res.code === 1) {
           this.$message({
@@ -295,6 +295,18 @@ export default {
       })
     },
     edit(close = true) {
+      const self = this
+      this.$eventBus.$emit('getDiyData', function(form) {
+        self.diyForm = form
+      })
+      this.diyForm.check_number = this.checkNum(this.formData)
+      if (this.checkForm()) {
+        return
+      }
+      this.saveLoading = true
+      this.diyForm['verify_correct'] = JSON.stringify(this.addVerifyContent(this.formData))
+      this.diyForm.content = JSON.stringify(this.formData)
+      this.diyForm.creator = this.$store.state.user.userInfo.name
       this.diyForm.id = this.id || this.editForm.id
       editCustomTable(this.diyForm).then(res => {
         if (res.code === 1) {

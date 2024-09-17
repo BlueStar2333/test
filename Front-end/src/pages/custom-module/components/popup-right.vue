@@ -277,7 +277,7 @@ export default {
         })
         return
       }
-      if (aColumnForm.regularError) {
+      if (aColumnForm.regularError && aColumnForm.content !== '') {
         this.$message({
           message: '请输入正确值',
           type: 'warning'

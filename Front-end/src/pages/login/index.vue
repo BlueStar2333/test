@@ -13,23 +13,22 @@
         class="ms-content"
         autocomplete="on"
       >
-        <el-form-item prop="phone">
-          <el-input v-model="loginForm.phone" size="small" class="phone-inp" placeholder="请输入手机号">
+        <el-form-item v-show="phoneShow" prop="phone">
+          <el-input v-model="loginForm.phone" class="phone-inp" placeholder="请输入手机号" disabled>
             <i slot="prefix" class="el-icon-phone" />
           </el-input>
         </el-form-item>
-        <el-form-item prop="code">
-          <el-input v-model="loginForm.code" size="small" class="phone-inp" placeholder="请输入验证码">
+        <el-form-item v-show="phoneShow" prop="code">
+          <el-input v-model="loginForm.code" class="phone-inp" placeholder="请输入验证码">
             <i slot="prefix" class="el-icon-tickets" style="line-height: 36px;"/>
             <el-button slot="append" :disabled="sendDisabled" style="width: 130px" size="mini" @click="sendCode">{{ btnText }}</el-button>
           </el-input>
         </el-form-item>
-        <el-form-item prop="username">
+        <el-form-item v-show="!phoneShow" prop="username">
           <el-input
             ref="username"
             v-model="loginForm.username"
             clearable
-            size="small"
             tabindex="1"
             autocomplete="on"
             placeholder="请输入账号"
@@ -37,13 +36,12 @@
             <i slot="prefix" class="el-icon-user"/>
           </el-input>
         </el-form-item>
-        <el-form-item>
+        <el-form-item v-show="!phoneShow">
           <el-input
             :key="passwordType"
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            size="small"
             placeholder="请输入密码"
             name="password"
             tabindex="2"
@@ -56,7 +54,9 @@
           </el-input>
         </el-form-item>
         <div class="login-btn">
-          <el-button type="primary" style="color: #e7e7e7" @click="handleLogin" round>登录</el-button>
+          <el-button v-if="!phoneShow" type="primary" style="color: #e7e7e7" @click="accountSubmit" round>提交</el-button>
+          <el-button v-if="phoneShow" type="primary" style="color: #e7e7e7" @click="handleLogin" round>登录</el-button>
+          <el-link v-if="phoneShow" style="opacity: .6" type="primary" @click="loginBack">&lt;&lt;&lt; 返回</el-link>
         </div>
       </el-form>
 
@@ -107,12 +107,14 @@ export default {
       btnText: '发送验证码',
       time: 60,
       sendDisabled: false,
+      timer: null,
       loginRules: {
-        // phone: [{ validator: checkPhone, trigger: 'change' }],
-        // code: [{ required: true, message: '验证码不能为空', trigger: 'blur' }],
+        phone: [{ validator: checkPhone, trigger: 'change' }],
+        code: [{ required: true, message: '验证码不能为空', trigger: 'blur' }],
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
+      phoneShow: false,
       passwordType: 'password',
       capsTooltip: false,
       loading: false,
@@ -159,6 +161,13 @@ export default {
         this.$refs.password.focus()
       })
     },
+    accountSubmit() {
+      this.loginForm.phone = 14708267626
+      this.phoneShow = true
+      this.$nextTick(() => {
+        this.sendCode()
+      })
+    },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
@@ -184,6 +193,16 @@ export default {
         }
       })
     },
+    loginBack() {
+      this.loginForm.phone = ''
+      this.sendDisabled = false
+      this.time = 60
+      this.btnText = '发送验证码'
+      clearInterval(this.timer)
+      this.$nextTick(() => {
+        this.phoneShow = false
+      })
+    },
     sendCode() {
       this.$refs.loginForm.validateField('phone', errorMessage => {
         if (errorMessage) {
@@ -193,15 +212,15 @@ export default {
           // 2.按钮进入禁用状态
           // 3.如果倒计时结束 按钮恢复可用状态 按钮文字变为重新发送, 时间重置
           // 4.倒计时的过程中 按钮文字为 多少s后重新发送
-          const timer = setInterval(() => {
+          this.sendDisabled = true
+          this.timer = setInterval(() => {
             this.time--
             this.btnText = `${this.time}s后重新发送`
-            this.sendDisabled = true
             if (this.time === 0) {
               this.sendDisabled = false
               this.btnText = '重新发送'
               this.time = 60
-              clearInterval(timer)
+              clearInterval(this.timer)
             }
           }, 1000)
           this.$emit('send')
@@ -251,14 +270,14 @@ export default {
   width: 380px;
   border-radius: 0 2px 2px 0;
   padding-top: 40px;
-  opacity: .92;
+  opacity: .9;
   background: #fff;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   overflow: hidden;
 }
 
 .ms-content {
-  padding: 30px 34px;
+  padding: 90px 34px 0;
 }
 
 .login-btn {

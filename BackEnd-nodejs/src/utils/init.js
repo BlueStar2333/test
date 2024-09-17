@@ -39,10 +39,19 @@ app.use(
 
 app.use("/api", router); // 使用路由中间件
 
+// // 创建连接池
+// let pool = mysql.createPool({
+//   host: "localhost", // 主机名
+//   user: "wh", // 用户名
+//   password: "wanghao123", // 密码
+//   database: "west_hospital", // 数据库名
+//   port: 3307, // 端口号
+//   connectionLimit: 25 // 限制数量
+// });
 // 创建连接池
 let pool = mysql.createPool({
   host: "localhost", // 主机名
-  user: "wh", // 用户名
+  user: "root", // 用户名
   password: "wanghao123", // 密码
   database: "west_hospital", // 数据库名
   port: 3306, // 端口号

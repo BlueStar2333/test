@@ -261,8 +261,11 @@ export default {
             itemTwo.forEach((itemThree, indexThree) => {
               if (itemOne.bodyForm[indexThree].type === 5) {
                 if (itemThree > itemOne.bodyForm[indexThree].max || itemThree < itemOne.bodyForm[indexThree].min) {
-                  errorTxt = '第' + (indexOne + 1) + '题第' + (indexTwo + 1) + '行输入的值不在有效范围内'
+                  errorTxt = '第' + (indexOne + 1) + '题第' + (indexTwo + 1) + '行输入的值不在有效范围内！'
                 }
+              }
+              if (itemOne.bodyForm[indexThree].type === 4 && !itemThree) {
+                errorTxt = '第' + (indexOne + 1) + '题第' + (indexTwo + 1) + '行日期的值不能为空！'
               }
               console.log(itemOne.bodyForm,indexOne,itemThree,14,indexTwo,indexThree)
               if (itemOne.bodyForm[indexThree].type === 0 || itemOne.bodyForm[indexThree].type === 1) {
@@ -391,11 +394,12 @@ export default {
       this.correct[index].push(new Array(len).fill(false))
     },
     addBodyFormCope(index) {
-      console.log(this.previewData.content[index], 36)
       const data = this.previewData.content[index]
       const len = data.content[0].length
+      const STR_DATA = JSON.stringify(data.content[data.content.length - 1])
       console.log(this.correct[index], data.content[data.content.length - 1], 78)
-      data.content.push(deepClone(data.content[data.content.length - 1]))
+      // data.content.push(deepClone(data.content[data.content.length - 1]))
+      data.content.push(JSON.parse(STR_DATA))
       data.regularError.push(new Array(len).fill(false))
       this.correct[index].push(new Array(len).fill(false))
     },

@@ -5,6 +5,7 @@ import { getToken, setToken } from '@/utils/auth'
 
 // const url = 'http://localhost:3100/api/'
 const url = 'http://124.71.103.53:3100/api/'
+// const url = 'http://172.27.11.79:3100/api/' // 内网
 
 const service = axios.create({
   baseURL: url,
