@@ -16,7 +16,6 @@ const CoSaveDiyForm = (req, res) => {
     if (error) throw error;
     pool.query('SELECT * FROM form_list WHERE id = ?', [result.insertId], (error, resultT) => {
       if (error) throw error;
-      console.log(result.insertId, resultT[0],4456)
       $api.ReturnJson(res, {
         code: 1,
         msg: "添加成功",
