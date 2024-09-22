@@ -34,7 +34,7 @@
           <el-autocomplete v-if="formData.type === 7" v-model="formData.content" class="inline-input" :class="{ 'verify-error': formData.regularError }" :fetch-suggestions="querySearch" @select="selectTips($event.value)" @blur="selectTips(formData.content)" placeholder="请输入内容" />
           <el-slider v-if="formData.type === 6" v-model="formData.content" :min="formData.min" :max="formData.max" style="padding: 0 20px"></el-slider>
           <el-input-number v-if="formData.type === 5" v-model="formData.content" :min="formData.min" :max="formData.max" size="small" label="描述文字" />
-          <el-date-picker v-if="formData.type === 4" v-model="formData.content" :type="formData.dateType" placeholder="选择日期" style="width: 100%" />
+          <el-date-picker v-if="formData.type === 4" v-model="formData.content" value-format="yyyy-MM-dd hh:mm:ss" :type="formData.dateType" placeholder="选择日期" style="width: 100%" />
           <el-input v-if="formData.type === 1 || formData.type === 0" v-model="formData.content" :maxlength="formData.max" show-word-limit :class="{ 'verify-error': formData.regularError }" @input="validateInput(formData.regularRule, formData.content)" placeholder="可验证正则规则是否正确"/>
           <span v-if="formData.regularError" class="regular-tips">{{ formData.regularTips }}</span>
         </div>

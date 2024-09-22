@@ -259,7 +259,7 @@ export default {
         } else {
           this.$message({
             type: 'warning',
-            message: '修改失败'
+            message: res.msg
           })
         }
       })

@@ -2,7 +2,8 @@
   <div class="login-wrap">
     <div class="ms-left">
       <p class="ms-left-txt">Welcome!</p>
-      <p class="ms-left-txt">华西医院填表系统</p>
+      <p class="ms-left-txt">体外循环心脏手术</p>
+      <p class="ms-left-txt" style="margin-top: -6px">数据录入管理系统</p>
     </div>
     <div class="ms-login">
       <el-form
@@ -66,8 +67,9 @@
 </template>
 
 <script>
+  import { sendCode, submitup } from "@/api/user";
 
-export default {
+  export default {
   name: 'Login',
   components: {},
   data() {
@@ -162,11 +164,25 @@ export default {
       })
     },
     accountSubmit() {
-      this.loginForm.phone = 14708267626
-      this.phoneShow = true
-      this.$nextTick(() => {
-        this.sendCode()
+      const data = {
+        username: this.loginForm.username,
+        password: this.loginForm.password
+      }
+      submitup(data).then(res => {
+        if (res.code === 1) {
+          this.loginForm.phone = res.data.phone
+          this.phoneShow = true
+        } else {
+          this.$message({
+            showClose: true,
+            message: res.msg,
+            type: 'error'
+          })
+        }
       })
+      // this.$nextTick(() => {
+      //   this.sendCode()
+      // })
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
@@ -208,22 +224,38 @@ export default {
         if (errorMessage) {
           this.$message.error(errorMessage)
         } else {
-          // 1.时间开始倒数
-          // 2.按钮进入禁用状态
-          // 3.如果倒计时结束 按钮恢复可用状态 按钮文字变为重新发送, 时间重置
-          // 4.倒计时的过程中 按钮文字为 多少s后重新发送
-          this.sendDisabled = true
-          this.timer = setInterval(() => {
-            this.time--
-            this.btnText = `${this.time}s后重新发送`
-            if (this.time === 0) {
-              this.sendDisabled = false
-              this.btnText = '重新发送'
-              this.time = 60
-              clearInterval(this.timer)
+          sendCode({ phone: this.loginForm.phone }).then(res => {
+            console.log(res, 789456)
+            if (res.code === 1) {
+              this.$message({
+                showClose: true,
+                message: res.msg,
+                type: 'success'
+              })
+              // 1.时间开始倒数
+              // 2.按钮进入禁用状态
+              // 3.如果倒计时结束 按钮恢复可用状态 按钮文字变为重新发送, 时间重置
+              // 4.倒计时的过程中 按钮文字为 多少s后重新发送
+              this.sendDisabled = true
+              this.timer = setInterval(() => {
+                this.time--
+                this.btnText = `${this.time}s后重新发送`
+                if (this.time === 0) {
+                  this.sendDisabled = false
+                  this.btnText = '重新发送'
+                  this.time = 60
+                  clearInterval(this.timer)
+                }
+              }, 1000)
+              this.$emit('send')
+            } else {
+              this.$message({
+                showClose: true,
+                message: res.msg,
+                type: 'error'
+              })
             }
-          }, 1000)
-          this.$emit('send')
+          })
         }
       })
     }

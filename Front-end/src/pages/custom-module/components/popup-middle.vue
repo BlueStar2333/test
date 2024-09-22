@@ -27,7 +27,7 @@
           <el-checkbox v-for="(itemB, idx) in itemA.select" :key="idx" :label="itemB">{{ itemB }}</el-checkbox>
         </el-checkbox-group>
         <!--日期选择-->
-        <el-date-picker v-if="itemA.type === 4" v-model="formData[index].content" class="body-input-content" :type="formData[index].dateType" size="small" placeholder="选择日期" />
+        <el-date-picker v-if="itemA.type === 4" v-model="formData[index].content" value-format="yyyy-MM-dd hh:mm:ss" class="body-input-content" :type="formData[index].dateType" size="small" placeholder="选择日期" />
         <!--数量选择-->
         <el-input-number v-if="itemA.type === 5" v-model="formData[index].content" :min="formData[index].min" :max="formData[index].max" label="数"/>
         <!--滑动条-->

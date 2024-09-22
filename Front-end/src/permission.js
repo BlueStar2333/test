@@ -13,6 +13,10 @@ const whiteList = ['/login', '/auth-redirect']
 router.beforeEach(async(to, from, next) => {
   NProgress.start()
 
+  if (sessionStorage.getItem('userInfo') && !store.state.user.userInfo.account) {
+    store.commit('user/SET_USER_INFO', JSON.parse(sessionStorage.getItem('userInfo')))
+  }
+
   // 设置页面标题
   document.title = getPageTitle(to.meta.title)
 

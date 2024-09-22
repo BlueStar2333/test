@@ -35,8 +35,14 @@ const CoEditInfo = (req, res) => {
   sql = "UPDATE user SET name=?, password=?, phone=?, power=?, roles=?, create_date=? WHERE account=?";
   pool.query(sql, [name, password, phone, power, roles, new Date(), account], (error, result) => {
     if (error) throw error;
-    // 判断是否改变信息
-    $api.ReturnJson(res, { code: YES, msg: "修改成功" });
+    pool.query("SELECT * FROM user WHERE phone=? AND account!=?", [phone, account], (errorT, resultT) => {
+      if (errorT) throw errorT;
+      if(resultT.length > 0) {
+        $api.ReturnJson(res, { code: 0, msg: "修改失败, 该手机号被其他用户使用" });
+      } else {
+        $api.ReturnJson(res, { code: YES, msg: "修改成功" });
+      }
+    })
   });
 };
 const CoDeleteUser = (req, res) => {

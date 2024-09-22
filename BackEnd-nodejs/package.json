@@ -16,6 +16,12 @@
   "author": "biaov",
   "license": "ISC",
   "dependencies": {
+    "@alicloud/dysmsapi20170525": "3.0.0",
+    "@alicloud/openapi-client": "^0.4.11",
+    "@alicloud/openapi-util": "^0.3.2",
+    "@alicloud/tea-console": "^1.0.0",
+    "@alicloud/tea-typescript": "^1.8.0",
+    "@alicloud/tea-util": "^1.4.9",
     "chinese-random-name": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",

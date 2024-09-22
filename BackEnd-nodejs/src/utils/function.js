@@ -17,21 +17,22 @@ function generateToken(data = { userId: 'user_id' }) {
 function refreshT(token) {
   let data = ''
   jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) return res.status(403).json({ message: 'Failed to refresh the token' });
+    if (err) return res.status(406).json({ message: 'Failed to refresh the token' });
     data = {
       account: decoded.account,
       password: decoded.password
     }
   })
   return jwt.sign(data, secretKey, { expiresIn: '1h' });
+  //return jwt.sign(data, secretKey, { expiresIn: '10s' });
 }
 
 function authToken(req, res, next) {
   const token = req.headers['x-token'];
-  if (!token) return res.status(401).json({ message: 'Unauthorized' });
+  if (!token) return res.status(407).json({ message: 'Unauthorized' });
  
   jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) return res.status(403).json({ message: 'Invalid token' });
+    if (err) return res.status(406).json({ message: 'Invalid token' });
     next();
   });
 }

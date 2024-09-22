@@ -28,7 +28,7 @@
             </div>
           </el-form-item>
           <el-form-item v-if="dateShow" label="时间选择">
-            <el-date-picker v-model="componentData.content" :type="componentData.dateType" placeholder="选择日期" style="width: 100%" />
+            <el-date-picker v-model="componentData.content" :type="componentData.dateType" value-format="yyyy-MM-dd hh:mm:ss" placeholder="选择日期" style="width: 100%" />
           </el-form-item>
           <el-form-item v-if="numShow || sliderShow" label="最小范围">
             <el-input-number v-model="componentData.min" :min="0" :max="10000" size="small" label="描述文字" />

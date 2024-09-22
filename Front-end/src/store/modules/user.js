@@ -45,6 +45,7 @@ const actions = {
           const data = response.data.result[0] // 登录获取回复，并设置状态token
           commit('SET_TOKEN', response.data.token)
           commit('SET_USER_INFO', data)
+          sessionStorage.setItem('userInfo', JSON.stringify(data))
           setToken(response.data.token)
           resolve()
         } else {
@@ -103,6 +104,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
+      sessionStorage.setItem('userInfo', '')
       removeToken()
       resetRouter()
 

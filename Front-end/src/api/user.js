@@ -1,6 +1,21 @@
 import Orequest from '@/utils/Orequest'
 import request from '@/utils/request'
 
+export function sendCode(data) {
+  return request({
+    url: 'admin/sendCode',
+    method: 'post',
+    data
+  })
+}
+export function submitup(data) {
+  return request({
+    url: 'admin/submitup',
+    method: 'post',
+    data
+  })
+}
+
 export function login(data) {
   return request({
     url: 'admin/login',

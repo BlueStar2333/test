@@ -2,7 +2,7 @@
  * 账户管理模块校验
  */
 
-const { PhoneReg, PwdReg } = require("@/utils");
+const { pool, PhoneReg, PwdReg } = require("@/utils");
 
 /**
  * 校验登录
@@ -33,8 +33,17 @@ const VaLogin = (req, res, next) => {
 const VaRegister = (req, res, next) => {
   // POST接收参数
   $api.PostArg(req).then(({ name, account, password, phone, power }) => {
-    req.validData = $api.SaveValidData(req.validData, { name, account, password, phone, power }); // 保存校验对象
-    next(); // 校验通过
+    
+  
+    pool.query("SELECT * FROM user WHERE phone=?", [phone], (errorT, resultT) => {
+      if (errorT) throw errorT;
+      if(resultT.length > 0) {
+        $api.ReturnJson(res, { code: 0, msg: "该手机号已经注册" });
+      } else {
+        req.validData = $api.SaveValidData(req.validData, { name, account, password, phone, power }); // 保存校验对象
+        next(); // 校验通过
+      }
+    })
   });
 };
 

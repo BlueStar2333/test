@@ -1,10 +1,11 @@
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
+import router from "@/router"
 import { getToken, setToken } from '@/utils/auth'
 
-// const url = 'http://localhost:3100/api/'
-const url = 'http://124.71.103.53:3100/api/'
+const url = 'http://localhost:3100/api/'
+// const url = 'http://124.71.103.53:3100/api/'
 // const url = 'http://172.27.11.79:3100/api/' // 内网
 
 const service = axios.create({
@@ -84,12 +85,21 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err' + error.code)
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+    console.log(error,error.response.status,563339)
+    if (error.response.status === 406) {
+      Message({
+        message: '登陆状态过期',
+        type: 'error',
+        duration: 5 * 1000
+      })
+      store.dispatch('user/logout')
+      router.push(`/login`)
+    }
+    // Message({
+    //   message: error.message,
+    //   type: 'error',
+    //   duration: 5 * 1000
+    // })
     return Promise.reject(error)
   }
 )

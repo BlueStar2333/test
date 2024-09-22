@@ -3,6 +3,84 @@
  */
 const { pool, YES } = require("@/utils");
 
+// This file is auto-generated, don't edit it
+// 依赖的模块可通过下载工程中的模块依赖文件或右上角的获取 SDK 依赖信息查看
+const Dysmsapi20170525 = require('@alicloud/dysmsapi20170525');
+const OpenApi = require('@alicloud/openapi-client');
+const Console = require('@alicloud/tea-console');
+const Util = require('@alicloud/tea-util');
+const Tea = require('@alicloud/tea-typescript');
+
+
+// 生成一个6位数字的字符串
+function generateVerificationCode(phone) {
+  // 生成一个6位数字的字符串
+  let code = Math.floor(100000 + Math.random() * 900000).toString();
+  let sqls = "SELECT * FROM verification_codes WHERE phone_number = ?"
+  let sql = ""
+  pool.query(sqls, [phone], (error, result) => {
+    if (error) throw error;
+    if (result.length === 0) {
+      sql = "INSERT INTO verification_codes (code, expires_at, phone_number) VALUES (?, ?, ?)"
+    } else {
+      sql = "UPDATE verification_codes SET code=?, expires_at=? WHERE phone_number=?";
+    }
+    pool.query(sql, [code, new Date(), phone], (errorT, resultT) => {
+      if (errorT) throw errorT;
+    })
+  })
+  return code;
+}
+
+const sendCode = (req, res) => {
+  $api.PostArg(req).then(({ phone }) => { // 发送成功后存储验证码
+    const code = generateVerificationCode(phone)
+    Client.main({ phone, code }).then(resp => {
+      $api.ReturnJson(res, {
+        code: 1,
+        msg: "发送成功",
+        data: null
+      });
+    }).catch(err => {
+      $api.ReturnJson(res, {
+        code: 0,
+        msg: "发送失败",
+        data: null
+      });
+    });
+  });
+};
+
+const submitup = (req, res) => {
+  $api.PostArg(req).then(({ username, password }) => {
+    sql = "SELECT * FROM user WHERE account = ? AND password = ?"
+    pool.query(sql, [username, password], (error, result) => {
+      if (error) throw error;
+      if (result.length === 0) {
+        $api.ReturnJson(res, {
+          code: 0,
+          msg: "账号或密码错误",
+          data: null
+        });
+      } else {
+        $api.ReturnJson(res, {
+          code: 1,
+          msg: "成功",
+          data: { phone: result[0].phone }
+        });
+      }
+    });
+  });
+};
+
+
+
+
+
+
+
+
+
 /**
  * 登录
  * @param {Object} req - 请求对象
@@ -75,6 +153,8 @@ const refreshToken = (req, res) => {
   $api.ReturnJson(res, { code:1,msg: "成功", data: { token: newToken } });
 };
 module.exports = {
+  submitup,
+  sendCode,
   CoLogin, // 登录
   CoRegister, // 注册
   refreshToken

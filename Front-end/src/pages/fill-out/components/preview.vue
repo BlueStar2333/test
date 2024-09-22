@@ -18,7 +18,7 @@
           <el-checkbox v-for="(checkbox,idx) in item.select" :key="idx" :label="checkbox" :disabled="redactStateC === '查看'">{{ checkbox }}</el-checkbox>
         </el-checkbox-group>
         <!--日期选择-->
-        <el-date-picker v-if="item.type === 4" v-model="item.content" :class="{ 'verify-error': correct[index] === false }" size="small" :type="item.dateType" placeholder="选择日期" :disabled="redactStateC === '查看'" />
+        <el-date-picker v-if="item.type === 4" v-model="item.content" :class="{ 'verify-error': correct[index] === false }" size="small" :type="item.dateType" placeholder="选择日期" value-format="yyyy-MM-dd hh:mm:ss" :disabled="redactStateC === '查看'" />
         <!--数量选择-->
         <el-input-number v-if="item.type === 5" v-model="item.content" :class="{ 'verify-error': correct[index] === false }" @change="numChange(item.content, index)" label="数" :disabled="redactStateC === '查看'" />
         <!--滑动条-->
@@ -34,7 +34,7 @@
               <div class="table-forms">
                 <el-input v-if="item.bodyForm[colIdx].type === 0" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'regular-error': item.regularError[scope.$index][colIdx], 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" @input="validateInput(item.bodyForm[colIdx].regularRule, item.content[scope.$index][colIdx], index, { row: scope.$index, col: colIdx })" placeholder="请输入内容" :maxlength="item.bodyForm[colIdx].max" show-word-limit size="mini" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
                 <el-input v-if="item.bodyForm[colIdx].type === 1" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'regular-error': item.regularError[scope.$index][colIdx], 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" @input="validateInput(item.bodyForm[colIdx].regularRule, item.content[scope.$index][colIdx], index, { row: scope.$index, col: colIdx })" type="textarea" :maxlength="item.bodyForm[colIdx].max" show-word-limit :rows="2" placeholder="请输入内容" size="mini" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
-                <el-date-picker v-if="item.bodyForm[colIdx].type === 4" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" :type="item.bodyForm[colIdx].dateType" placeholder="选择日期" style="width: 100%" size="mini" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
+                <el-date-picker v-if="item.bodyForm[colIdx].type === 4" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" :type="item.bodyForm[colIdx].dateType" placeholder="选择日期" style="width: 100%" size="mini" value-format="yyyy-MM-dd hh:mm:ss" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
                 <el-input-number v-if="item.bodyForm[colIdx].type === 5" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" @change="numChange(item.content[scope.$index][colIdx], index, { row: scope.$index, col: colIdx })" label="数" style="width: 100%" size="mini" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
                 <el-slider v-if="item.bodyForm[colIdx].type === 6" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" :min="item.bodyForm[colIdx].min" :max="item.bodyForm[colIdx].max" style="padding: 0 20px" size="mini" :disabled="redactStateC === '查看'" :id="'input' + index + scope.$index + colIdx"/>
                 <el-autocomplete v-if="item.bodyForm[colIdx].type === 7" v-model="item.content[scope.$index][colIdx]" @keyup.enter.native="enterLine($event, index, scope.$index, colIdx)" :class="{ 'regular-error': item.regularError[scope.$index][colIdx], 'verify-error': correct[index] !== false && (correct[index] === false || correct[index][scope.$index][colIdx] === false) }" @select="selectTips($event.value, index, { row: scope.$index, col: colIdx })" @blur="selectTips(item.content[scope.$index][colIdx], index, { row: scope.$index, col: colIdx })" class="inline-input" :fetch-suggestions="querySearch" placeholder="请输入内容" size="mini" :disabled="redactStateC === '查看'" @focus="sugFocus(index, 'table', colIdx)" :id="'input' + index + scope.$index + colIdx"/>
@@ -228,6 +228,21 @@ export default {
         this.sugData = this.previewData.content[index].bodyForm[twoIndex].suggestion.split(',')
       }
     },
+    formatDateTime(isoString) {
+      // 创建Date对象
+      var date = new Date(isoString);
+
+      // 获取年月日时分秒
+      var year = date.getFullYear();
+      var month = ('0' + (date.getMonth() + 1)).slice(-2); // 补零
+      var day = ('0' + date.getDate()).slice(-2); // 补零
+      var hours = ('0' + date.getHours()).slice(-2); // 补零
+      var minutes = ('0' + date.getMinutes()).slice(-2); // 补零
+      var seconds = ('0' + date.getSeconds()).slice(-2); // 补零
+
+      // 返回格式化后的日期时间字符串
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    },
     // 校验初始值和表单正则校验
     verifyContent(content) {
       let errorTxt = ''
@@ -251,7 +266,12 @@ export default {
           }
         }
         if (itemOne.checkValue) {
-          verify += '-' + itemOne.content.toString()
+          console.log(itemOne,789)
+          if (itemOne.type === 4) {
+            verify += '-' + this.formatDateTime(itemOne.content)
+          } else {
+            verify += '-' + itemOne.content.toString()
+          }
         }
         if (itemOne.type === 20) {
           verify_correct[indexOne] = []
@@ -285,7 +305,7 @@ export default {
     addForm() {
       this.loading = true
       const verifyData = this.verifyContent(this.previewData.content)
-      console.log(verifyData.errorRegular, 6635)
+      console.log(verifyData, 6635)
       if (verifyData.errorRegular.includes('error')) {
         this.$message({
           type: 'warning',
@@ -331,7 +351,7 @@ export default {
     editForm() {
       this.loading = true
       const verifyData = this.verifyContent(this.previewData.content)
-      console.log(verifyData.verify_correct, this.previewData, 886)
+      console.log(verifyData, this.previewData, 886)
       if (verifyData.errorRegular.includes('error')) {
         this.$message({
           type: 'warning',
