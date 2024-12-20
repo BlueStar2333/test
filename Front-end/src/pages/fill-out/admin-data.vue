@@ -173,7 +173,7 @@ export default {
       exportProgress: 0,
       checkLabel: [],
       reqCancel: null,
-      haveData: false // 是否以及下载数据到前端
+      haveData: false // 是否已经下载数据到前端
     }
   },
   created() {
@@ -324,6 +324,18 @@ export default {
         })
       }
     },
+
+
+    handleCurrentChange(page) {
+      this.searchByDate(page, '1') // 第二个参数等于1时不请求导出数据只翻页
+      this.listQuery.page = page
+    },
+    handleSizeChange(val) {
+      this.listQuery.limit = val
+      this.listQuery.page = 1
+      this.searchByDate(1, '1')
+    },
+
     handleCommand(command) {
       this.tableName = command.table_name
       this.diyTable = command
@@ -378,6 +390,7 @@ export default {
         })
       }
     },
+
     exportExcelT() {
       if (!this.tableName) {
         this.$message({
@@ -389,7 +402,6 @@ export default {
       const headers = ['表名', '填写时间', '填报人', '填报人账号', '校验值', '校验状态(1：待校验  2：校验正确  3：错误  4: 未校验)', '每项校验结果（false为未匹配上）', '填写内容']
       const fields = ['form_name', 'date', 'written_by', 'written_account', 'verify', 'state', 'verify_correct', 'content']
       let data = new Array()
-
       data = this.tableDeriveData.map((obj) => {
         return fields.map((field) => {
           let result = obj[field]
@@ -399,6 +411,15 @@ export default {
           return result
         })
       })
+
+      this.excelAa(data)
+      this.excelAb(data)
+      this.excelAc(data)
+      this.excelAd(data)
+      return;
+
+
+
       if (headers.length > 0) {
         data.splice(0, 0, headers)
       } else {
@@ -416,14 +437,87 @@ export default {
       XLSX.writeFile(wb, this.tableName + '填写情况.xlsx') // 导出文件
     },
 
-    handleCurrentChange(page) {
-      this.searchByDate(page, '1') // 第二个参数等于1时不请求导出数据只翻页
-      this.listQuery.page = page
+
+    // 四川大学华西医院体外录入正式模板 数据处理（CPB总结）
+    excelAa(dataArr) {
+      const headers = ['校验值', '病案号', '手术编号', '预充液_乳酸林格液（mL）', '预充液_万汶（mL）', '预充液_佳乐施（mL）',
+        '预充液_甘露醇（mL）', '预充液_氯化钠（ml）', '预充液_白蛋白（g）', '预冲液_血浆（mL）', '预冲液_红悬（U）', '预冲液_肝素（mg）',
+        '预冲液_碳酸氢钠（mL）', '预冲液_其他', '术中超滤使用（无0，普通超滤1，改良超滤2）', '超滤量（ml）', '术中小结_CPB红细胞（U）',
+        '术中小结_CPB血浆（mL）', '术中小结_CPB血小板（U）', '术中小结_CPB白蛋白（g)', '术中小结_肝素总量（mg）', '术中小结_鱼精蛋白总量（mg）',
+        '术中小结_机血（mL）', '术中小结_机血鱼精蛋白用量（mg）', '术中小结_体外循环开始尿量（mL）', '术中小结_体外循环结束尿量（mL）']
+      const data = []
+      data.push(headers)
+
+      dataArr.forEach(item => {
+        console.log(item)
+        const content = JSON.parse(item[7])
+        console.log(content, 7896)
+        data.push([item[4], content[1].content, content[2].content, content[3].content[0][0], content[3].content[0][1], content[3].content[0][2],
+          content[3].content[0][3], content[3].content[0][4], content[3].content[0][5], content[3].content[0][6], content[3].content[0][7], content[3].content[0][8],
+          content[3].content[0][9], '', content[4].content.slice(2).toString(), content[5].content, content[6].content[0][0],
+          content[6].content[0][1], content[6].content[0][2], content[6].content[0][3], content[6].content[0][4], content[6].content[0][5],
+          content[6].content[0][6], content[6].content[0][7], content[7].content[0][0], content[7].content[0][1]])
+      })
+      const ws = XLSX.utils.aoa_to_sheet(data) // 创建工作表
+      const wb = XLSX.utils.book_new() // 创建工作簿
+      XLSX.utils.book_append_sheet(wb, ws) // 将工作表添加到工作簿中
+      XLSX.writeFile(wb, 'CPB总结.xlsx') // 导出文件
     },
-    handleSizeChange(val) {
-      this.listQuery.limit = val
-      this.listQuery.page = 1
-      this.searchByDate(1, '1')
+    // 四川大学华西医院体外录入正式模板 数据处理（CPB事件记录）
+    excelAb(dataArr) {
+      const headers = ['校验值', '病案号', '手术编号', '体外循环开始时间', '开机次数', '阻断次数', '主动脉阻断时间（开机后-min)', '主动脉开放（开机后-min)', '体外循环总时间（min）']
+      const data = []
+      data.push(headers)
+
+      dataArr.forEach(item => {
+        console.log(item)
+        const content = JSON.parse(item[7])
+        content[8].content.forEach((cItem, Idx) => {
+          data.push([item[4] + Idx, content[1].content, content[2].content, cItem[0], cItem[1], cItem[2], cItem[3], cItem[4], cItem[5]])
+        })
+      })
+      const ws = XLSX.utils.aoa_to_sheet(data) // 创建工作表
+      const wb = XLSX.utils.book_new() // 创建工作簿
+      XLSX.utils.book_append_sheet(wb, ws) // 将工作表添加到工作簿中
+      XLSX.writeFile(wb, 'CPB事件记录.xlsx') // 导出文件
+    },
+    // 四川大学华西医院体外录入正式模板 数据处理（CPB灌注）
+    excelAc(dataArr) {
+      const headers = ['校验值', '病案号', '手术编号', '开机次数', '开机后时间（min）', '术中灌注_灌注次数', '术中灌注_灌注方式（无0、根部1、左右冠2、逆灌3、桥灌4）', '术中灌注_灌注量（ml)']
+      const data = []
+      data.push(headers)
+
+      dataArr.forEach(item => {
+        console.log(item)
+        const content = JSON.parse(item[7])
+        content[9].content.forEach((cItem, Idx) => {
+          data.push([item[4] + Idx, content[1].content, content[2].content, cItem[0], cItem[1], cItem[2], cItem[3], cItem[4]])
+        })
+      })
+      const ws = XLSX.utils.aoa_to_sheet(data) // 创建工作表
+      const wb = XLSX.utils.book_new() // 创建工作簿
+      XLSX.utils.book_append_sheet(wb, ws) // 将工作表添加到工作簿中
+      XLSX.writeFile(wb, 'CPB灌注.xlsx') // 导出文件
+    },
+    // 四川大学华西医院体外录入正式模板 数据处理（CPB时间变量）
+    excelAd(dataArr) {
+      const headers = ['校验值', '病案号', '手术编号', '开机次数', '开机后时间（min）', '转机流量（L/min）', '通气_FIO2', '通气_O2流量']
+      const data = []
+      data.push(headers)
+
+      dataArr.forEach(item => {
+        console.log(item)
+        const content = JSON.parse(item[7])
+        console.log(content, 7896)
+        content[10].content.forEach((cItem, Idx) => {
+          data.push([item[4] + Idx, content[1].content, content[2].content, cItem[0], cItem[1], cItem[2], cItem[3], cItem[4]])
+        })
+      })
+      console.log(data, 7896)
+      const ws = XLSX.utils.aoa_to_sheet(data) // 创建工作表
+      const wb = XLSX.utils.book_new() // 创建工作簿
+      XLSX.utils.book_append_sheet(wb, ws) // 将工作表添加到工作簿中
+      XLSX.writeFile(wb, 'CPB时间变量.xlsx') // 导出文件
     }
   }
 }
