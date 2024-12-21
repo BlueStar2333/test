@@ -25,7 +25,7 @@
         <el-option v-for="(item,index) in searchIds" :key="index" :label="item.user_id" :value="item.user_id" />
       </el-select>
       <el-select v-if="this.$store.state.user.userInfo.power === 1" v-model="searchUsers" multiple collapse-tags style="margin-top: 2px;margin-right: 20px;width: 180px" placeholder="请选择录入人员" clearable>
-        <el-option v-for="item in searchUserOption" :key="item.account" :label="item.name" :value="item.account" />
+        <el-option v-for="item in searchUserOption" :key="item.written_by" :label="item.written_by" :value="item.written_account" />
       </el-select>
       <el-button
         style="margin-top: 2px;"
@@ -205,16 +205,6 @@ export default {
           self.tableLoading = false
         }, 600)
       })
-      if (this.$store.state.user.userInfo.power === 1) {
-        getUserinfoByName({
-          name: '',
-          getPower: 0
-        }).then((res) => {
-          if (res.code === 1) {
-            this.searchUserOption = res.data.list
-          }
-        })
-      }
     },
     checkValueArr(data) {
       const result = []
@@ -328,6 +318,20 @@ export default {
       this.tableName = command.table_name
       this.diyTable = command
       this.searchByDate(1)
+      if (this.$store.state.user.userInfo.power === 1) {
+        this.getSearchUserOption(this.diyTable.id)
+      }
+    },
+    getSearchUserOption(id) {
+      getUserinfoByName({
+        name: '',
+        getPower: 0,
+        form_id: id
+      }).then((res) => {
+        if (res.code === 1) {
+          this.searchUserOption = res.data.list
+        }
+      })
     },
     formatDate(date) {
       date = new Date(date)

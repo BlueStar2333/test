@@ -11,16 +11,21 @@ const { pool, YES } = require("@/utils");
 // 查询用户列表
 const CoUserList = (req, res) => {
   $api.PostArg(req).then(data => {
-    const { name, getPower } = data;
-	let sql = "SELECT * FROM user WHERE name LIKE ? ORDER BY power DESC";
-  if(getPower === 0) {
-    sql  = "SELECT * FROM user WHERE name LIKE ? AND power=0";
-  }
-	pool.query(sql, ['%' + name + '%'], (error, result) => {
-		if (error) throw error;
-		// 判断是否查询到信息
-    $api.ReturnJson(res, { code: YES, msg: "查询成功", data: { list: result } });
-		});
+    const { name, getPower, form_id } = data;
+    let sqlData = ['%' + name + '%']
+    let sql = "SELECT * FROM user WHERE name LIKE ? ORDER BY power DESC";
+    if(getPower === 0) {
+      sql  = "SELECT * FROM user WHERE name LIKE ? AND power=0";
+    }
+    if(form_id) {
+      sql = 'SELECT DISTINCT written_by,written_account FROM fill_in WHERE form_id = ?'
+      sqlData = [form_id]
+    }
+    pool.query(sql, sqlData, (error, result) => {
+      if (error) throw error;
+      // 判断是否查询到信息
+      $api.ReturnJson(res, { code: YES, msg: "查询成功", data: { list: result } });
+      });
 	})
 };
 /**
