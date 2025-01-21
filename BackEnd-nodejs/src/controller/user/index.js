@@ -2,6 +2,7 @@
  * 用户模块控制器
  */
 const { pool, YES } = require("@/utils");
+const md5 = require('md5');
 /**
  * 用户信息
  * @param {Object} req - 请求对象
@@ -37,8 +38,16 @@ const CoUserList = (req, res) => {
 const CoEditInfo = (req, res) => {
   const { name, account, password, phone, power } = req.validData; // 接收验证参数
   const roles = power ? "admin" : "['自定义表单','表单列表','表单填写']"
-  sql = "UPDATE user SET name=?, password=?, phone=?, power=?, roles=?, create_date=? WHERE account=?";
-  pool.query(sql, [name, password, phone, power, roles, new Date(), account], (error, result) => {
+  let sql
+  let sqlDate
+  if(password) {
+    sql = "UPDATE user SET name=?, password=?, phone=?, power=?, roles=?, create_date=? WHERE account=?";
+    sqlDate =[name, md5(password), phone, power, roles, new Date(), account]
+  } else {
+    sql = "UPDATE user SET name=?, phone=?, power=?, roles=?, create_date=? WHERE account=?";
+    sqlDate =[name, phone, power, roles, new Date(), account]
+  }
+  pool.query(sql, sqlDate, (error, result) => {
     if (error) throw error;
     pool.query("SELECT * FROM user WHERE phone=? AND account!=?", [phone, account], (errorT, resultT) => {
       if (errorT) throw errorT;

@@ -114,7 +114,7 @@
       :close-on-click-modal="false"
       width="94%"
     >
-      <Preview v-if="fillInShow" :preview-data="fillInForm" @add="searchByDate(listQuery.page)" @close="fillInShow = false" />
+      <Preview v-if="fillInShow" :diy-table="diyTable" :preview-data="fillInForm" @add="searchByDate(listQuery.page)" @close="fillInShow = false" />
     </el-dialog>
 
     <el-drawer
@@ -287,7 +287,7 @@ export default {
       }).catch((_) => {})
     },
     editFillIn(row, redactState) {
-      console.log(this.diyTable, 89)
+      console.log(this.diyTable,row, 89)
       if (this.diyTable) {
         if (!this.diyTable.state) {
           this.$message({

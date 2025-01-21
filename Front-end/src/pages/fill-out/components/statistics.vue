@@ -30,10 +30,11 @@
       <el-button v-if="this.$store.state.user.userInfo.power === 0" size="small" type="primary" style="float: right" icon="el-icon-document" plain @click="editFillIn(diyTable, '新增')">添加</el-button>
     </el-form>
 
-    <div class="table-pie" style="height: calc(100vh - 180px);overflow-y: auto">
+    <div class="table-pie" style="height: calc(100vh - 180px)">
       <el-table
         :data="drawerData"
-        style="width: 40%;margin-right: 1%"
+        height="100%"
+        style="width: 40%;margin-right: 1%;overflow: auto"
       >
         <el-table-column label="姓名">
           <template slot-scope="scope">
@@ -61,7 +62,7 @@
 </template>
 
 <script>
-import { getDrawerNumData, getGraphicData, getBrokenLineData } from '@/api/fillout'
+  import { getDrawerNumData, getGraphicData, getBrokenLineData, sysTest } from '@/api/fillout'
 import * as echarts from 'echarts'
 import { getTestData } from './test'
 import { getTestData2 } from './test2'
@@ -273,7 +274,8 @@ export default {
               type: 'filter',
               config: {
                 and: [
-                  { dimension: 'Year', gte: _rawData[1][4] },
+                  // { dimension: 'Year', gte: _rawData[1][4] },
+                  { dimension: 'Year', gte: 15 },
                   { dimension: 'Country', '=': country }
                 ]
               }

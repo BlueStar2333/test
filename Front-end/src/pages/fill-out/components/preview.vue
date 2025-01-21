@@ -7,7 +7,7 @@
       <h5 class="preview-form-title" :class="{required: item.isNecessary}">{{ index + 1 }}. {{ item.label }}{{ item.checkValue ? '（校验值）' : '' }}</h5>
       <div class="forms">
         <!--单行文本-->
-        <el-input v-if="item.type === 0" v-model="item.content" @input="validateInput(item.regularRule, item.content, index)" :class="{ 'verify-error': correct[index] === false, 'regular-error': item.regularError }" size="small" placeholder="请输入内容" :maxlength="item.max" show-word-limit :disabled="redactStateC === '查看'" />
+        <el-input v-if="item.type === 0" v-model="item.content" @input="validateInput(item.regularRule, item.content, index)" :class="{ 'verify-error': correct[index] === false, 'regular-error': item.regularError, 'verify-width': item.checkValue }" size="small" placeholder="请输入内容" :maxlength="item.max" show-word-limit :disabled="redactStateC === '查看'" />
         <!--多行文本-->
         <el-input v-if="item.type === 1" v-model="item.content" @input="validateInput(item.regularRule, item.content, index)" :class="{ 'verify-error': correct[index] === false, 'regular-error': item.regularError }" type="textarea" :maxlength="item.max" show-word-limit :rows="2" placeholder="请输入内容" :disabled="redactStateC === '查看'" />
         <!--单选-->
@@ -86,6 +86,10 @@ export default {
     previewData: {
       type: Object,
       default: null
+    },
+    diyTable: {
+      type: Object,
+      default: null
     }
   },
   data() {
@@ -96,6 +100,7 @@ export default {
       redactStateC: '',
       loading: false,
       correct: [],
+      diyContent: [],
       errorForm: {
         content: '',
         dialogVisible: false
@@ -111,6 +116,7 @@ export default {
     init() {
       console.log(this.previewData, 781)
       this.previewData.content = JSON.parse(this.previewData.content)
+      this.diyContent = JSON.parse(this.diyTable.content)
       console.log(this.previewData, 782)
       this.redactStateC = this.previewData.redactState
       this.correct = JSON.parse(this.previewData.verify_correct)
@@ -161,7 +167,7 @@ export default {
       let result = ''
       if (coordinate) {
         this.previewData.content[idx].bodyForm[coordinate.col].regularTips = '只能选择建议内容'
-        if (content === '' || !this.previewData.content[idx].bodyForm[coordinate.col].suggestion.split(',').includes(content)) {
+        if (content === '' || !this.diyContent[idx].bodyForm[coordinate.col].suggestion.split(',').includes(content)) {
           const newErrorRow = { ...this.previewData.content[idx]['regularError'][coordinate.row] }
           newErrorRow[coordinate.col] = true
           // 使用 Vue.set 替换整个对象,确保数据双向绑定
@@ -175,7 +181,7 @@ export default {
         }
       } else {
         console.log(this.previewData.content[idx])
-        if (content === '' || !this.previewData.content[idx].suggestion.split(',').includes(content)) {
+        if (content === '' || !this.diyContent[idx].suggestion.split(',').includes(content)) {
           this.previewData.content[idx]['regularError'] = true
           result = 'error'
         } else {
@@ -226,9 +232,9 @@ export default {
     },
     sugFocus(index, type, twoIndex) {
       if (type === 'pub') {
-        this.sugData = this.previewData.content[index].suggestion.split(',')
+        this.sugData = this.diyContent[index].suggestion.split(',')
       } else if (type === 'table') {
-        this.sugData = this.previewData.content[index].bodyForm[twoIndex].suggestion.split(',')
+        this.sugData = this.diyContent[index].bodyForm[twoIndex].suggestion.split(',')
       }
     },
     formatDateTime(isoString) {
@@ -253,9 +259,11 @@ export default {
       let verify = ''
       const verify_correct = []
       content.forEach((itemOne, indexOne) => {
-        console.log(itemOne['regularError'], itemOne['regularRule'],69)
-        if (itemOne['isNecessary'] && !itemOne.content.toString()) {
-          errorTxt = '请将必填项填写完整'
+        console.log(itemOne.content,69)
+        if (itemOne.content) {
+          if (itemOne['isNecessary'] && !itemOne.content.toString()) {
+            errorTxt = '请将必填项填写完整'
+          }
         }
         if (itemOne.type === 0 || itemOne.type === 1) {
           errorRegular += this.validateInput(itemOne['regularRule'], itemOne.content, indexOne)
@@ -339,7 +347,7 @@ export default {
         written_by: this.$store.state.user.userInfo.name,
         written_account: this.$store.state.user.userInfo.account,
         // content: JSON.stringify(this.previewData.content),
-        content: btoa(unescape(encodeURIComponent(JSON.stringify(this.previewData.content)))),
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(this.previewData.content).replace(/"suggestion":"[^"]*"/g, '"suggestion":""')))),
         user_id_req: btoa(unescape(encodeURIComponent(this.previewData.content[0].content))),
         verify_req: btoa(unescape(encodeURIComponent(verifyData.verify))),
         verify_correct_req: verifyData.verify_correct
@@ -389,7 +397,7 @@ export default {
       const data = {
         id: this.previewData.id,
         // content: JSON.stringify(this.previewData.content),
-        content: btoa(unescape(encodeURIComponent(JSON.stringify(this.previewData.content)))),
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(this.previewData.content).replace(/"suggestion":"[^"]*"/g, '"suggestion":""')))),
         written_account: this.$store.state.user.userInfo.account,
         user_id_req: btoa(unescape(encodeURIComponent(this.previewData.content[0].content))),
         verify_req: btoa(unescape(encodeURIComponent(verifyData.verify))),
@@ -492,10 +500,13 @@ export default {
         if (files.length === 1) {
           // alert(files[0].name)
           // 定义正则表达式来匹配所需的模式
-          const regex = /^([^-]+)-[^_]+_(\d+)\.[^.]+$/
+          const regex = /^(\d+)-.*?([^.]{6})\.[^.]+$/
           // 使用正则表达式测试输入字符串
           const match = files[0].name.match(regex)
-          if (match) {
+          // 检查6位字符是否全由数字组成
+          const isNumeric = /^\d{6}$/.test(match[2]);
+
+          if (match && isNumeric) {
             // 如果匹配成功，提取所需的部分
             const string1 = match[1] // - 符号前的数据
             const string2 = match[2] // _ 和 . 之间的数据
@@ -553,6 +564,9 @@ export default {
     ::v-deep * {
       border-color: red !important;
     }
+  }
+  .verify-width {
+    width: 200px !important;
   }
   .inline-input {
     width: 250px;

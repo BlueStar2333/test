@@ -40,25 +40,25 @@ app.use(
 app.use("/api", router); // 使用路由中间件
 
 // 创建连接池
-let pool = mysql.createPool({
-  host: "172.18.0.1", // 主机名
-  user: "root", // 用户名
-  password: "lrxt@Admin2024", // 密码
-  database: "west_hospital", // 数据库名
-  port: 13306, // 端口号
-  connectionLimit: 25, // 限制数量
-  charset: 'utf8mb4'
-});
-// 创建连接池
 // let pool = mysql.createPool({
-//   host: "localhost", // 主机名
+//   host: "172.18.0.1", // 主机名
 //   user: "root", // 用户名
-//   password: "wanghao123", // 密码
+//   password: "lrxt@Admin2024", // 密码
 //   database: "west_hospital", // 数据库名
-//   port: 3306, // 端口号
+//   port: 13306, // 端口号
 //   connectionLimit: 25, // 限制数量
 //   charset: 'utf8mb4'
 // });
+// 创建连接池
+let pool = mysql.createPool({
+  host: "localhost", // 主机名
+  user: "root", // 用户名
+  password: "wanghao123", // 密码
+  database: "west_hospital", // 数据库名
+  port: 3306, // 端口号
+  connectionLimit: 25, // 限制数量
+  charset: 'utf8mb4'
+});
 
 module.exports = {
   app, // express主程序对象

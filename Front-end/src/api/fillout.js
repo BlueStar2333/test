@@ -68,3 +68,11 @@ export function editContentTable(data) {
   })
 }
 
+export function sysTest(data) {
+  return request({
+    url: 'log/sysTest',
+    method: 'post',
+    data
+  })
+}
+

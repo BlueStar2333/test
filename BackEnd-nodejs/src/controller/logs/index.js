@@ -29,7 +29,21 @@ const searchByData = (req, res) => {
 };
 
 
+const sysTest = (req, res) => {
+	console.log(9993)
+	$api.PostArg(req).then(data => {
+		// const { user, startDate, endDate } = data;
+		let sql = "SELECT * FROM logs"
+		pool.query(sql, [], (error, result) => {
+			if (error) throw error;
+			$api.ReturnJson(res, { code: YES, msg: "查询成功", data: result });
+		});
+	})
+};
+
+
 
 module.exports = {
 	searchByData,
+	sysTest //测试接口，仅用于调试测试
 };

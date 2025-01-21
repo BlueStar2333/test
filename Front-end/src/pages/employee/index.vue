@@ -112,7 +112,7 @@
             type="password"
             clearable
             show-password
-            placeholder="请输入用户密码"
+            placeholder="为空不修改"
           />
         </el-form-item>
         <el-form-item label="联系电话：" prop="phone">
@@ -165,7 +165,8 @@ export default {
     }
     const checkStrongPassword = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('密码不能为空'));
+        // return callback(new Error('密码不能为空'));
+        callback();
       } else {
         // 密码强度规则：至少8个字符，必须包含大写字母、小写字母和数字
         const reg = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
@@ -197,7 +198,7 @@ export default {
       personRules: {
         name: [{ required: true, trigger: 'blur', message: '姓名不能为空' }],
         account: [{ required: true, trigger: 'blur', message: '账号不能为空' }],
-        password: [{ required: true, trigger: 'blur', validator: checkStrongPassword }],
+        password: [{ required: false, trigger: 'blur', validator: checkStrongPassword }],
         phone: [{ required: true, trigger: 'blur', validator: checkPhone }],
         power: [{ required: true, trigger: 'blur', message: '权限不能为空' }]
       },
@@ -217,7 +218,8 @@ export default {
       this.drawer = true
       this.addPerson.name = row.name
       this.addPerson.account = row.account
-      this.addPerson.password = row.password
+      // this.addPerson.password = row.password
+      this.addPerson.password = ''
       this.addPerson.phone = row.phone
       this.addPerson.power = row.power
     },

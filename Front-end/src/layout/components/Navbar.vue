@@ -64,7 +64,7 @@
             type="password"
             clearable
             show-password
-            placeholder="请输入用户密码"
+            placeholder="为空不修改"
           />
         </el-form-item>
         <el-form-item label="联系电话：" prop="phone">
@@ -125,7 +125,8 @@ export default {
     }
     const checkStrongPassword = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('密码不能为空'));
+        // return callback(new Error('密码不能为空'));
+        callback();
       } else {
         // 密码强度规则：至少8个字符，必须包含大写字母、小写字母和数字
         const reg = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
@@ -141,14 +142,14 @@ export default {
       editPerson: {
         name: this.$store.state.user.userInfo.name,
         account: this.$store.state.user.userInfo.account,
-        password: this.$store.state.user.userInfo.password,
+        password: '',
         phone: this.$store.state.user.userInfo.phone,
         power: this.$store.state.user.userInfo.power
       },
       personRules: {
         name: [{ required: true, trigger: 'blur', message: '姓名不能为空' }],
         account: [{ required: true, trigger: 'blur', message: '账号不能为空' }],
-        password: [{ required: true, trigger: 'blur', validator: checkStrongPassword }],
+        password: [{ required: false, trigger: 'blur', validator: checkStrongPassword }],
         phone: [{ required: true, trigger: 'blur', validator: checkPhone }],
         power: [{ required: true, trigger: 'blur', message: '权限不能为空' }]
       },
@@ -158,7 +159,7 @@ export default {
     openEdit() {
       this.editPerson.name = this.$store.state.user.userInfo.name
       this.editPerson.account = this.$store.state.user.userInfo.account
-      this.editPerson.password = this.$store.state.user.userInfo.password
+      // this.editPerson.password = this.$store.state.user.userInfo.password
       this.editPerson.phone = this.$store.state.user.userInfo.phone
       this.editPerson.power = this.$store.state.user.userInfo.power
       this.drawer = true

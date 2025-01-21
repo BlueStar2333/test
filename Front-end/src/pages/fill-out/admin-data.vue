@@ -134,7 +134,7 @@ import { deepClone, parseTime } from '@/utils'
 import Pagination from '@/components/Pagination'
 import FileSaver from 'file-saver'
 import XLSX from 'xlsx'
-import { getStaffContentTable, deleteContentTable, getDrawerNumData } from '@/api/fillout'
+import { getStaffContentTable, deleteContentTable, getDrawerNumData, sysTest } from '@/api/fillout'
 import Preview from './components/preview'
 import Statistics from './components/statistics'
 import { getCustomTable } from '@/api/custom-module'
@@ -191,7 +191,14 @@ export default {
     this.reqCancel && this.reqCancel()
   },
   methods: {
+    sysTestt() {
+      sysTest().then(res => {
+        console.log(res,456)
+      })
+    },
     getData() {
+      this.sysTestt()
+
       this.tableData = []
       this.tableDeriveData = []
       this.tableLoading = true
